@@ -322,8 +322,26 @@ function adjustSummary(num){
     /*let amountDP = contractJSON.contract.downPaymentAmount;
     let amountMC = contractJSON.contract.monthlyPaymentsTotalAmount;
     let amountTC = contractJSON.contract.contractTotalAmount;*/
-    
-    if(num == 1 || num === 1) {
+
+    /*let amountDP = downPaymentAmount;
+    let amountMC = totalMonthlyCharges;
+    let amountTC = totalContractAmount;*/
+
+    let amountDP = 0;
+    let amountMC = 0;
+    let amountTC = 0;
+
+    /*amountDP = parseFloat(amountDP);
+    amountMC = parseFloat(amountMC);
+    amountTC = parseFloat(amountTC);*/
+
+    console.log(amountDP);
+    console.log(amountMC);
+    console.log(amountTC);
+
+    //var inputEvent = new Event('input', { bubbles: true, cancelable: true });
+
+    /*if(num == 1 || num === 1) {
         
         downPaymentAmount = document.getElementById("amountDP").value;
         //downPaymentAmount = parseFloat(downPaymentAmount).toFixed(2);
@@ -340,33 +358,75 @@ function adjustSummary(num){
 
         totalContractAmount = document.getElementById("totalContractAmount").value;
 
+    }*/
+
+    let flag1 = true;
+    console.log(totalMonthlyCharges);
+
+    if(num == 1 || num === 1) {
+        
+        amountDP = document.getElementById("amountDP").value;
+
+        if(amountDP >= totalContractAmount && totalContractAmount != 0 && amountDP != 0){
+            console.log("case 1 1");
+            sweetAlert(2, 'Down Payment amount: $' + amountDP + ', cannot be greater or equal than total amount: $' + totalContractAmount, null);
+            flag1 = false;
+
+        }
+
+
+    } else if(num == 2 || num === 2) {
+
+        amountMC = totalMonthlyCharges;
+        
+        console.log(amountMC);
+        if(amountMC >= totalContractAmount && totalContractAmount != 0 && amountMC != 0){
+            console.log("case 2 1");
+            sweetAlert(2, 'Monthly Charges amount: $' + amountMC + ', cannot be greater or equal than total amount: $' + totalContractAmount, null);
+            flag1 = false;
+
+        }
+
+    } else if(num == 3 || num === 3) {
+
+        amountTC = document.getElementById("totalContractAmount").value;
+
+        if(downPaymentAmount >= amountTC && amountTC != 0 && downPaymentAmount != 0 ){
+            console.log("case 3 1");
+            console.log(downPaymentAmount);
+            sweetAlert(2, 'Total Contract Amount: $' + amountTC + ', cannot be lower or equal than Down Payment amount: $' + downPaymentAmount, null);
+            flag1 = false;
+
+        } else if(totalMonthlyCharges >= amountTC && amountTC != 0 && totalMonthlyCharges != 0 ) {
+            console.log("case 3 2");
+            sweetAlert(2, 'Total Contract Amount: $' + amountTC + ', cannot be lower or equal than Monthly Charges amount: $' + totalMonthlyCharges, null);
+            flag1 = false;
+
+        }
     }
 
-    let amountDP = downPaymentAmount;
-    let amountMC = totalMonthlyCharges;
-    let amountTC = totalContractAmount;
+    console.log(flag1);
 
-    amountDP = parseFloat(amountDP);
-    amountMC = parseFloat(amountMC);
-    amountTC = parseFloat(amountTC);
+    if(flag1){
 
-    console.log(amountDP);
-    console.log(amountMC);
-    console.log(amountTC);
+        if(num == 1 || num === 1){
 
-    var inputEvent = new Event('input', { bubbles: true, cancelable: true });
+            amountDP = document.getElementById("amountDP").value;
+            amountMC = totalMonthlyCharges;
+            amountTC = totalContractAmount;
 
-    console.log(amountDP >= amountTC);
+        } else if(num == 2 || num === 2){
+            
+            amountDP = downPaymentAmount;
+            amountMC = totalMonthlyCharges;
+            amountTC = totalContractAmount;
 
-    if(amountDP >= amountTC && amountTC != 0 && amountDP != 0){
+        } else if(num == 3 || num === 3){
 
-        sweetAlert(2, 'Down Payment amount cannot be greater or equal than total amount $' + amountTC, null);
-
-    } else if (amountMC >= amountTC && amountTC != 0 && amountMC != 0){
-
-        sweetAlert(2, 'Monthly Charges amount cannot be greater or equal than total amount $' + amountMC, null);
-
-    } else {
+            amountDP = downPaymentAmount;
+            amountMC = totalMonthlyCharges;
+            amountTC = document.getElementById("totalContractAmount").value;
+        }
 
         if(
             (amountDP == null || amountDP === null || amountDP == undefined || amountDP == 0 || amountDP === 0)
@@ -375,17 +435,12 @@ function adjustSummary(num){
     
             console.log("case 1 DP");
 
-            if(amountTC ){
-                amountMC = 0;
-            }
-
-            amountDP = amountTC - amountMC;
+            amountDP = parseFloat(amountTC) - parseFloat(amountMC);
             console.log(amountDP);
-    
-            /*downPaymentAmount = document.getElementById("amountDP").value;
-    
-            contractJSON.contract.downPaymentAmount = parseFloat(downPaymentAmount).toFixed(2);
-            contractJSON.contract.dateDownPayment = dayFormatted;*/
+            
+            document.getElementById("summaryDownPayment").innerText = parseFloat(amountDP).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+            document.getElementById("amountDP").value = amountDP;
+            document.getElementById("summaryDownPaymentAmount").innerText = parseFloat(amountDP).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
     
         } else if(
             (!(amountDP == null || amountDP === null || amountDP == undefined || amountDP == 0 || amountDP === 0) && amountDP > 0)
@@ -394,9 +449,13 @@ function adjustSummary(num){
     
             console.log("case 2 MC");
     
-            amountMC = amountTC - amountDP;
+            amountMC = parseFloat(amountTC) - parseFloat(amountDP);
             console.log(amountMC);
-    
+
+            document.getElementById("summaryMC").innerText = parseFloat(amountMC).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+            document.getElementById("totalMC").value = amountMC;
+            document.getElementById("summaryMCAmount").innerText = parseFloat(amountMC).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+
         } else if(
             (!(amountDP == null || amountDP === null || amountDP == undefined || amountDP == 0 || amountDP === 0) && amountDP > 0)
         && (!(amountMC == null || amountMC === null || amountMC == undefined || amountMC == 0 || amountMC === 0) && amountMC > 0)
@@ -404,34 +463,83 @@ function adjustSummary(num){
             
             console.log("case 3 TC");
     
-            amountTC = amountDP + amountMC;
+            amountTC = parseFloat(amountDP) + parseFloat(amountMC);
             console.log(amountTC);
-    
-            /*contractJSON.contract.contractTotalAmount = parseFloat(totalContractAmount).toFixed(2);*/
+            
+            document.getElementById("totalContractAmount").value = amountTC;
+            document.getElementById("summaryTotalContract").innerText = parseFloat(amountTC).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+            document.getElementById("summaryDownPaymentAmount").innerText = parseFloat(amountDP).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+            document.getElementById("summaryMCAmount").innerText = parseFloat(amountMC).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+
+            contractJSON.contract.contractTotalAmount = parseFloat(amountTC).toFixed(2);
     
         } else if (
             (!(amountDP == null || amountDP === null || amountDP == undefined || amountDP == 0 || amountDP === 0) && amountDP > 0)
         && (!(amountMC == null || amountMC === null || amountMC == undefined || amountMC == 0 || amountMC === 0) && amountMC > 0)
-        && (!(amountTC == null || amountTC === null || amountTC == undefined || amountTC == 0 || amountTC === 0) && amountTC > 0)) {
+        && (!(amountTC == null || amountTC === null || amountTC == undefined || amountTC == 0 || amountTC === 0) && amountTC > 0)) { 
     
             console.log("case 4 All Filled");
     
-            let result;
+            let result = 0;
     
-            /*if(num == 1 || num === 1) {
-                result = amountDP + amountMC;
-                contractJSON.contract.contractTotalAmount = parseFloat(result).toFixed(2);
+            if(num == 1 || num === 1) {
+
+                amountTC = parseFloat(amountDP) + parseFloat(amountMC);
+
+                document.getElementById("totalContractAmount").value = amountTC;
+                document.getElementById("summaryTotalContract").innerText = parseFloat(amountTC).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+
+                contractJSON.contract.contractTotalAmount = parseFloat(amountTC).toFixed(2);
     
             } else if(num == 2 || num === 2) {
-                result = amountDP + amountMC;
-                contractJSON.contract.contractTotalAmount = parseFloat(result).toFixed(2);
-    
+
+                amountTC = parseFloat(amountDP) + parseFloat(amountMC);
+
+                document.getElementById("totalContractAmount").value = amountTC;
+                document.getElementById("summaryTotalContract").innerText = parseFloat(amountTC).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+
+                contractJSON.contract.contractTotalAmount = parseFloat(amountTC).toFixed(2);
+
             } else if(num == 3 || num === 3) {
                 
-                result = amountTC - amountDP;
-                contractJSON.contract.monthlyPaymentsTotalAmount = parseFloat(result).toFixed(2)
+                totalMonthlyCharges = amountTC - amountDP;
+
+                document.getElementById("summaryMCListOfCharges").innerHTML = `<p class="fw-light text-start">0 of $ 0.00</p>`;
+
+                document.getElementById("summaryMCTotalNumberOfCharges").innerText = "0 charges in total";
+
+                document.getElementById("summaryMCStartDate").innerText = "00/00/0000";
+                document.getElementById("summaryMCEndDate").innerText = "00/00/0000";
+
+                document.getElementById("summaryMC").innerText = parseFloat(totalMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+                
+                document.getElementById("summaryMCAmount").innerText = parseFloat(totalMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+
+
+                let html = `
+                    <tr>
+                        <th scope="row">0</th>
+                        <td>00/00/0000</td>
+                        <td>$ 00.00</td>
+                    </tr>
+                `;
+                
+                document.getElementById("previewTable").innerHTML = html;
+
+                document.getElementById("amountMC").value = 0;
+                document.getElementById("numberOfMC").value = 0;
+                 	
+                $( "#startDateMC" ).datepicker( "setDate", null );
+                $( "#endDateMC" ).datepicker( "setDate", null );
+
+                document.getElementById("totalMC").value = totalMonthlyCharges;
+
+                contractJSON.contract.numberOfMonthlyPayments = "0";
+                contractJSON.contract.monthlyPayments.length = "0";
+
+                contractJSON.contract.monthlyPaymentsTotalAmount = parseFloat(totalMonthlyCharges).toFixed(2);
     
-            }*/
+            }
 
             
             // always delete TC either way is MC or DP
@@ -447,21 +555,84 @@ function adjustSummary(num){
     
         }
 
+        console.log(num);
         if(num == 1 || num === 1) {
+
+            console.log(amountDP);
+
+            downPaymentAmount = parseFloat(amountDP);
+
             document.getElementById("summaryDownPayment").innerText = parseFloat(downPaymentAmount).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
             let dateInput = $( "#dateDP" ).datepicker( "getDate" );
             let dayFormatted = objectDateToFormattedDate(dateInput);
             document.getElementById("summaryDownPaymentDate").innerText = dayFormatted;
+
+            document.getElementById("summaryDownPaymentAmount").innerText = parseFloat(downPaymentAmount).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+
+            contractJSON.contract.downPaymentAmount = parseFloat(downPaymentAmount).toFixed(2);
+            contractJSON.contract.dateDownPayment = dayFormatted;
+
         } else if(num == 2 || num === 2) {
+
+            console.log(amountMC);
+
+            totalMonthlyCharges = parseFloat(amountMC);
+
             document.getElementById("summaryMC").innerText = parseFloat(totalMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+
+            let html = '';
             
-            document.getElementById("summaryMCListOfCharges ").innerText;
+            let sizeMP = Object.keys(contractJSON.contract.monthlyPayments).length;
+            
+            if(contractJSON.contract.monthlyPayments[0].amount == contractJSON.contract.monthlyPayments[sizeMP-1].amount){
+                    
+                html += `
+                    <p class="fw-light text-start">${sizeMP} of $ ${contractJSON.contract.monthlyPayments[0].amount}</p>
+                `;
+                
+            } else if (contractJSON.contract.monthlyPayments[0].amount > contractJSON.contract.monthlyPayments[1].amount) {
+
+                html += `
+                    <p class="fw-light text-start">1 of $ ${contractJSON.contract.monthlyPayments[0].amount}</p>
+                    <p class="fw-light text-start">${sizeMP-1} of $ ${contractJSON.contract.monthlyPayments[1].amount}</p>
+                `;
+            } else {
+
+                html += `
+                    <p class="fw-light text-start">${sizeMP-1} of $ ${contractJSON.contract.monthlyPayments[0].amount}</p>
+                    <p class="fw-light text-start">1 of $ ${contractJSON.contract.monthlyPayments[sizeMP-1].amount}</p>
+                `;
+            }
+
+            document.getElementById("summaryMCListOfCharges").innerHTML = html;
+
+            document.getElementById("summaryMCTotalNumberOfCharges").innerText = sizeMP + " charges in total";
+
+            document.getElementById("summaryMCStartDate").innerText = contractJSON.contract.monthlyPayments[0].date;
+            document.getElementById("summaryMCEndDate").innerText = contractJSON.contract.monthlyPayments[sizeMP-1].date;
+
+            document.getElementById("summaryMCAmount").innerText = parseFloat(totalMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+
+            contractJSON.contract.numberOfMonthlyPayments = parseInt(Object.keys(contractJSON.contract.monthlyPayments).length);
+            contractJSON.contract.monthlyPaymentsTotalAmount = parseFloat(totalMonthlyCharges).toFixed(2);
+
+
         } else if(num == 3 || num === 3) {
-            document.getElementById("summaryTotalContract").innerText = parseFloat(totalContractAmount).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });   
+
+            console.log(amountTC);
+
+            totalContractAmount = parseFloat(amountTC);
+            
+            document.getElementById("summaryTotalContract").innerText = parseFloat(totalContractAmount).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+            console.log(downPaymentAmount);
+            console.log(totalMonthlyCharges);
+            document.getElementById("summaryDownPaymentAmount").innerText = parseFloat(downPaymentAmount).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+            document.getElementById("summaryMCAmount").innerText = parseFloat(totalMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+
+            contractJSON.contract.contractTotalAmount = parseFloat(totalContractAmount).toFixed(2);
         }
 
     }
-
 }
 
 function objectDateToFormattedDate(dateInput){
@@ -680,6 +851,7 @@ formMC.addEventListener('submit', function (event) {
             console.log(exactAmountTotalNotFixed);
 
             exactNumberOfCharges = exactAmountTotalNotFixed / parseFloat(calculatedAmountMonthlyNotFixed).toFixed(2);
+            exactNumberOfCharges = parseInt(exactNumberOfCharges);
             console.log(exactNumberOfCharges);
 
             calculatedAmountMonthly = parseFloat(calculatedAmountMonthlyNotFixed.toFixed(2));
