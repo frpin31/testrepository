@@ -8,6 +8,7 @@
         <link rel="stylesheet" href="<?php echo base_url(); ?>css/bootstrap5/css/bootstrap-grid.min.css" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="<?php echo base_url(); ?>css/bootstrap5/css/bootstrap-reboot.min.css" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="<?php echo base_url(); ?>css/bootstrap5/css/fstdropdown.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="<?php echo base_url(); ?>js/contracts/sweetalert2.min.css" rel="stylesheet" type="text/css">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Contracts</title>
@@ -21,6 +22,13 @@
 
             .table-responsive {
                 max-height:300px;
+            }
+
+            .format-pre pre {
+                background: #49483e;
+                color: #f7f7f7;
+                padding: 10px;
+                font-size: 14px;
             }
         </style>
     </head>
@@ -295,8 +303,8 @@
                                                         <div class="row mt-4">
                                                             <div class="col">
                                                                 <p class="fw-normal">Charges:<p>
-                                                                <div>
-                                                                    <p id="summaryMCListOfCharges" class="fw-light text-start">0 of $ 0.00</p>
+                                                                <div id="summaryMCListOfCharges">
+                                                                    <p class="fw-light text-start">0 of $ 0.00</p>
                                                                 </div>
                                                                 <div class="separator"></div> <!-- Separator line -->
                                                                 <p id="summaryMCTotalNumberOfCharges" class="fw-normal text-start">0 charges in total</p>
@@ -373,52 +381,18 @@
         </div>
         <button id="convert" class="btn btn-primary" onclick="generate()">Generate Document</button>
             <script>
-                function loadFile(url, callback) {
-                    PizZipUtils.getBinaryContent(url, callback);
-                }
-                window.generate = function generate() {
-                    loadFile(
-                        //"C:/Users/Mira/node_modules/html-docx-js/test/example.docx",
-                        //"https://docxtemplater.com/tag-example.docx",
-                        //"https://netorgft7771403-my.sharepoint.com/:w:/g/personal/fpineda_miralawgroup_com/ESpflsl_FrlHqK_qYdy-YS4BZztNaUeRmlbNa3BwEhr6IA?e=sZ0UA7",
-                        "<?php echo base_url(); ?>docsxup_hidden/contracts/example.docx",
-                        function (error, content) {
-                            if (error) {
-                                throw error;
-                            }
-                            const zip = new PizZip(content);
-                            const doc = new window.docxtemplater(zip, {
-                                paragraphLoop: true,
-                                linebreaks: true,
-                            });
-
-                            // Render the document (Replace {first_name} by John, {last_name} by Doe, ...)
-                            doc.render({
-                                first_name: "John",
-                                last_name: "Doe",
-                                phone: "0652455478",
-                                description: "New Website",
-                            });
-
-                            const blob = doc.getZip().generate({
-                                type: "blob",
-                                mimeType:
-                                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                // compression: DEFLATE adds a compression step.
-                                // For a 50MB output document, expect 500ms additional CPU time
-                                compression: "DEFLATE",
-                            });
-                            // Output the document using Data-URI
-                            saveAs(blob, "output.docx");
-                        }
-                    );
-                };
+                
             </script>
+        <!-- Embed BASE_URL in a JavaScript script tag -->
+        <script>
+            var base_url = '<?php echo base_url(); ?>';
+        </script>
+        <script src="<?php echo base_url(); ?>js/contracts/docxloader.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>js/jquery-3.2.1.min.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>js/jquery-ui.min.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>css/bootstrap5/js/bootstrap.bundle.min.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>css/bootstrap5/js/fstdropdown.min.js" type="text/javascript"></script>
-        <script src="<?php echo base_url(); ?>js/contracts/sweetalert.min.js" type="text/javascript"></script>
+        <script src="<?php echo base_url(); ?>js/contracts/sweetalert2.all.min.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>js/contracts/contrato.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>js/contracts/docxtemplater.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>js/contracts/pizzip.js" type="text/javascript"></script>
