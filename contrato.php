@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="<?php echo base_url(); ?>css/bootstrap5/css/bootstrap-reboot.min.css" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="<?php echo base_url(); ?>css/bootstrap5/css/fstdropdown.min.css" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="<?php echo base_url(); ?>js/contracts/sweetalert2.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="<?php echo base_url(); ?>js/contracts/animate.min.css" rel="stylesheet" type="text/css">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Contracts</title>
@@ -24,12 +25,6 @@
                 max-height:300px;
             }
 
-            .format-pre pre {
-                background: #49483e;
-                color: #f7f7f7;
-                padding: 10px;
-                font-size: 14px;
-            }
         </style>
     </head>
     <body>
@@ -354,7 +349,7 @@
                                         </div>
                                         <div class="col-auto">
                                             <select class="form-select mt-2" id="contractLanguage" aria-label="Default select example">
-                                                <option selected>Select Language</option>
+                                                <option value = "0" selected>Select Language</option>
                                                 <option value="1">English</option>
                                                 <option value="2">Spanish</option>                                        
                                             </select>
@@ -370,7 +365,7 @@
                             <div class="row align-items-center mb-4">
                                 <div class="col-sm-5"></div>
                                 <div class="col-sm-2">
-                                    <button type="submit" class="btn btn-primary mb-3">Generate Contract</button>
+                                    <button type="submit" class="btn btn-primary mb-3"  onclick="sendRequest()">Generate Contract</button>
                                 </div>
                                 <div class="col-sm-5"></div>
                             </div>
@@ -379,13 +374,15 @@
                 </div>
             </div>       
         </div>
-        <button id="convert" class="btn btn-primary" onclick="generate()">Generate Document</button>
+        <button id="convert" class="btn btn-primary" onclick="checkContractValues()">Generate Document</button>
+        <button class="btn btn-secondary" onclick="simulateSend()">check data</button>
             <script>
-                
+                <?php $CI =& get_instance(); echo $CI->session->userdata('token');?>
             </script>
         <!-- Embed BASE_URL in a JavaScript script tag -->
         <script>
-            var base_url = '<?php echo base_url(); ?>';
+            var base_url = '<?php echo base_url();?>';
+
         </script>
         <script src="<?php echo base_url(); ?>js/contracts/docxloader.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>js/jquery-3.2.1.min.js" type="text/javascript"></script>
@@ -393,7 +390,9 @@
         <script src="<?php echo base_url(); ?>css/bootstrap5/js/bootstrap.bundle.min.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>css/bootstrap5/js/fstdropdown.min.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>js/contracts/sweetalert2.all.min.js" type="text/javascript"></script>
+        <script src="<?php echo base_url(); ?>js/resources/app/helpers/components.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>js/contracts/contrato.js" type="text/javascript"></script>
+        <script src="<?php echo base_url(); ?>js/contracts/contractValidations.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>js/contracts/docxtemplater.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>js/contracts/pizzip.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>js/contracts/FileSaver.js" type="text/javascript"></script>
