@@ -1,3 +1,72 @@
+const create = 'Contrato/call_to_save_contract';
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: "center-end",
+    showConfirmButton: false,
+    timer: 8000,
+    timerProgressBar: true,
+    showClass: {
+        popup: `
+            animate__animated
+            animate__backInLeft
+            animate__faster
+        `
+    },
+    hideClass: {
+        popup: `
+            animate__animated
+            animate__backOutRight
+            animate__faster
+        `
+    },
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    }
+});
+
+function sweetAlert(type, text, url) {
+    // Se compara el tipo de mensaje a mostrar.
+    switch (type) {
+        case 1:
+            title = 'Success';
+            icon = 'success';
+            break;
+        case 2:
+            title = 'Error';
+            icon = 'error';
+            break;
+        case 3:
+            title = 'Warning';
+            icon = 'warning';
+            break;
+        case 4:
+            title = 'Notice';
+            icon = 'info';
+    }
+    // Si existe una ruta definida, se muestra el mensaje y se direcciona a dicha ubicación, de lo contrario solo se muestra el mensaje.
+    if (url) {
+        swal.fire({
+            title: title,
+            text: text,
+            icon: icon,
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        }).then(function () {
+            location.href = url
+        });
+    } else {
+        swal.fire({
+            title: title,
+            text: text,
+            icon: icon,
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        });
+    }
+}
+
 //Run when page is loaded
 $(document).ready(function() {
     // Attach a click event handler to a parent element that exists in the DOM
@@ -246,6 +315,14 @@ $(document).ready(function() {
         });
     */
 });
+
+function getHeaders() {
+    return {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + localStorage.token
+    }
+}
 
 $(".dateinput").on("keydown", function(e) {
     e.preventDefault();
@@ -499,7 +576,7 @@ function adjustSummary(num){
                 document.getElementById("summaryTotalContract").innerText = parseFloat(amountTC).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
 
                 contractJSON.contract.contractTotalAmount = parseFloat(amountTC).toFixed(2);
-
+                
             } else if(num == 3 || num === 3) {
                 
                 totalMonthlyCharges = amountTC - amountDP;
@@ -514,7 +591,6 @@ function adjustSummary(num){
                 document.getElementById("summaryMC").innerText = parseFloat(totalMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
                 
                 document.getElementById("summaryMCAmount").innerText = parseFloat(totalMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
-
 
                 let html = `
                     <tr>
@@ -538,6 +614,16 @@ function adjustSummary(num){
                 contractJSON.contract.monthlyPayments.length = "0";
 
                 contractJSON.contract.monthlyPaymentsTotalAmount = parseFloat(totalMonthlyCharges).toFixed(2);
+
+                Toast.fire({
+                    icon: "info",
+                    title: "Monthly Charges information changed",
+                    html: `
+                        Due to changes to <b>Total Contract amount</b>,
+                        all the details of monthly charges changed.
+                        Total Monthly Charges amount is now: <b>` + parseFloat(totalMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 }) + `</b>
+                    `
+                });
     
             }
 
@@ -851,7 +937,7 @@ formMC.addEventListener('submit', function (event) {
             console.log(exactAmountTotalNotFixed);
 
             exactNumberOfCharges = exactAmountTotalNotFixed / parseFloat(calculatedAmountMonthlyNotFixed).toFixed(2);
-            exactNumberOfCharges = parseInt(exactNumberOfCharges);
+            exactNumberOfCharges = parseInt(exactNumberOfCharges.toFixed(0));
             console.log(exactNumberOfCharges);
 
             calculatedAmountMonthly = parseFloat(calculatedAmountMonthlyNotFixed.toFixed(2));
@@ -1125,7 +1211,7 @@ function getAllMonths(startDate, endDate){
         monthsArray.push(startDate.toLocaleDateString("en-US", {
             month: "2-digit",
             day: "2-digit",
-            year: "2-digit"
+            year: "numeric"
         }));
 
         console.log(currentDate);
@@ -1189,7 +1275,7 @@ function getAllMonths(startDate, endDate){
             const formattedDate = nextMonthDate.toLocaleDateString("en-US", {
                 month: "2-digit",
                 day: "2-digit",
-                year: "2-digit"
+                year: "numeric"
             });
 
             monthsArray.push(formattedDate);
@@ -1315,91 +1401,87 @@ let servicesArray = [
 let applicationsArray = [
     ["Advanced Parole"],
     [        
-        ["1", "I-130 | Petition for Alien Relative"],
-        ["2", "I-192 | Application for Advance Permission to Enter as a Nonimmigrant"],
-        ["3", "I-407 | Record of Abandonment of Lawful Permanent Resident Status"],
-        ["4", "I-485 | Application to Register Permanent Residence or Adjust Status"],
-        ["5", "I-526 | Immigrant Petition by Standalone Investor"]
+        ["93", "I-131 | Application for Travel Document"]
     ],
 
     ["AOS Asylum"],
     [
-        ["1", "I-191 | Application for Relief Under Former Section 212(c) of the Immigration and Nationality Act (INA)"],
-        ["2", "I-193 | Application for Waiver of Passport and/or Visa"],
-        ["3", "I-212 | Application for Permission to Reapply for Admission into the United States After Deportation or Removal"],
-        ["4", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant"],
-        ["5", "I-361 | Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"]        
+        ["2", "I-191 | Application for Relief Under Former Section 212(c) of the Immigration and Nationality Act (INA)"],
+        ["3", "I-193 | Application for Waiver of Passport and/or Visa"],
+        ["4", "I-212 | Application for Permission to Reapply for Admission into the United States After Deportation or Removal"],
+        ["5", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant"],
+        ["6", "I-361 | Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"]        
     ],
 
     ["AOS Petition"],
     [
-        ["1", "I-602 | Application by Refugee for Waiver of Inadmissibility Grounds"],
-        ["2", "I-687 | Application for Status as a Temporary Resident Under Section 245A of the Immigration and Nationality Act"],
-        ["3", "I-690 | Application for Waiver of Grounds of Inadmissibility Under Sections 245A or 210 of the Immigration and Nationality Act"],
-        ["4", "I-693 | Report of Immigration Medical Examination and Vaccination Record"],
-        ["5", "I-730 | Refugee/Asylee Relative Petition"]
+        ["7", "I-602 | Application by Refugee for Waiver of Inadmissibility Grounds"],
+        ["8", "I-687 | Application for Status as a Temporary Resident Under Section 245A of the Immigration and Nationality Act"],
+        ["9", "I-690 | Application for Waiver of Grounds of Inadmissibility Under Sections 245A or 210 of the Immigration and Nationality Act"],
+        ["10", "I-693 | Report of Immigration Medical Examination and Vaccination Record"],
+        ["11", "I-730 | Refugee/Asylee Relative Petition"]
     ],
 
     ["AOS U-visa"],
     [
-        ["1", "I-363 | Request to Enforce Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"],
-        ["2", "I-485 SA | I-485 Supplement A | Supplement A to Form I-485, Adjustment of Status Under Section 245(i)"],
-        ["3", "I-485 SJ | I-485 Supplement J | Confirmation of Bona Fide Job Offer or Request for Job Portability Under INA Section 204(j)"],
-        ["4", "I-539 | Application to Extend/Change Nonimmigrant Status"],
-        ["5", "I-600A | Application for Advance Processing of an Orphan Petition"],
-        ["6", "I-601A | Application for Provisional Unlawful Presence Waiver"]
+        ["12", "I-363 | Request to Enforce Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"],
+        ["13", "I-485 SA | I-485 Supplement A | Supplement A to Form I-485, Adjustment of Status Under Section 245(i)"],
+        ["14", "I-485 SJ | I-485 Supplement J | Confirmation of Bona Fide Job Offer or Request for Job Portability Under INA Section 204(j)"],
+        ["15", "I-539 | Application to Extend/Change Nonimmigrant Status"],
+        ["16", "I-600A | Application for Advance Processing of an Orphan Petition"],
+        ["17", "I-601A | Application for Provisional Unlawful Presence Waiver"]
     ],
     ["AOS T-Visa"],
     [
-        ["1", "I-601 | Application for Waiver of Grounds of Inadmissibility"],
-        ["2", "I-612 | Application for Waiver of the Foreign Residence Requirement"],
-        ["3", "I-698 | Application to Adjust Status from Temporary to Permanent Resident"],
-        ["4", "I-765V | Application for Employment Authorization for Abused Nonimmigrant Spouse"],
-        ["5", "I-821 | Application for Temporary Protected Status"],
-        ["6", "I-824 | Application for Action on an Approved Application or Petition"]
+        ["18", "I-601 | Application for Waiver of Grounds of Inadmissibility"],
+        ["19", "I-612 | Application for Waiver of the Foreign Residence Requirement"],
+        ["20", "I-698 | Application to Adjust Status from Temporary to Permanent Resident"],
+        ["21", "I-765V | Application for Employment Authorization for Abused Nonimmigrant Spouse"],
+        ["22", "I-821 | Application for Temporary Protected Status"],
+        ["23", "I-824 | Application for Action on an Approved Application or Petition"]
     ],
     ["BIA Appeals"],
     [
-        ["1", "I-129 | Petition for a Nonimmigrant Worker"],
-        ["2", "I-129F | Petition for Alien Fiancé(e)"],
-        ["3", "I-140 | Immigrant Petition for Alien Workers"],
-        ["4", "I-191 | Application for Relief Under Former Section 212(c) of the Immigration and Nationality Act (INA)"],
-        ["5", "I-193 | Application for Waiver of Passport and/or Visar"]
+        ["24", "I-129 | Petition for a Nonimmigrant Worker"],
+        ["25", "I-129F | Petition for Alien Fiancé(e)"],
+        ["26", "I-140 | Immigrant Petition for Alien Workers"],
+        ["27", "I-191 | Application for Relief Under Former Section 212(c) of the Immigration and Nationality Act (INA)"],
+        ["28", "I-193 | Application for Waiver of Passport and/or Visar"]
     ],
     ["Civil Litigation"],
     [
-        ["1", "I-212 | Application for Permission to Reapply for Admission into the United States After Deportation or Removal"],
-        ["2", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant"],
-        ["3", "I-361 | Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"],
-        ["4", "I-363 | Request to Enforce Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"],
-        ["5", "I-485 Supplement A | Supplement A to Form I-485, Adjustment of Status Under Section 245(i)"]
+        ["29", "I-212 | Application for Permission to Reapply for Admission into the United States After Deportation or Removal"],
+        ["30", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant"],
+        ["31", "I-361 | Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"],
+        ["32", "I-363 | Request to Enforce Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"],
+        ["33", "I-485 Supplement A | Supplement A to Form I-485, Adjustment of Status Under Section 245(i)"]
     ],
     ["Consultations"],
     [
-        ["1", "I-600A | Application for Advance Processing of an Orphan Petition"],
-        ["2", "I-601A | Application for Provisional Unlawful Presence Waiver"],
-        ["3", "I-602 | Application by Refugee for Waiver of Inadmissibility Grounds"],
-        ["4", "I-687 | Application for Status as a Temporary Resident Under Section 245A of the Immigration and Nationality Act"],
-        ["5", "I-690 | Application for Waiver of Grounds of Inadmissibility Under Sections 245A or 210 of the Immigration and Nationality Act"]
+        ["34", "I-600A | Application for Advance Processing of an Orphan Petition"],
+        ["35", "I-601A | Application for Provisional Unlawful Presence Waiver"],
+        ["36", "I-602 | Application by Refugee for Waiver of Inadmissibility Grounds"],
+        ["37", "I-687 | Application for Status as a Temporary Resident Under Section 245A of the Immigration and Nationality Act"],
+        ["38", "I-690 | Application for Waiver of Grounds of Inadmissibility Under Sections 245A or 210 of the Immigration and Nationality Act"]
     ],
     ["Criminal Law"],
     [
-        ["1", "I-191 | Application for Relief Under Former Section 212(c) of the Immigration and Nationality Act (INA)"],
-        ["2", "I-193 | Application for Waiver of Passport and/or Visa"],
-        ["3", "I-212 | Application for Permission to Reapply for Admission into the United States After Deportation or Removal"],
-        ["4", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant"],
-        ["5", "I-361 | Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"],
-        ["6", "I-363 | Request to Enforce Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"]
+        ["39", "I-191 | Application for Relief Under Former Section 212(c) of the Immigration and Nationality Act (INA)"],
+        ["40", "I-193 | Application for Waiver of Passport and/or Visa"],
+        ["41", "I-212 | Application for Permission to Reapply for Admission into the United States After Deportation or Removal"],
+        ["42", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant"],
+        ["43", "I-361 | Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"],
+        ["44", "I-363 | Request to Enforce Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"]
     ],
     ["DACA"],
     [
-        ["1", "I-956 | Application for Regional Center Designation"],
-        ["2", "N-336 | Request for a Hearing on a Decision in Naturalization Proceedings"],
-        ["3", "N-565 | Application for Replacement Naturalization/Citizenship Document"],
-        ["4", "EOIR-29 | Notice of Appeal to the Board of Immigration Appeals from a Decision of a DHS Officer"],
-        ["5", "G-639 | Freedom of Information/Privacy Act and Online FOIA Request"],
-        ["6", "G-845 | Verification Request"],
-        ["7", "G-1256 | Declaration for Interpreted USCIS Interview"]
+        ["45", "I-956 | Application for Regional Center Designation"],
+        ["46", "N-336 | Request for a Hearing on a Decision in Naturalization Proceedings"],
+        ["47", "N-565 | Application for Replacement Naturalization/Citizenship Document"],
+        ["48", "EOIR-29 | Notice of Appeal to the Board of Immigration Appeals from a Decision of a DHS Officer"],
+        ["49", "G-639 | Freedom of Information/Privacy Act and Online FOIA Request"],
+        ["50", "G-845 | Verification Request"],
+        ["51", "G-1256 | Declaration for Interpreted USCIS Interview"]
     ],
     ["Deportation Defense"],
     [
@@ -1416,7 +1498,6 @@ let applicationsArray = [
         ["1", "I-956K | Application for Religious Worker Visa"],
         ["2", "G-325A | Biographic Information"],
         ["3", "I-129CWR | Petition for a CNMI-Only Nonimmigrant Transitional Worker"],
-        ["4", "I-131 | Application for Travel Document"],
         ["5", "I-942 | Request for Deferral of Deportation or Removal"],
         ["6", "I-942P S | HHS or ORR 1-912 Supplement | Request for Deferral of Removal Supplement"],
         ["7", "I-956F | Application for T Nonimmigrant Status"]
@@ -1703,6 +1784,73 @@ function loadContract(){
     };
 }
 
+function sendRequest(){
+    let listOfWrongValues = checkContractValues();
+
+    if(listOfWrongValues == null || listOfWrongValues == undefined || listOfWrongValues.length == 0) {
+        let data = {};
+        let listContactsApplications = [];
+        let listRoleContacts = [];
+        let listPaymentPlans = [];
+        let request = {};
+
+        data.idcontractlanguage = document.getElementById('contractLanguage').value;
+
+        // Down Payment
+        let downPaymentPlan = {};
+        downPaymentPlan.amountpaymentplan = parseFloat(contractJSON.contract.downPaymentAmount);
+        downPaymentPlan.datepaymentplan = formatDates(contractJSON.contract.dateDownPayment);
+        downPaymentPlan.idpaymentplantype = 2;
+
+        listPaymentPlans.push(downPaymentPlan);
+
+        // Monthly Charges
+        for(let i = 0 ; i < Object.keys(contractJSON.contract.monthlyPayments).length ; i++){
+            let montlhlyPlan = {};
+            montlhlyPlan.amountpaymentplan = parseFloat(contractJSON.contract.monthlyPayments[i].amount);
+            montlhlyPlan.datepaymentplan = formatDates(contractJSON.contract.monthlyPayments[i].date);
+            montlhlyPlan.idpaymentplantype = 1;
+
+            listPaymentPlans.push(montlhlyPlan);
+        }
+
+        for(let i = 0 ; i < Object.keys(contractJSON.contract.contacts).length ; i++){
+            let roleContacts = {};
+            roleContacts.idcontractrole = parseInt(contractJSON.contract.contacts[i].contactRole);
+            roleContacts.idcontact = parseInt(contractJSON.contract.contacts[i].contactId);
+
+            listRoleContacts.push(roleContacts);
+        }
+
+        listContactsApplications = contractJSON.contract.contacts.flatMap(nameObj => {
+            return nameObj.services.flatMap(typeObj => {
+            return typeObj.applications.map(subtypeObj => ({
+                idcontractapplication: subtypeObj.applicationId,
+                idcontact: parseInt(nameObj.contactId)
+            }));
+            });
+        });
+        
+        request.contracts = data;
+        request.applicationsContactsList = listContactsApplications;
+        request.roleContactsList = listRoleContacts;
+        request.contractPaymentPlansList = listPaymentPlans;
+        //generate();
+        saveRow(create, null, request, null, 'https://test.counselmanager.com/matters/0', null);
+        console.log(JSON.stringify(request));
+    } else {
+        console.log(listOfWrongValues);
+
+        swal.fire({
+            title: 'Error',
+            html: 'Cannot proceed with empty / invalid values: \n <pre class="text-start">' + listOfWrongValues + '</pre>',
+            icon: 'error',
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        });
+    }
+}
+
 function loadContacts(num){
     // get contacts related values
     // add them to a select
@@ -1716,10 +1864,10 @@ function addContact(name, relation){
     let contactRole;
 
     if(numContacts === 0){
-        contactRole = "Main Client";
+        contactRole = "1";
         relation = "";
     } else {
-        contactRole = "Beneficiary";
+        contactRole = "2";
     }
 
     contractJSON.contract.contacts.push(
@@ -1727,6 +1875,7 @@ function addContact(name, relation){
             'contactName':name,
             'contactRole': contactRole,
             'contactRelation':relation,
+            'contactId': '110',
             'services':[]
         }
     );
@@ -1796,49 +1945,6 @@ function addService(num){
     }
 }
 
-function sweetAlert(type, text, url) {      
-    // Se compara el tipo de mensaje a mostrar.
-    switch (type) {
-        case 1:
-            title = 'Success';
-            icon = 'success';
-            break;
-        case 2:
-            title = 'Error';
-            icon = 'error';
-            break;
-        case 3:
-            title = 'Warning';
-            icon = 'warning';
-            break;
-        case 4:
-            title = 'Notice';
-            icon = 'info';
-    }
-    // Si existe una ruta definida, se muestra el mensaje y se direcciona a dicha ubicación, de lo contrario solo se muestra el mensaje.
-    if (url) {
-        swal({
-            title: title,
-            text: text,
-            icon: icon,
-            button: 'Ok',
-            closeOnClickOutside: false,
-            closeOnEsc: false
-        }).then(function () {
-            location.href = url
-        });
-    } else {
-        swal({
-            title: title,
-            text: text,
-            icon: icon,
-            button: 'Ok',
-            closeOnClickOutside: false,
-            closeOnEsc: false
-        });
-    }
-}
-
 function adjustmentPositioning(){
     const highlightedItems = document.querySelectorAll("a");
     [].forEach.call(highlightedItems, function(atag) {
@@ -1874,21 +1980,23 @@ function removeBeneficiary(num) {
     if(contact.length==0 || contact===null || contact===""){
         sweetAlert(2, 'Unable to Perform this action right now', null);
     } else {
-        swal({
+        swal.fire({
             title: 'Warning',
             text: 'Are you sure you want to delete this contact?',
             icon: 'warning',
-            buttons: ['No', 'Yes'],
-            closeOnClickOutside: false,
-            closeOnEsc: false
-        }).then(function (value) {
+            showCancelButton: true,
+            cancelButtonText: 'No',
+            confirmButtonText: 'Yes',
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        }).then(result => {
             // verify if Yes button is clicked
-            if (value) {                
+            if (result.value) {                
                 contractJSON.contract.contacts.splice(num,1);
                 contact.remove();
             }
-        });    
-    }    
+        });
+    }
 }
 
 function removeService(num, nums){
@@ -1900,16 +2008,18 @@ function removeService(num, nums){
     if(service===null || service.length==0 || service===""){
         sweetAlert(2, 'Unable to Perform this action right now', null);
     } else {
-        swal({
+        swal.fire({
             title: 'Warning',
             text: 'Are you sure you want to delete service ' + textOfService + ' from the list?',
             icon: 'warning',
-            buttons: ['No', 'Yes'],
-            closeOnClickOutside: false,
-            closeOnEsc: false
-        }).then(function (value) {
+            showCancelButton: true,
+            cancelButtonText: 'No',
+            confirmButtonText: 'Yes',
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        }).then(result => {
             // verify if button is clicked
-            if (value) {                
+            if (result.value) {
                 let index = contractJSON.contract.contacts[num].services.findIndex(function (services){
                     return services.serviceId == nums;
                 });
@@ -1956,15 +2066,26 @@ function removeService(num, nums){
 }*/
 
 function addBeneficiaryViewContent(num, relation, role){
+    let roleContact;
     if(relation.length==0 || relation===null || relation===""){
         relation = '';
+    }
+    switch(role){
+        case '1':
+            roleContact = 'Primary';
+            break;
+        case '2':
+            roleContact = 'Beneficiary';
+            break;
+        default:
+            roleContact = 'Part of Contract';
     }
     let html = `<div class="row align-items-start mb-4" id="${num}Contact">
                     <div class="col">
                         <div class="mb-3">
                             <div class="d-flex">
                                 <div class="p-2">
-                                    <label for="${num}ContactName" class="form-label mb-2">${role} (${relation})</label>
+                                    <label for="${num}ContactName" class="form-label mb-2">${roleContact} (${relation})</label>
                                 </div>
                                 <div class="p-2 ms-auto">
                                     <a class="text-danger" href="#;" onclick="removeBeneficiary(${num})">
