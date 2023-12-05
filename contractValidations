@@ -1,0 +1,56 @@
+function findKeysWithNullOrZero(jsonObject) {
+    let keysWithNullOrZero = [];
+
+    function exploreObject(obj, path = '') {
+        for (let key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                let currentPath = path ? `${path}.${key}` : key;
+                if (obj[key] === null || obj[key] === 0 || obj[key] == 0 || obj[key] == "" || obj[key] == '') {
+                    if(currentPath == 'contractTotalAmount' || currentPath == 'downPaymentAmount' || currentPath == 'dateDownPayment' ||
+                    currentPath == 'numberOfMonthlyPayments' || currentPath == 'monthlyPaymentsTotalAmount') {
+                        keysWithNullOrZero.push(currentPath);
+                    }
+                } else if (typeof obj[key] === 'object') {
+                    exploreObject(obj[key], currentPath);
+                }
+            }
+        }
+    }
+
+    exploreObject(jsonObject);
+
+    if(document.getElementById('contractLanguage').value == 0 || document.getElementById('contractLanguage').value === 0 ){
+        keysWithNullOrZero.push("contractLanguage");
+    }
+
+    return keysWithNullOrZero;
+}
+
+function replaceArrayValues(originalArray, replacements) {
+    return originalArray.map(item => replacements[item] || item);
+}
+
+let replacements = {
+//"signDate": "",
+"contractTotalAmount": "Total Contract Amount",
+"downPaymentAmount": "Amount of Down Payment (Deposit)",
+"dateDownPayment": "Date of Down Payment",
+"numberOfMonthlyPayments": "Number of Monthly Charges",
+"monthlyPaymentsTotalAmount": "Total Amount of Monthly Charges",
+"contractLanguage": "Contract Language Select Option"
+};
+
+function checkContractValues(){
+    let emptyKeys =  replaceArrayValues(findKeysWithNullOrZero(contractJSON.contract), replacements);
+    if(emptyKeys.length != 0){
+
+        let listEmptyKeys = '';
+        listEmptyKeys += " \n";
+        emptyKeys.forEach(element => {
+            listEmptyKeys += "- " + element + "\n";
+        });
+
+        return listEmptyKeys;
+    }
+    return null;
+}
