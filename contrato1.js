@@ -1,4 +1,4 @@
-const create = 'Contrato/call_to_save_contract';
+const create = 'Contracts/call_to_save_contract';
 
 const Toast = Swal.mixin({
     toast: true,
@@ -372,6 +372,10 @@ let numberOfMonthlyCharges = 0;
 let amountMonthlyCharges = 0;
 let totalContractAmount = 0;
 
+/**
+ * -- Pending to comment --
+ * @param {*} num 
+ */
 function adjustSummary(num){
     //Object.keys(contractJSON.contract.contacts[contactId].services[servicePositionNum].applications).length;
     //contractJSON.contract.monthlyPayments[sizeMP-1].date;
@@ -731,7 +735,6 @@ function objectDateToFormattedDate(dateInput){
 }
 
 // Format the new date as mm/dd/yy
-
 const formDP = document.getElementById('downPaymentForm');
 formDP.addEventListener('submit', function (event) {
     if (!formDP.checkValidity()) {
@@ -747,6 +750,17 @@ formDP.addEventListener('submit', function (event) {
 });
 
 
+/**
+ * Following function main goals consist of 3 things
+ * - Create a list of values for payment plan: amount per month, payment date
+ * - Make sure that only 1 date is assigned per month
+ * - Keep values exact, not showing more than 2 decimals
+ * By doing calculations the values are generated
+ * Important inputs: amountMC, numberOfMC, totalMC
+ * It is important to know that this escenarios are evaluated:
+ * - when 1 input value is 0 (input could be any of the 3 of them so 3 if are created)
+ * - when all inputs values are valid and different than 0 (if was created at the end for this escenario)
+ */
 const formMC = document.getElementById('monthlyChargesForm');
 formMC.addEventListener('submit', function (event) {
     //$("#numberOfMC").addClass("is-valid");
@@ -1094,6 +1108,14 @@ const quantityNot0Pattern = /^([1-9]\d{0,2}|1000)$/; // Regular expression to ma
 
 const quantityWith0Pattern = /^(0|([1-9]\d{0,2})|1000)$/; // Regular expression to match 0 and positive integers up to 1000
 
+/**
+ * Method to abstract the validation of inputs
+ * takes the unique names of:
+ * @param {String} idInput , input to be validate
+ * @param {String} idInvalidFeedback , id of html element to show input feedback
+ * @param {String} pattern , the pattern to match value input against
+ * @param {String} message , message to show when value is invalid
+ */
 function validateInput(idInput, idInvalidFeedback, pattern, message) {
     let inputText = document.getElementById(idInput);
     let invalidFeedback = document.getElementById(idInvalidFeedback);
@@ -1175,7 +1197,12 @@ document.getElementById('totalContractAmount').addEventListener('blur', function
     validateInput("totalContractAmount", "totalContractAmountValidation", "money", "Please enter a valid amount");
 });
 
-
+/**
+ * Creates an array of dates that is then used to store
+ * the date information about the payment plan
+ * @param {Number} numberOfMonthlyCharges , total months
+ * @returns an array containing all the dates of a monthly charges plan 
+ */
 function setDates(numberOfMonthlyCharges){
     let startDate = $( "#startDateMC" ).datepicker( "getDate" );
     console.log("start date: " + startDate.getMonth());
@@ -1189,10 +1216,8 @@ function setDates(numberOfMonthlyCharges){
     return monthsArray;
 }
 
-
 /**
  * Get all the months between a start date and an end date.
- *
  * @param {Date} startDate - The start date (inclusive).
  * @param {Date} endDate - The end date (inclusive).
  * @returns {Array} - An array of formatted date strings representing each month.
@@ -1291,6 +1316,12 @@ function getAllMonths(startDate, endDate){
     }
 }
 
+/**
+ * Calculates the last payment date of a monthly charge plan
+ * @param {Number} numberOfMonthlyCharges , number of months
+ * @param {Date} dateInput , starting date. Value is obtained with .datepicker("getDate") method from jQuery UI date picker
+ * @returns 
+ */
 function calculateDateEnd(numberOfMonthlyCharges, dateInput){
     //let dayFormatted = objectDateToFormattedDate(dateInput);
     let numMonthsAhead = parseInt(numberOfMonthlyCharges);
@@ -1311,16 +1342,12 @@ function calculateDateEnd(numberOfMonthlyCharges, dateInput){
     }
 }
 
-
-
 /**
- * Add all the payment information to contractJSON
- *
- * @param {Array} monthsArray - All the dates.
- * @param {Array} chargesArray - All the payments amount.
+ * Add all the payment information about monthly charges to contractJSON array
+ * @param {Array} monthsArray - Array with dates that represents the payments date.
+ * @param {Array} chargesArray - Array with doubles that represents the amount to be paid.
  * @returns {null}
  */
-
 function addMonthlyPaymentsToJSON(monthsArray, chargesArray){
 
     for(let i = 0; i < monthsArray.length; ++i){
@@ -1369,271 +1396,357 @@ function calculateTotal(){
     }*/
 }
 
+/**
+ * Array that holds the services name and their id
+ */
 let servicesArray = [
-    [1, "Advanced Parole"],
-    [2, "AOS Asylum"],
-    [3, "AOS Petition"],
-    [4, "AOS U-visa"],
-    [5, "AOS T-Visa"],
-    [6, "BIA Appeals"],
-    [7, "Civil Litigation"],
-    [8, "Consultations"],
-    [9, "Criminal Law"],
-    [10, "DACA"],
-    [11, "Deportation Defense"],
-    [12, "Employment Visa"],
-    [13, "Family Law"],
-    [14, "I-601"],
-    [15, "I-918"],
-    [16, "Naturalization"],
-    [17, "Ninth Circuit Appeals"],
-    [18, "NVC"],
-    [19, "Personal Injury"],
-    [20, "Petition I-130"],
-    [21, "Research"],
-    [22, "SIJS"],
-    [23, "TPS"],
-    [24, "T-Visa"],
-    [25, "U-Visa"],
-    [26, "VAWA"]
+    [1, "AOS Asylum"],
+    [2, "AOS Petition"],
+    [3, "AOS I-929"],
+    [4, "AOS SIJS"],
+    [5, "AOS U-visa"],
+    [6, "AOS T-Visa"],
+    [7, "AOS VAWA"],
+    [8, "Asylum"],
+    [9, "Research"],
+    [10, "B-CERT (I-918 B)"],
+    [11, "Adoption-Related Forms"],
+    [12, "Citizenship and Naturalization"],
+    [13, "DACA"],
+    [14, "Department of State (DS) and Other Non-USCIS Forms"],
+    [15, "Documents"],
+    [16, "Deportation Defense"],
+    [17, "Employment Authorization"],
+    [18, "N-400 (Naturalization)"],
+    [19, "NVC"],
+    [20, "I-90 Application to Replace Permanent Resident Card (Green Card)"],
+    [21, "I-130 (Petition)"],
+    [22, "I-131 (Advanced Parole)"],
+    [23, "I-134 (Declaration of Financial Support)"],
+    [24, "I-539 | Application to Extend/Change Nonimmigrant Status"],
+    [25, "I-601A Application for Provisional Unlawful Presence Waiver"],
+    [26, "I-730 | Refugee/Asylee Relative Petition"],
+    [27, "Permanent Residency (Green Card) Related"],
+    [28, "Premium Processing and Fee Related Forms"],
+    [29, "Representation"],
+    [30, "Benefits and Requests"],
+    [31, "SIJS"],
+    [32, "TPS"],
+    [33, "T-Visa"],
+    [34, "U-Visa"],
+    [35, "VAWA"],
+    [36, "Other Forms"]
 ];
 
+/**
+ * Array containing the Services and Applications
+ * Even positions (0, 2, 4, 6, ...) are Services Name
+ * Odd positions (1, 3, 5, 7, ...) are the Applications of the Service that is in the n-1 position
+ * Example:
+ * AOS Asylum position is 0, so the applications of AOS Asylum are in the position 1
+ */
 let applicationsArray = [
-    ["Advanced Parole"],
-    [        
-        ["93", "I-131 | Application for Travel Document"]
-    ],
-
     ["AOS Asylum"],
     [
-        ["2", "I-191 | Application for Relief Under Former Section 212(c) of the Immigration and Nationality Act (INA)"],
-        ["3", "I-193 | Application for Waiver of Passport and/or Visa"],
-        ["4", "I-212 | Application for Permission to Reapply for Admission into the United States After Deportation or Removal"],
-        ["5", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant"],
-        ["6", "I-361 | Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"]        
+        ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
+        ["67", "I-765 | Application for Employment Authorization", "I-765"],
+        ["108", "I-765 (A-5) | (Asylee) Application for Employment Authorization", "I-765 (A-5)"],
+        ["109", "I-765 (C-9) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"]
     ],
 
     ["AOS Petition"],
     [
-        ["7", "I-602 | Application by Refugee for Waiver of Inadmissibility Grounds"],
-        ["8", "I-687 | Application for Status as a Temporary Resident Under Section 245A of the Immigration and Nationality Act"],
-        ["9", "I-690 | Application for Waiver of Grounds of Inadmissibility Under Sections 245A or 210 of the Immigration and Nationality Act"],
-        ["10", "I-693 | Report of Immigration Medical Examination and Vaccination Record"],
-        ["11", "I-730 | Refugee/Asylee Relative Petition"]
+        ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
+        ["1", "I-130 | Petition for Alien Relative", "I-130"],
+        ["107", "I-130A | Supplemental Information for Spouse Beneficiary", "I-130A"],
+        ["70", "I-864 | Affidavit of Support Under Section 213A of the INA", "I-864"],
+        ["51", "I-864W | Request for Exemption for Intending Immigrant´s Affidavit of Support", "I-864W"],
+        ["71", "I-864EZ | Affidavit of Support Under Section 213A of the Act", "I-864EZ"],
+        ["81", "I-864P | 2023 HHS Poverty Guidelines for Affidavit of Support", "I-864P"],
+        ["106", "I-864A | Contract Between Sponsor and Household Member", "I-864A"],
+        ["67", "I-765 | Application for Employment Authorization", "I-765"],
+        ["108", "I-765 (A-5) | (Asylee) Application for Employment Authorization", "I-765 (A-5)"],
+        ["109", "I-765 (C-9) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"],
+        ["46", "I-693 | Report of Immigration Medical Examination and Vaccination Record", "I-693"]
+    ],
+
+    ["AOS I-929"],
+    [   
+        ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
+        ["52", "I-929 | Petition for Qualifying Family Member of a U-1 Nonimmigrant", "I-929"],
+        ["67", "I-765 | Application for Employment Authorization", "I-765"],
+        ["108", "I-765 (A-5) | (Asylee) Application for Employment Authorization", "I-765 (A-5)"],
+        ["109", "I-765 (C-9) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"]
+    ],
+
+    ["AOS SIJS"],
+    [        
+        ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
+        ["129", "Guardanship", "Guardanship"],
+        ["67", "I-765 | Application for Employment Authorization", "I-765"],
+        ["108", "I-765 (A-5) | (Asylee) Application for Employment Authorization", "I-765 (A-5)"],
+        ["109", "I-765 (C-9) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"]
     ],
 
     ["AOS U-visa"],
     [
-        ["12", "I-363 | Request to Enforce Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"],
-        ["13", "I-485 SA | I-485 Supplement A | Supplement A to Form I-485, Adjustment of Status Under Section 245(i)"],
-        ["14", "I-485 SJ | I-485 Supplement J | Confirmation of Bona Fide Job Offer or Request for Job Portability Under INA Section 204(j)"],
-        ["15", "I-539 | Application to Extend/Change Nonimmigrant Status"],
-        ["16", "I-600A | Application for Advance Processing of an Orphan Petition"],
-        ["17", "I-601A | Application for Provisional Unlawful Presence Waiver"]
+        ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
+        ["67", "I-765 | Application for Employment Authorization", "I-765"],
+        ["108", "I-765 (A-5) | (Asylee) Application for Employment Authorization", "I-765 (A-5)"],
+        ["109", "I-765 (C-9) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"],
+        ["17", "I-918 | Petition for U Nonimmigrant Status", "I-918"],
+        ["113", "I-918A (Supplement A) | Petition for Qualifying Family Member of U-1 Recipient", "I-918A"],
+        ["114", "I-918B (Supplement B) | U Nonimmigrant Status Certification", "I-918B"],
+        ["46", "I-693 | Report of Immigration Medical Examination and Vaccination Record", "I-693"]
     ],
+
     ["AOS T-Visa"],
     [
-        ["18", "I-601 | Application for Waiver of Grounds of Inadmissibility"],
-        ["19", "I-612 | Application for Waiver of the Foreign Residence Requirement"],
-        ["20", "I-698 | Application to Adjust Status from Temporary to Permanent Resident"],
-        ["21", "I-765V | Application for Employment Authorization for Abused Nonimmigrant Spouse"],
-        ["22", "I-821 | Application for Temporary Protected Status"],
-        ["23", "I-824 | Application for Action on an Approved Application or Petition"]
+        ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
+        ["16", "I-914 | Application for T Nonimmigrant Status", "I-914"],
+        ["115", "I-914A (Supplement A) | (Application for Family Member of T-1 Recipient) Application for T Nonimmigrant Status", "I-914A (Supplement A)"],
+        ["116", "I-914B (Supplement B) | (Delaration of Law Enforcement Officer for Victim of Trafficking in Persons) Application for T Nonimmigrant Status", "I-914B (Supplement B)"]
     ],
-    ["BIA Appeals"],
+
+    ["AOS VAWA"],
     [
-        ["24", "I-129 | Petition for a Nonimmigrant Worker"],
-        ["25", "I-129F | Petition for Alien Fiancé(e)"],
-        ["26", "I-140 | Immigrant Petition for Alien Workers"],
-        ["27", "I-191 | Application for Relief Under Former Section 212(c) of the Immigration and Nationality Act (INA)"],
-        ["28", "I-193 | Application for Waiver of Passport and/or Visar"]
+        ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
+        ["35", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant", "I-360"],
+        ["56", "EOIR-29 | Notice of Appeal to the Board of Immigration Appeals from a Decision of a DHS Officer", "EOIR-29"]
     ],
-    ["Civil Litigation"],
+
+    ["Asylum"],
     [
-        ["29", "I-212 | Application for Permission to Reapply for Admission into the United States After Deportation or Removal"],
-        ["30", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant"],
-        ["31", "I-361 | Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"],
-        ["32", "I-363 | Request to Enforce Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"],
-        ["33", "I-485 Supplement A | Supplement A to Form I-485, Adjustment of Status Under Section 245(i)"]
+        ["134", "Defensive Asylum", "Defensive Asylum"],
+        ["135", "Affirmative Asylum", "Affirmative Asylum"],
+        ["8", "I-589 | Application for Asylum and for Withholding of Removal", "I-589"],
+        ["119", "I-589 (Under CAT) | Convention Against Torture", "I-589 (Under CAT)"],
+        ["67", "I-765 | Application for Employment Authorization", "I-765"],
+        ["108", "I-765 (A-5) | (Asylee) Application for Employment Authorization", "I-765 (A-5)"],
+        ["109", "I-765 (C-9) | (Pending adju stment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"]
     ],
-    ["Consultations"],
-    [
-        ["34", "I-600A | Application for Advance Processing of an Orphan Petition"],
-        ["35", "I-601A | Application for Provisional Unlawful Presence Waiver"],
-        ["36", "I-602 | Application by Refugee for Waiver of Inadmissibility Grounds"],
-        ["37", "I-687 | Application for Status as a Temporary Resident Under Section 245A of the Immigration and Nationality Act"],
-        ["38", "I-690 | Application for Waiver of Grounds of Inadmissibility Under Sections 245A or 210 of the Immigration and Nationality Act"]
-    ],
-    ["Criminal Law"],
-    [
-        ["39", "I-191 | Application for Relief Under Former Section 212(c) of the Immigration and Nationality Act (INA)"],
-        ["40", "I-193 | Application for Waiver of Passport and/or Visa"],
-        ["41", "I-212 | Application for Permission to Reapply for Admission into the United States After Deportation or Removal"],
-        ["42", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant"],
-        ["43", "I-361 | Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"],
-        ["44", "I-363 | Request to Enforce Affidavit of Financial Support and Intent to Petition for Legal Custody for Public Law 97-359 Amerasian"]
-    ],
-    ["DACA"],
-    [
-        ["45", "I-956 | Application for Regional Center Designation"],
-        ["46", "N-336 | Request for a Hearing on a Decision in Naturalization Proceedings"],
-        ["47", "N-565 | Application for Replacement Naturalization/Citizenship Document"],
-        ["48", "EOIR-29 | Notice of Appeal to the Board of Immigration Appeals from a Decision of a DHS Officer"],
-        ["49", "G-639 | Freedom of Information/Privacy Act and Online FOIA Request"],
-        ["50", "G-845 | Verification Request"],
-        ["51", "G-1256 | Declaration for Interpreted USCIS Interview"]
-    ],
-    ["Deportation Defense"],
-    [
-        ["1", "I-864 | Affidavit of Support Under Section 213A of the Act"],
-        ["2", "I-864EZ | Affidavit of Support Under Section 213A of the Act"],
-        ["3", "I-907 | Request for Premium Processing Service"],
-        ["4", "N-300 | Application to File Declaration of Intention"],
-        ["5", "N-648 | Medical Certification for Disability Exceptions"],
-        ["6", "G-1145 | E-Notification of Application/Petition Acceptance"],
-        ["7", "I-90 | Application to Replace Permanent Resident Card"]
-    ],
-    ["Employment Visa"],
-    [
-        ["1", "I-956K | Application for Religious Worker Visa"],
-        ["2", "G-325A | Biographic Information"],
-        ["3", "I-129CWR | Petition for a CNMI-Only Nonimmigrant Transitional Worker"],
-        ["5", "I-942 | Request for Deferral of Deportation or Removal"],
-        ["6", "I-942P S | HHS or ORR 1-912 Supplement | Request for Deferral of Removal Supplement"],
-        ["7", "I-956F | Application for T Nonimmigrant Status"]
-    ],
-    ["Family Law"],
-    [
-        ["1", "I-956H | Declaration for Detained U Nonimmigrant Status"],
-        ["2", "G-1055 | Request for Certification for U Nonimmigrant Status"],
-        ["3", "N-426 | Request for Certification of Military or Naval Service"],
-        ["4", "AR-11 | Aliens Change of Address Card"],
-        ["5", "G-1041 | Genealogy Index Search Request"],
-        ["6", "G-1041A | Genealogy Records Request"],
-        ["7", "I-865 | Sponsors Notice of Change of Address"]
-    ],
-    ["I-601"],
-    [
-        ["1", "I-821 | Application for Temporary Protected Status"],
-        ["2", "I-824 | Application for Action on an Approved Application or Petition"],
-        ["3", "I-881 | Application for Suspension of Deportation or Special Rule Cancellation of Removal"],
-        ["4", "I-914 | Application for T Nonimmigrant Status"],
-        ["5", "I-918 | Petition for U Nonimmigrant Status"],
-        ["6", "I-941 | Application for Entrepreneur Parole"],
-        ["7", "N-400 | Application for Naturalization"]
-    ],
-    ["I-918"],
-    [
-        ["1", "EOIR-29 | Notice of Appeal to the Board of Immigration Appeals from a Decision of a DHS Officer"],
-        ["2", "G-639 | Freedom of Information/Privacy Act and Online FOIA Request"],
-        ["3", "G-845 | Verification Request"],
-        ["4", "G-1256 | Declaration for Interpreted USCIS Interview"],
-        ["5", "I-134 | Declaration of Financial Support"],
-        ["6", "I-134A | Online Request to be a Supporter and Declaration of Financial Support"],
-        ["7", "I-290B | Notice of Appeal or Motion"]
-    ],
-    ["Naturalization"],
-    [
-        ["1", "I-765 | Application for Employment Authorization"],
-        ["2", "I-800 | Petition to Classify Convention Adoptee as an Immediate Relative"],
-        ["3", "I-800A | Supplement 3 | Request for Action on Approved Form I-800A"],
-        ["4", "I-864 | Affidavit of Support Under Section 213A of the Act"],
-        ["5", "I-864EZ | Affidavit of Support Under Section 213A of the Act"],
-        ["6", "I-907 | Request for Premium Processing Service"]
-    ],
-    ["Ninth Circuit Appeals"],
-    [
-        ["1", "I-765V | Application for Employment Authorization for Abused Nonimmigrant Spouse"],
-        ["2", "I-821 | Application for Temporary Protected Status"],
-        ["3", "I-824 | Application for Action on an Approved Application or Petition"],
-        ["4", "I-881 | Application for Suspension of Deportation or Special Rule Cancellation of Removal"],
-        ["5", "I-914 | Application for T Nonimmigrant Status"],
-        ["6", "I-918 | Petition for U Nonimmigrant Status"]
-    ],
-    ["NVC"],
-    [
-        ["1", "I-526E | Immigrant Petition by Regional Center Investor"],
-        ["2", "I-566 | Interagency Record of Request -- A, G or NATO Dependent Employment Authorization or Change/Adjustment to/from A, G or NATO Status"],
-        ["3", "I-589 | Application for Asylum and for Withholding of Removal"],
-        ["4", "I-601 | Application for Waiver of Grounds of Inadmissibility"],
-        ["5", "I-612 | Application for Waiver of the Foreign Residence Requirement"],
-        ["6", "I-698 | Application to Adjust Status from Temporary to Permanent Resident"]
-    ],
-    ["Personal Injury"],
-    [
-        ["1", "AR-11 | Aliens Change of Address Card"],
-        ["2", "G-1041 | Genealogy Index Search Request"],
-        ["3", "G-1041A | Genealogy Records Request"],
-        ["4", "I-865 | Sponsors Notice of Change of Address"],
-        ["5", "I-945 | Public Transportation Benefit Fraud Assessment Questionnaire"],
-        ["6", "I-956G | Notice of Entry of Appearance as Attorney or Representative"],
-        ["7", "I-864A | Contract between Sponsor and Household Member"]
-    ],
-    ["Petition I-130"],
-    [
-        ["1", "I-864W | Request for Exemption for Intending Immigrants Affidavit of Support"],
-        ["2", "I-929 | Petition for Qualifying Family Member of a U-1 Nonimmigrant"],
-        ["3", "I-956 | Application for Regional Center Designation"],
-        ["4", "N-336 | Request for a Hearing on a Decision in Naturalization Proceedings"],
-        ["5", "N-565 | Application for Replacement Naturalization/Citizenship Document"],
-        ["6", "EOIR-29 | Notice of Appeal to the Board of Immigration Appeals from a Decision of a DHS Officer"],
-        ["7", "G-639 | Freedom of Information/Privacy Act and Online FOIA Request"],
-        ["8", "G-845 | Verification Request"]
-    ],
+
     ["Research"],
     [
-        ["1", "I-824 | Application for Action on an Approved Application or Petition"],
-        ["2", "I-881 | Application for Suspension of Deportation or Special Rule Cancellation of Removal"],
-        ["3", "I-914 | Application for T Nonimmigrant Status"],
-        ["4", "I-918 | Petition for U Nonimmigrant Status"],
-        ["5", "I-941 | Application for Entrepreneur Parole"],
-        ["6", "N-400 | Application for Naturalization"]
+        ["130", "FOIA-USCIS | FOIA petition before USCIS for client (Only if necessary).", "FOIA petition before USCIS for client (Only if necessary)."],
+        ["131", "FOIA-CBP | FOIA petition before CBP for client (Only if necessary).", "FOIA petition before CBP for client (Only if necessary)."],
+        ["132", "FOIA-OBIM | FOIA petition before OBIM for client (Only if necessary).", "FOIA petition before OBIM for client (Only if necessary)."],
+        ["133", "FBI | Request for Criminal Records with the FBI for client (Only if necessary).", "Request for Criminal Records with the FBI for client (Only if necessary)."]
     ],
+    
+    ["B-CERT (I-918 B)"],
+    [
+        ["114", "I-918B (Supplement B) | U Nonimmigrant Status Certification", "I-918B"]
+    ],
+
+    ["Adoption-Related Forms"],
+    [
+        ["65", "I-600 | Petition to Classify Orphan as an Immediate Relative", "I-600"],
+        ["41", "I-600A | Application for Advance Processing of an Orphan Petition", "I-600A"],
+        ["114", "I-800 | Petition to Classify Convention Adoptee as an Immediate Relative", "I-800"],
+        ["114", "I-800A | Application for Determination of Suitability to Adopt a Child from a Convention Country", "I-800A"]
+    ],
+    
+    ["Citizenship and Naturalization"],
+    [
+        ["19", "N-400 | Application for Naturalization", "N-400"],
+        ["20", "N-470 | Application to Preserve Residence for Naturalization Purposes", "N-470"],
+        ["21", "N-600 | Application for Certificate of Citizenship", "N-600"],
+        ["22", "N-600K | Application for Citizenship and Issuance of Certificate Under Section 322", "N-600K"],
+        ["23", "N-644 | Application for Posthumous Citizenship", "N-644"],
+        ["54", "N-336 | Request for a Hearing on a Decision in Naturalization Proceedings", "N-336"],
+        ["23", "N-644 | Application for Posthumous Citizenship", "N-644"],
+        ["53", "I-956 | Application for Regional Center Designation", "I-956"],
+    ],
+
+    ["DACA"],
+    [
+        ["49", "I-821D | Consideration of Deferred Action for Childhood Arrivals", "I-821D"],
+        ["28", "I-102 | Application for Replacement/Initial Nonimmigrant Arrival-Departure Document", "I-102"],
+        ["67", "I-765 | Application for Employment Authorization", "I-765"],
+        ["120", "I-765 Worksheet | I-765 under (c)(14), Deferred Action, or (c)(33), Consideration of Deferred Action for Childhood Arrivals, categories", "I-765 Worksheet"]
+    ],
+
+    ["Department of State (DS) and Other Non-USCIS Forms"],
+    [
+        ["140", "DS-260 | Application for Immigrant Visa and Alien Registration", "DS-260"],
+        ["141", "DS-160 | Electronic Nonimmigrant Visa Application", "DS-160"],
+        ["142", "DS-11 | DS-11 | Application for a U.S. Passport", "DS-11"]
+    ],
+
+    ["Documents"],
+    [
+        ["58", "G-845 | Verification Request", "G-845"],
+        ["25", "G-845 Supplement | Document Verification Request Supplement", "G-845 S"],
+        ["93", "I-131 | Application for Travel Document", "I-131"],
+        ["78", "I-131A | Application for Travel Document (Carrier Documentation)", "I-131A"]
+    ],
+
+    ["Deportation Defense"],
+    [
+        ["8", "I-589 | Application for Asylum and for Withholding of Removal", "I-589"],
+        ["119", "I-589 (Under CAT) | Convention Against Torture", "I-589 (Under CAT)"],
+        ["56", "EOIR-29 | Notice of Appeal to the Board of Immigration Appeals from a Decision of a DHS Officer", "EOIR-29"],
+        ["137", "EOIR-40 | Application for Suspension of Deportation", "EOIR-40"],
+        ["138", "EOIR-42A | Application for Cancellation of Removal for Certain Permanent Residents", "EOIR-42A"],
+        ["139", "EOIR-42B | Application for Cancellation of Removal and Adjustment of Status for Certain Nonpermanent Residents", "EOIR-42B"]
+    ],
+
+    ["Employment Authorization"],
+    [
+        ["67", "I-765 | Application for Employment Authorization", "I-765"],
+        ["120", "I-765 Worksheet | I-765 under (c)(14), Deferred Action, or (c)(33), Consideration of Deferred Action for Childhood Arrivals, categories", "I-765 Worksheet"],
+        ["108", "I-765 (A-5) | (Asylee) Application for Employment Authorization", "I-765 (A-5)"],
+        ["109", "I-765 (C-9) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"],
+        ["121", "I-765 (C-14) | Deferred Action", "I-765 (C-14)"],
+        ["122", "I-765 TPS (C-19) | Temporary Protected Status EAD", "I-765 TPS (C-19)"],
+        ["123", "I-765 TPS (A-12) | Temporary Protected Status EAD", "I-765 TPS (A-12)"],
+        ["124", "I-765 (C-20) | Applicant for Legalization Pursuant to INA Section 210", "I-765 (C-20)"],
+        ["125", "I-765 (A-14) | LIFE Family Unity", "I-765 (A-14)"],
+        ["126", "I-765 (A-19) | Victim of Qualifying Criminal Activity (U-1 Nonimmigrant)", "I-765 (A-19)"],
+        ["127", "I-765 (A-20) | U-2, U-3, U-4, or U-5", "I-765 (A-20)"]
+    ],
+
+    ["N-400 (Naturalization)"],
+    [
+        ["19", "N-400 | Application for Naturalization", "N-400"],
+        ["54", "N-336 | Request for a Hearing on a Decision in Naturalization Proceedings", "N-336"],
+        ["94", "I-942 | Request for Reduced Fee", "I-942"]
+    ],
+
+    ["NVC"],
+    [
+        ["110", "Representation for processing before the National Visa Center (NVC)", "Representation for processing before the National Visa Center (NVC)"]
+    ],
+
+    ["I-90 Application to Replace Permanent Resident Card (Green Card)"],
+    [
+        ["76", "I-90 | Application to Replace Permanent Resident Card (Green Card)", "I-90"]
+    ],
+
+    ["I-130 (Petition)"],
+    [
+        ["1", "I-130 | Petition for Alien Relative"],
+        ["56", "EOIR-29 | Notice of Appeal to the Board of Immigration Appeals from a Decision of a DHS Officer", "C", "Use this form to appeal a USCIS decision on a Form I-130 or Form I-360 Widow(er)."]
+    ],
+
+    ["I-131 (Advanced Parole)"],
+    [        
+        ["93", "I-131 | Application for Travel Document", "I-131"],
+        ["78", "I-131A | Application for Travel Document (Carrier Documentation)", "I-131A"]
+    ],
+
+    ["I-134 (Declaration of Financial Support)"],
+    [        
+        ["60", "I-134 | Declaration of Financial Support", "I-134"],
+        ["61", "I-134A | Online Request to be a Supporter and Declaration of Financial Support", "I-134A"]
+    ],
+
+    ["I-539 | Application to Extend/Change Nonimmigrant Status"],
+    [
+        ["40", "I-539 | Application to Extend/Change Nonimmigrant Status", "I-539"]
+    ],
+
+    ["I-601A Application for Provisional Unlawful Presence Waiver"],
+    [
+        ["42", "I-601A | Application for Provisional Unlawful Presence Waiver", "I-601A"]
+    ],
+
+    ["I-730 | Refugee/Asylee Relative Petition"],
+    [
+        ["47", "I-730 | Refugee/Asylee Relative Petition", "I-730"]
+    ],
+
+    ["Permanent Residency (Green Card) Related"],
+    [
+        ["3", "I-407 | Record of Abandonment of Lawful Permanent Resident Status", "I-407"],
+        ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
+        ["11", "I-698 | Application to Adjust Status from Temporary to Permanent Resident", "I-698"],
+        ["48", "I-751 | Petition to Remove Conditions on Residence", "I-751"],
+        ["80", "I-829 | Petition by Investor to Remove Conditions on Permanent Resident Status", "I-829"]
+    ],
+
+    ["Premium Processing and Fee Related Forms"],
+    [
+        ["72", "I-907 | Request for Premium Processing Service", "I-907"],
+        ["85", "G-1450 | Authorization for Credit Card Transactions", "G-1450"],
+        ["82", "I-912 | Request for Fee Waiver", "I-912"],
+        ["83", "I-912P Supplement | 2023 HHS Poverty Guidelines for Fee Waiver Request", "I-912P S"]
+    ],
+
+    ["Representation"],
+    [
+        ["24", "G-28 | Notice of Entry of Appearance as Attorney or Accredited Representative", "G-28"],
+        ["84", "G-28I | Notice of Entry of Appearance as Attorney in Matters Outside the Geographical Confines of the United States", "G-28I"],
+        ["110", "Representation for processing before the National Visa Center (NVC)", "Representation for processing before the National Visa Center (NVC)"],
+        ["112", "Representacion and processing in favour of (client) before the National Visa Center (NVC)", "Representacion and processing in favour of (client) before the National Visa Center (NVC)"],
+        ["136", "Legal Representation for the following charges:", "Legal Representation for the following charges:"]
+    ],
+
+    ["Benefits and Requests"],
+    [
+        ["9", "I-601 | Application for Waiver of Grounds of Inadmissibility", "I-601"],
+        ["10", "I-612 | Application for Waiver of the Foreign Residence Requirement", "I-612"],
+        ["13", "I-821 | Application for Temporary Protected Status", "I-821"],
+        ["14", "I-824 | Application for Action on an Approved Application or Petition", "I-824"],
+        ["15", "I-881 | Application for Suspension of Deportation or Special Rule Cancellation of Removal", "I-881"],
+        ["53", "I-956 | Application for Regional Center Designation", "I-956"],
+        ["90", "I-956K | Registration for Direct and Third-Party Promoters", "I-956K"],
+        ["96", "I-956F | Application for Approval of an Investment in a Commercial Enterprise", "I-956F"],
+        ["97", "I-956H | Bona Fides of Persons Involved with Regional Center Program", "I-956H"],
+        ["105", "I-956G | Regional Center Annual Statement", "I-956G"]
+    ],
+
     ["SIJS"],
     [
-        ["1", "I-589 | Application for Asylum and for Withholding of Removal"],
-        ["2", "I-601 | Application for Waiver of Grounds of Inadmissibility"],
-        ["3", "I-612 | Application for Waiver of the Foreign Residence Requirement"],
-        ["4", "I-698 | Application to Adjust Status from Temporary to Permanent Resident"],
-        ["5", "I-765V | Application for Employment Authorization for Abused Nonimmigrant Spouse"],
-        ["6", "I-821 | Application for Temporary Protected Status"]
+        ["129", "Guardanship", "Guardanship"],
+        ["8", "I-589 | Application for Asylum and for Withholding of Removal", "I-589"],
+        ["119", "I-589 (Under CAT) | Convention Against Torture", "I-589 (Under CAT)"],
+        ["35", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant", "I-360"],
+        ["67", "I-765 | Application for Employment Authorization", "I-765"],
+        ["120", "I-765 Worksheet | I-765 under (c)(14), Deferred Action, or (c)(33), Consideration of Deferred Action for Childhood Arrivals, categories", "I-765 Worksheet"],
+        ["109", "I-765 (C-9) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"],
+        ["121", "I-765 (C-14) | Deferred Action", "I-765 (C-14)"]
     ],
+
     ["TPS"],
     [
-        ["1", "G-639 | Freedom of Information/Privacy Act and Online FOIA Request"],
-        ["2", "G-845 | Verification Request"],
-        ["3", "G-1256 | Declaration for Interpreted USCIS Interview"],
-        ["4", "I-134 | Declaration of Financial Support"],
-        ["5", "I-134A | Online Request to be a Supporter and Declaration of Financial Support"],
-        ["6", "I-290B | Notice of Appeal or Motion"]
+        ["13", "I-821 | Application for Temporary Protected Status", "I-821"],
+        ["49", "I-821D | Consideration of Deferred Action for Childhood Arrivals", "I-821D"]
     ],
+
     ["T-Visa"],
     [
-        ["1", "I-508 | Request for Waiver of Grounds of Inadmissibility"],
-        ["2", "I-600 | Petition to Classify Orphan as an Immediate Relative"],
-        ["3", "I-694 | Notice of Appeal of Decision"],
-        ["4", "I-765 | Application for Employment Authorization"],
-        ["5", "I-800 | Petition to Classify Convention Adoptee as an Immediate Relative"],
-        ["6", "I-800A | Supplement 3 | Request for Action on Approved Form I-800A"]
+        ["16", "I-914 | Application for T Nonimmigrant Status", "I-914"],
+        ["115", "I-914A (Supplement A) | (Application for Family Member of T-1 Recipient) Application for T Nonimmigrant Status", "I-914A (Supplement A)"],
+        ["116", "I-914B (Supplement B) | (Delaration of Law Enforcement Officer for Victim of Trafficking in Persons) Application for T Nonimmigrant Status", "I-914B (Supplement B)"],
+        ["2", "I-192 | Application for Advance Permission to Enter as a Nonimmigrant", "I-192"]
     ],
+
     ["U-Visa"],
     [
-        ["1", "I-90 | Application to Replace Permanent Resident Card"],
-        ["2", "I-129CW | Petition for a CNMI-Only Nonimmigrant Transitional Worker"],
-        ["3", "I-131A | Application for Travel Document (Carrier Documentation)"],
-        ["4", "I-817 | Application for Family Unity Benefits"],
-        ["5", "I-829 | Petition by Entrepreneur to Remove Conditions"],
-        ["6", "I-864P | Affidavit of Support Under Section 213A of the Act"],
-        ["7", "I-912 | Request for Fee Waiver"]
+        ["17", "I-918 | Petition for U Nonimmigrant Status", "I-918"],
+        ["113", "I-918A (Supplement A) | Petition for Qualifying Family Member of U-1 Recipient", "I-918A"],
+        ["114", "I-918B (Supplement B) | U Nonimmigrant Status Certification", "I-918B"],
+        ["2", "I-192 | Application for Advance Permission to Enter as a Nonimmigrant", "I-192"]
     ],
+    
     ["VAWA"],
     [
-        ["1", "I-905 | Application for Authorization to Issue Certification for Health Care Workers"],
-        ["2", "I-910 | Application for Civil Surgeon Designation"],
-        ["3", "I-956K | Application for Religious Worker Visa"],
-        ["4", "G-325A | Biographic Information"],
-        ["5", "I-129CWR | Petition for a CNMI-Only Nonimmigrant Transitional Worker"],
-        ["6", "I-131 | Application for Travel Document"]
+        ["35", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant", "I-360"]
+    ],
+
+    ["Other Forms"],
+    [
+        ["86", "G-1566 | Request for Certificate of Non-Existence", "G-1566"],
+        ["98", "G-1055 | Fee Schedule", "G-1055"],
+        ["104", "I-945 | Public Charge Bond", "I-945"],
+        ["63", "I-356 | Request for Cancellation of Public Charge Bond", "I-356"],
+        ["100", "AR-11 | Alien’s Change of Address Card", "AR-11"],
+        ["75", "G-1145 | E-Notification of Application/Petition Acceptance", "G-1145"],
+        ["103", "I-865 | Sponsor´s Notice of Change of Address", "I-865"],
+        ["101", "G-1041 | Genealogy Index Search Request", "G-1041"],
+        ["102", "G-1041A | Genealogy Records Request", "G-1041A"]
     ]
 ];
 
@@ -1647,17 +1760,20 @@ function getApplicationsArray(name){
     return null;
 }
 
+/**
+ * creates the view elements for the applications list after a service is selected
+ * filter application from predefined list by serviceId
+ * applications are checkboxes in the view, if a checkbox is true then is added to the json
+ * @param {*} name , name of the service: u-visa, AOS Petition, etc
+ * @param {*} numContact , contact view id to handle dom, html, etc
+ * @param {*} numService , serviceId that contains all the applications
+ * @returns 
+ */
 function addApplicationsToView(name, numContact, numService){
-    // necessary values: serviceId, applcationName, applicationId
-    // get application from predefined list, then we determined which to show depending on the selected service
-    // applications are checkboxes in the view, if a checkbox is true then is added to the json
-    // check applications
-
     // call method to get applications array and assign it to variable
     let applicationsFound = getApplicationsArray(name);
     // check if there was an array for the name of the service
     if(applicationsFound) {
-        console.log(applicationsFound);        
         for (let i = 0; i < applicationsFound.length; i++){
             let index = contractJSON.contract.contacts[numContact].services[numService].applications.findIndex(function (applications){
                 return applications.applicationName === applicationsFound[i][1];
@@ -1708,7 +1824,7 @@ function addApplications(num){
 // To Fill Searchable Dropdown With an Array
 function fillSelectFSByTagsArrayLocal(array, select, selected) {
     let content = document.createElement("option");
-    if (array) {        
+    if (array) {
         for (let i = 0; i < 300; i++) {
             let last = Array.from(document.getElementById(select).querySelectorAll("option")).slice(-1)[0];
             if (last == undefined)
@@ -1765,6 +1881,9 @@ let maxContacts = 2;
 let numOfContacts = 1;
 
 var contractJSON;
+/**
+ * Starts the array
+ */
 function loadContract(){
     // make main contact in contract the same as the contact for the matter
     // load all values if update
@@ -1784,6 +1903,21 @@ function loadContract(){
     };
 }
 
+let nameMainClient;
+let clientsToWord;
+let servicesToWord;
+
+
+/**
+ * Prepares the request by building a json that is then sent to an endpoint.
+ * Most of the information comes from the contractJSON array
+ * which is used for dom manipulation, billing validations, etc
+ * First, calls the checkContractValues function which checks that values are valid/not empty/etc
+ * Then starts building multiple arrays that are then hold by the request array
+ * After that, the generate and saveRow functions are called
+ * generate is the function that create the word document
+ * saveRow is the funciton that saves the contract to the database
+ */
 function sendRequest(){
     let listOfWrongValues = checkContractValues();
 
@@ -1794,7 +1928,10 @@ function sendRequest(){
         let listPaymentPlans = [];
         let request = {};
 
+        data.pathdocumentcontract = "-";
         data.idcontractlanguage = document.getElementById('contractLanguage').value;
+        data.idcontractstatus = "1";
+        data.idmatter = "4416";
 
         // Down Payment
         let downPaymentPlan = {};
@@ -1814,6 +1951,7 @@ function sendRequest(){
             listPaymentPlans.push(montlhlyPlan);
         }
 
+        //Roles
         for(let i = 0 ; i < Object.keys(contractJSON.contract.contacts).length ; i++){
             let roleContacts = {};
             roleContacts.idcontractrole = parseInt(contractJSON.contract.contacts[i].contactRole);
@@ -1822,6 +1960,7 @@ function sendRequest(){
             listRoleContacts.push(roleContacts);
         }
 
+        //Applications
         listContactsApplications = contractJSON.contract.contacts.flatMap(nameObj => {
             return nameObj.services.flatMap(typeObj => {
             return typeObj.applications.map(subtypeObj => ({
@@ -1835,8 +1974,91 @@ function sendRequest(){
         request.applicationsContactsList = listContactsApplications;
         request.roleContactsList = listRoleContacts;
         request.contractPaymentPlansList = listPaymentPlans;
+
+        nameMainClient = document.getElementById("0ContactName").value;
+
+        clientsToWord = [
+            {
+                'name_client': document.getElementById("0ContactName").value,
+                'role_client': "Victima"
+            },
+            {
+                'name_client': document.getElementById("1ContactName").value,
+                'role_client': "Derivativo"
+            }
+        ];
+        
+        servicesToWord = [
+            {
+                service_message: "Socorro migratorio al que se aplica: VISA U. Comprende lo siguiente",
+                service_client: document.getElementById("0ContactName").value,
+                "applications": [
+                    {
+                        application_message: "Aplicación para Visa-U (I-918) a favor de"
+                    },
+                    {
+                        application_message: "Petición de Perdón (I-192) para"
+                    },
+                    {
+                        application_message: "Petición de Permiso de Trabajo I-765 (C14)"
+                    }
+                ]
+            },
+            {
+                service_message: "Peticiones para obtener registros de Cliente",
+                service_client: document.getElementById("0ContactName").value,
+                "applications": [
+                    {
+                        application_message: "Petición FOIA a USCIS para"
+                    },
+                    {
+                        application_message: "Petición FOIA a CBP para"
+                    },
+                    {
+                        application_message: "Petición FOIA frente a OBIM"
+                    },
+                    {
+                        application_message: "Peticiones de registro Criminal con el FBI para"
+                    }
+                ]
+            },
+            {
+                service_message: "Socorro migratorio al que se aplica: VISA U. Comprende lo siguiente",
+                service_client: "Epifanio Arenal",
+                "applications": [
+                    {
+                        application_message: "Aplicación para Visa-U (I-918A) a favor de"
+                    },
+                    {
+                        application_message: "Petición de Perdón (I-192) para"
+                    },
+                    {
+                        application_message: "Petición de Permiso de Trabajo I-765 (Categoria C14)"
+                    },
+                    {
+                        application_message: "Petición de Permiso de Trabajo I-765 (Categoria A20)"
+                    }
+                ]
+            },
+            {
+                service_message: "Peticiones para obtener registros de Cliente",
+                service_client: "Epifanio Arenal",
+                "applications": [
+                    {
+                        application_message: "Petición FOIA a USCIS para"
+                    },
+                    {
+                        application_message: "Petición FOIA a CBP para"
+                    },
+                    {
+                        application_message: "Peticiones de registro Criminal con el FBI para Cliente"
+                    }
+                ]
+            },
+        ];
+
         //generate();
-        saveRow(create, null, request, null, 'https://test.counselmanager.com/matters/0', null);
+        //saveRow(create, null, request, null, null, null);
         console.log(JSON.stringify(request));
     } else {
         console.log(listOfWrongValues);
@@ -1866,19 +2088,28 @@ function addContact(name, relation){
     if(numContacts === 0){
         contactRole = "1";
         relation = "";
+        contractJSON.contract.contacts.push(
+            {
+                'contactName':name,
+                'contactRole': contactRole,
+                'contactRelation':relation,
+                'contactId': '5054',
+                'services':[]
+            }
+        );
     } else {
         contactRole = "2";
+        contractJSON.contract.contacts.push(
+            {
+                'contactName':name,
+                'contactRole': contactRole,
+                'contactRelation':relation,
+                'contactId': '110',
+                'services':[]
+            }
+        );
     }
 
-    contractJSON.contract.contacts.push(
-        {
-            'contactName':name,
-            'contactRole': contactRole,
-            'contactRelation':relation,
-            'contactId': '110',
-            'services':[]
-        }
-    );
     let html = addBeneficiaryViewContent(numContacts,relation, contactRole); // add query to get the relation of the contact in the contract (son, mom, brother, sibling, ...)
     document.getElementById("listBeneficiaries").insertAdjacentHTML("beforeend", html);
     setFstDropdown();
@@ -1894,6 +2125,30 @@ function addServicet(num){
     const serviceName = selectService.options[selectService.selectedIndex].text;
     console.log(serviceName);
 }
+
+/*function updateArraysToWord(){
+    for(let i = 0; i < Object.keys(contractJSON.contract.contacts).length; i++){
+        let checkRole = contractJSON.contract.contacts[i].contactRole == '1' ? "Victima" : "Beneficiario";
+        let elementClient = {
+            'name_client': contractJSON.contract.contacts[i].contactName,
+            'role_client': checkRole
+        }
+        clientsToWord.push(elementClient);
+        
+        for(let j = 0; j < Object.keys(contractJSON.contract.contacts[i].services).length; j++){
+            let serviceMessage = '';
+            if(contractJSON.contract.contacts[i].services[j].serviceId == '34') {
+                serviceMessage += "Socorro migratorio al que se aplica: VISA U. Comprende lo siguiente";
+            } else if(contractJSON.contract.contacts[i].services[j].serviceId == '9') {
+                serviceMessage += "Peticiones para obtener registros del Cliente";
+                contractJSON.contract.contacts[i].services[j].applications.forEach(item => {
+                    let applicationMessage = {};
+                    servicesToWord
+                });
+            }
+        }
+    }
+}*/
 
 function addService(num){
     const selectService = document.getElementById('ContactServicesSelect'+num);
@@ -1945,6 +2200,10 @@ function addService(num){
     }
 }
 
+/** 
+ * Adds #; at the end of url when triggered.
+ * This is to avoid unwanted behvaiour (the page moves up, refreshes, etc) when a button is clicked
+ * */
 function adjustmentPositioning(){
     const highlightedItems = document.querySelectorAll("a");
     [].forEach.call(highlightedItems, function(atag) {
@@ -1953,6 +2212,11 @@ function adjustmentPositioning(){
     });
 }
 
+/**
+ * Hide Sections of the page per contact.
+ * Query elements with the @param {Number} num
+ * Check the name of the section with @param {String} section to check if further information is needed
+ */
 function hideElementContacts(num, section){
     const sectionContact = document.getElementById(num+'Contact'+section);
     const titleContact = document.getElementById(num+'Contact'+section+'Title');
@@ -1975,6 +2239,13 @@ function hideElementContacts(num, section){
     }
 }
 
+/**
+ * Removes all the sections of the Contact that was selected
+ * This functions is called by an onclick event
+ * Shows a modal to confirm the transaction then
+ * Querys all the elements with num to then remove them
+ * @param {Number} num 
+ */
 function removeBeneficiary(num) {
     const contact = document.getElementById(num+'Contact');
     if(contact.length==0 || contact===null || contact===""){
@@ -1999,6 +2270,19 @@ function removeBeneficiary(num) {
     }
 }
 
+/**
+ * This function removes a service from a contacts services
+ * First querys elements with the parameters being passed
+ * Then if the contact has no services, it shows a modal
+ * If contact has services, shows a modal confirming the transaction
+ * If transactions is confirmed, querys the position of the services in the contractJSON array
+ * then checks if the service is selected to remove the applications options of the service from the view
+ * then the service element is removed from the view
+ * then checks if the contact has remaining services, if no, button to save applications is disabled until
+ * a new one is added
+ * @param {*} num , this is the id of the contact
+ * @param {Number} nums , this is the id of the service
+ */
 function removeService(num, nums){
     const service = document.getElementById('Contact'+num+'Service'+nums);
     const textOfService = $( "#Contact"+num+"Service"+nums ).find( "li" ).contents().first().text();
@@ -2052,7 +2336,6 @@ function removeService(num, nums){
      * check if first contact
      * add contact to json
      */
-    
     /*if(numOfContacts > maxContacts) {
         sweetAlert(2, 'Can'+ "'" +'t add morde than ' + maxContacts + ' Beneficiary', null);
     } else if (numOfContacts <= maxContacts) {
@@ -2065,6 +2348,16 @@ function removeService(num, nums){
     }
 }*/
 
+/**
+ * Creates the view html elements and assigns them the ids and other values needed
+ * ids are useful for dom modification via javascript
+ * @param {*} num , is the id of contact in the view (not the database). Starts from 0 and increments by 1
+ * @param {*} relation
+ * @param {*} role , holds if contact is Main client/Primary or Beneficiary/Derivative
+ * @returns the html of a new contact with a new id
+ * all contacts have a unique id that is shared with
+ * the view elements of each contact
+ */
 function addBeneficiaryViewContent(num, relation, role){
     let roleContact;
     if(relation.length==0 || relation===null || relation===""){
@@ -2093,7 +2386,7 @@ function addBeneficiaryViewContent(num, relation, role){
                                     </a>
                                 </div>
                             </div>  
-                            <input type="text" class="form-control" id="${num}ContactName">
+                            <input type="text" class="form-control" id="${num}ContactName" required>
                         </div>
                     </div>
                     <div class="col">
