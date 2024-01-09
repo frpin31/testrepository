@@ -1,10 +1,25 @@
-const create = 'Contracts/call_to_save_contract';
+const create = 'Contract/call_to_save_contract';
+const update = 'Contract/update/';
+
+let shouldShowConfirmation = true;
+
+// Set the confirmation message based on your condition
+window.onbeforeunload = function(event) {
+    if (shouldShowConfirmation) {
+        // This message will be shown in the confirmation dialog
+        const confirmationMessage = "You're leaving the Contract page, any unsaved work will be lost.";
+        event.returnValue = confirmationMessage;
+        return confirmationMessage;
+    }
+};
+
 
 const Toast = Swal.mixin({
     toast: true,
     position: "center-end",
     showConfirmButton: false,
     timer: 8000,
+    width: "30%",
     timerProgressBar: true,
     showClass: {
         popup: `
@@ -67,20 +82,21 @@ function sweetAlert(type, text, url) {
     }
 }
 
-//Run when page is loaded
+// jQuery syntax: This function will be executed when the DOM is fully loaded and ready for manipulation.
 $(document).ready(function() {
+    // Code inside this block will run after the DOM is ready.
+    // It's commonly used in jQuery to ensure that the DOM elements are accessible before manipulating them.
     // Attach a click event handler to a parent element that exists in the DOM
     // and delegate it to ".li" elements
     $(document).on("click", ".services-list li", function() {
         // Remove the active class from all list items in the same list
-        let serviceId = $(this).closest(".row")[0].id;      
+        let serviceId = $(this).closest(".row")[0].id;
         if($(this).hasClass("active")){
             $(this).closest("ul").find("li").removeClass("active");
         } else {
             $(this).closest("ul").find("li").removeClass("active");
             $(this).addClass("active");
         }
-
         // get the number of the contact and number of the service
         // Regular expression to match and extract the 2 numbers from id
         const regex = /\d+/g;
@@ -90,24 +106,27 @@ $(document).ready(function() {
             // Assign the first and last numbers to variables
             const contactNum = parseInt(matches[0]);
             const serviceId = parseInt(matches[matches.length - 1]);
-            let serviceNum = contractJSON.contract.contacts[contactNum].services.findIndex(function (services){
+            // Get the checkbox element
+            const checkboxElement = document.getElementById('selectAll' + contactNum);
+            // Set the checked property to false
+            checkboxElement.checked = false;
+            let serviceNum = contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == contactNum)].services.findIndex(function (services){
                 return services.serviceId == serviceId;
             });
-            if(serviceNum >= 0){                
+            if(serviceNum >= 0){
                 var store = $(this).contents().first().text().trim();
                 if($(this).hasClass("active")){
                     addApplicationsToView(store, contactNum, serviceNum);
                 } else {
                     document.getElementById("Contact" + contactNum + "ApplicationsContainer").innerHTML = "";
                 }
-                
             } else {
                 sweetAlert(2, 'There was an issue with your request, please contact an administrator', null);
             }
         } else {
             sweetAlert(2, 'There was an issue with your request, please contact an administrator', null);
         }
-        
+
     });
 
     // Handle button click events
@@ -121,7 +140,7 @@ $(document).ready(function() {
         // Use the `match` method to find the first match
         const match = contactId.match(regex);
         if (match) {
-            // Convert the matched string to a number and assign it to a variable            
+            // Convert the matched string to a number and assign it to a variable
             let extractedContactId = parseInt(match[0]);
             let activeService = $("#Contact" + extractedContactId + "ServicesContainer").find(".active").closest(".row");
             if(activeService == undefined || activeService.length==0 || activeService === null || activeService === "" ) {
@@ -134,10 +153,12 @@ $(document).ready(function() {
                     const match2 = serviceId.match(regex2);
                     if(match2 && match2.length >= 2){
                         let extractedServiceId = parseInt(match2[match2.length - 1]);
-                        let servicePositionId = contractJSON.contract.contacts[extractedContactId].services.findIndex(function (services){
+                        let servicePositionId = contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == extractedContactId)].services.findIndex(function (services){
                             return services.serviceId == extractedServiceId;
                         });
                         console.log(extractedServiceId);
+                        const repeatedApplicationIds = [];
+                        let repeatedCounter = 1;
                         applicationElement.each(function() {
                             // check if application exist in the json by searching it
                             // if application exists:
@@ -149,36 +170,74 @@ $(document).ready(function() {
                             let applicationName = $(this).find("label").text();
                             if (match3) {
                                 const extractedApplicationId = parseInt(match3[0]);
-                                let index = contractJSON.contract.contacts[extractedContactId].services[servicePositionId].applications.findIndex(function (applications){
+                                let index = contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == extractedContactId)].services[servicePositionId].applications.findIndex(function (applications){
                                     return applications.applicationName == applicationName;
                                 });
-    
+
                                 if($(this).find("input").is(":checked")){
                                     if(index >= 0){
-                                        
                                     } else {
-                                        contractJSON.contract.contacts[extractedContactId].services[servicePositionId].applications.push(
-                                            {
-                                                'applicationName':applicationName,
-                                                'applicationId':extractedApplicationId
+                                        for (const service of contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == extractedContactId)].services) {
+                                            for (const application of service.applications) {
+                                                const applicationIdCheck = application.applicationId;
+                                                if (applicationIdCheck === match3 || applicationIdCheck == match3) {
+                                                    repeatedApplicationIds.push("<br>" + repeatedCounter + "- " + applicationName);
+                                                    repeatedCounter++;
+                                                }
                                             }
-                                        );
+                                        }
+                                        // Using Array.prototype.some() to check if any element in the array includes the specified searchText
+                                        const exists = repeatedApplicationIds.some(item => item.includes(applicationName));
+                                        if(repeatedApplicationIds.length == 0 || repeatedApplicationIds.length === 0) {
+                                            contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == extractedContactId)].services[servicePositionId].applications.push(
+                                                {
+                                                    'applicationName':applicationName,
+                                                    'applicationId':extractedApplicationId
+                                                }
+                                            );
+                                        } else if (!exists){
+                                            contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == extractedContactId)].services[servicePositionId].applications.push(
+                                                {
+                                                    'applicationName':applicationName,
+                                                    'applicationId':extractedApplicationId
+                                                }
+                                            );
+                                        }
                                     }
                                 } else {
                                     if(index >= 0){
-                                        contractJSON.contract.contacts[extractedContactId].services[servicePositionId].applications.splice(index,1);
+                                        contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == extractedContactId)].services[servicePositionId].applications.splice(index,1);
                                     } else {
-    
+
                                     }
                                 }
                             } else {
                                 console.log("No numbers found in the string.");
                             }
                         });
+                        if(repeatedApplicationIds.length == 0 || repeatedApplicationIds.length === 0) {
+                        } else {
+                            Toast.fire({
+                                icon: "error",
+                                position: "center",
+                                title: "Can't add " + (repeatedCounter-1) + " application(s)",
+                                showCloseButton: true,
+                                html: `
+                                    The contact has already the following applications:
+                                    <br>
+                                    <div style="word-wrap: break-word;">
+                                        <b>` + repeatedApplicationIds + `</b>
+                                    </div>
+                                    <br>
+                                    You shouldn't repeat an application in a Contract
+                                `
+                            });
+                        }
+
                         updateApplicationsPerService(extractedContactId, servicePositionId, extractedServiceId);
                     }
                 }
-            }            
+            }
         } else {
             console.log("No number found in the string.");
         }
@@ -194,7 +253,7 @@ $(document).ready(function() {
     $("#expandTablePreview").click(function(event) {
         event.preventDefault(); // Prevent the default behavior of the anchor tag
         $(this).toggleClass("highlight"); // Toggle the "highlight" class on the clicked element
-        
+
         let sizeMP = Object.keys(contractJSON.contract.monthlyPayments).length;
 
         // This code is executed when the button is clicked.
@@ -218,7 +277,7 @@ $(document).ready(function() {
                 $(this).text("collapse view");
             } else {
                 if(contractJSON.contract.monthlyPayments[0].amount == contractJSON.contract.monthlyPayments[sizeMP-1].amount){
-                    
+
                     if(sizeMP == 1 || sizeMP === 1){
                         html += `
                         <tr>
@@ -248,7 +307,7 @@ $(document).ready(function() {
                             <th scope="row">${sizeMP-1}</th>
                             <td>from ${contractJSON.contract.monthlyPayments[1].date} to ${contractJSON.contract.monthlyPayments[sizeMP-1].date}</td>
                             <td>$ ${contractJSON.contract.monthlyPayments[1].amount}</td>
-                        </tr>                    
+                        </tr>
                         `;
                 } else {
 
@@ -298,7 +357,7 @@ $(document).ready(function() {
                 var day = date.getDate();
                 // Array of allowed days
                 var allowedDays = [1, 15, 30, 31];
-                
+
                 // Check if the current day is in the allowed days array
                 if (allowedDays.includes(day)) {
                 return [true, ''];
@@ -314,7 +373,16 @@ $(document).ready(function() {
             selectOtherMonths: true
         });
     */
+    loadContract();
 });
+
+// Native JavaScript syntax: This event listener will be triggered when the DOM has been fully loaded and is ready for interaction.
+// document.addEventListener('DOMContentLoaded', function() {
+//      // Code inside this block will run after the DOMContentLoaded event is fired.
+//     // It's a native way to ensure that the DOM elements are accessible before performing any operations.
+//     //adjustmentPositioning();
+//     //loadContract();
+// }, false);
 
 function getHeaders() {
     return {
@@ -328,13 +396,10 @@ $(".dateinput").on("keydown", function(e) {
     e.preventDefault();
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    //adjustmentPositioning();
-    loadContract();
-}, false);
+
 
 function updateApplicationsPerService(contactId, servicePositionNum, serviceId){
-    let numApplications = Object.keys(contractJSON.contract.contacts[contactId].services[servicePositionNum].applications).length;
+    let numApplications = Object.keys(contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == contactId)].services[servicePositionNum].applications).length;
     $("#Contact" + contactId + "Service" + serviceId).find("span").text(numApplications);
 }
 
@@ -343,7 +408,7 @@ var formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
 });
-  
+
 document.querySelector('#amountDP').addEventListener('change', (e)=>{
     if(isNaN(e.target.value)){
         e.target.value = ''
@@ -374,13 +439,13 @@ let totalContractAmount = 0;
 
 /**
  * -- Pending to comment --
- * @param {*} num 
+ * @param {*} num
  */
 function adjustSummary(num){
     //Object.keys(contractJSON.contract.contacts[contactId].services[servicePositionNum].applications).length;
     //contractJSON.contract.monthlyPayments[sizeMP-1].date;
-    // scenarios: 
-    
+    // scenarios:
+
     // Not given 1, given 2 and 3 calculate 1
     // Not given 2, given 1 and 3 calculate 2
     // Not given 3, given 1 and 2 calculate 3
@@ -423,13 +488,13 @@ function adjustSummary(num){
     //var inputEvent = new Event('input', { bubbles: true, cancelable: true });
 
     /*if(num == 1 || num === 1) {
-        
+
         downPaymentAmount = document.getElementById("amountDP").value;
         //downPaymentAmount = parseFloat(downPaymentAmount).toFixed(2);
         //downPaymentDate = dayFormatted;
-    
+
     } else if(num == 2 || num === 2) {
-        
+
         //document.getElementById("summaryMC").innerText = parseFloat(totalMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
 
         //contractJSON.contract.numberOfMonthlyPayments = parseInt(Object.keys(contractJSON.contract.monthlyPayments).length);
@@ -445,7 +510,7 @@ function adjustSummary(num){
     console.log(totalMonthlyCharges);
 
     if(num == 1 || num === 1) {
-        
+
         amountDP = document.getElementById("amountDP").value;
 
         if(amountDP >= totalContractAmount && totalContractAmount != 0 && amountDP != 0){
@@ -459,7 +524,7 @@ function adjustSummary(num){
     } else if(num == 2 || num === 2) {
 
         amountMC = totalMonthlyCharges;
-        
+
         console.log(amountMC);
         if(amountMC >= totalContractAmount && totalContractAmount != 0 && amountMC != 0){
             console.log("case 2 1");
@@ -497,7 +562,7 @@ function adjustSummary(num){
             amountTC = totalContractAmount;
 
         } else if(num == 2 || num === 2){
-            
+
             amountDP = downPaymentAmount;
             amountMC = totalMonthlyCharges;
             amountTC = totalContractAmount;
@@ -513,23 +578,23 @@ function adjustSummary(num){
             (amountDP == null || amountDP === null || amountDP == undefined || amountDP == 0 || amountDP === 0)
         && (!(amountMC == null || amountMC === null || amountMC == undefined || amountMC == 0 || amountMC === 0) && amountMC > 0)
         && (!(amountTC == null || amountTC === null || amountTC == undefined || amountTC == 0 || amountTC === 0) && amountTC > 0)){
-    
+
             console.log("case 1 DP");
 
             amountDP = parseFloat(amountTC) - parseFloat(amountMC);
             console.log(amountDP);
-            
+
             document.getElementById("summaryDownPayment").innerText = parseFloat(amountDP).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
             document.getElementById("amountDP").value = amountDP;
             document.getElementById("summaryDownPaymentAmount").innerText = parseFloat(amountDP).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
-    
+
         } else if(
             (!(amountDP == null || amountDP === null || amountDP == undefined || amountDP == 0 || amountDP === 0) && amountDP > 0)
         && (amountMC == null || amountMC === null || amountMC == undefined || amountMC == 0 || amountMC === 0)
         && (!(amountTC == null || amountTC === null || amountTC == undefined || amountTC == 0 || amountTC === 0) && amountTC > 0)){
-    
+
             console.log("case 2 MC");
-    
+
             amountMC = parseFloat(amountTC) - parseFloat(amountDP);
             console.log(amountMC);
 
@@ -541,28 +606,28 @@ function adjustSummary(num){
             (!(amountDP == null || amountDP === null || amountDP == undefined || amountDP == 0 || amountDP === 0) && amountDP > 0)
         && (!(amountMC == null || amountMC === null || amountMC == undefined || amountMC == 0 || amountMC === 0) && amountMC > 0)
         && (amountTC == null || amountTC === null || amountTC == undefined || amountTC == 0 || amountTC === 0)){
-            
+
             console.log("case 3 TC");
-    
+
             amountTC = parseFloat(amountDP) + parseFloat(amountMC);
             console.log(amountTC);
-            
+
             document.getElementById("totalContractAmount").value = amountTC;
             document.getElementById("summaryTotalContract").innerText = parseFloat(amountTC).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
             document.getElementById("summaryDownPaymentAmount").innerText = parseFloat(amountDP).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
             document.getElementById("summaryMCAmount").innerText = parseFloat(amountMC).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
 
             contractJSON.contract.contractTotalAmount = parseFloat(amountTC).toFixed(2);
-    
+
         } else if (
             (!(amountDP == null || amountDP === null || amountDP == undefined || amountDP == 0 || amountDP === 0) && amountDP > 0)
         && (!(amountMC == null || amountMC === null || amountMC == undefined || amountMC == 0 || amountMC === 0) && amountMC > 0)
-        && (!(amountTC == null || amountTC === null || amountTC == undefined || amountTC == 0 || amountTC === 0) && amountTC > 0)) { 
-    
+        && (!(amountTC == null || amountTC === null || amountTC == undefined || amountTC == 0 || amountTC === 0) && amountTC > 0)) {
+
             console.log("case 4 All Filled");
-    
+
             let result = 0;
-    
+
             if(num == 1 || num === 1) {
 
                 amountTC = parseFloat(amountDP) + parseFloat(amountMC);
@@ -571,7 +636,7 @@ function adjustSummary(num){
                 document.getElementById("summaryTotalContract").innerText = parseFloat(amountTC).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
 
                 contractJSON.contract.contractTotalAmount = parseFloat(amountTC).toFixed(2);
-    
+
             } else if(num == 2 || num === 2) {
 
                 amountTC = parseFloat(amountDP) + parseFloat(amountMC);
@@ -580,9 +645,9 @@ function adjustSummary(num){
                 document.getElementById("summaryTotalContract").innerText = parseFloat(amountTC).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
 
                 contractJSON.contract.contractTotalAmount = parseFloat(amountTC).toFixed(2);
-                
+
             } else if(num == 3 || num === 3) {
-                
+
                 totalMonthlyCharges = amountTC - amountDP;
 
                 document.getElementById("summaryMCListOfCharges").innerHTML = `<p class="fw-light text-start">0 of $ 0.00</p>`;
@@ -593,7 +658,7 @@ function adjustSummary(num){
                 document.getElementById("summaryMCEndDate").innerText = "00/00/0000";
 
                 document.getElementById("summaryMC").innerText = parseFloat(totalMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
-                
+
                 document.getElementById("summaryMCAmount").innerText = parseFloat(totalMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
 
                 let html = `
@@ -603,12 +668,12 @@ function adjustSummary(num){
                         <td>$ 00.00</td>
                     </tr>
                 `;
-                
+
                 document.getElementById("previewTable").innerHTML = html;
 
                 document.getElementById("amountMC").value = 0;
                 document.getElementById("numberOfMC").value = 0;
-                 	
+
                 $( "#startDateMC" ).datepicker( "setDate", null );
                 $( "#endDateMC" ).datepicker( "setDate", null );
 
@@ -628,10 +693,10 @@ function adjustSummary(num){
                         Total Monthly Charges amount is now: <b>` + parseFloat(totalMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 }) + `</b>
                     `
                 });
-    
+
             }
 
-            
+
             // always delete TC either way is MC or DP
             // if is mc or dp
                 // do dp + mc and save it to val1
@@ -642,7 +707,7 @@ function adjustSummary(num){
                 // calculate mc by doing tc - dp
                 // assign value to mc
             // reminder: in all empty/adding/update transactions, do it to view and json
-    
+
         }
 
         console.log(num);
@@ -671,15 +736,15 @@ function adjustSummary(num){
             document.getElementById("summaryMC").innerText = parseFloat(totalMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
 
             let html = '';
-            
+
             let sizeMP = Object.keys(contractJSON.contract.monthlyPayments).length;
-            
+
             if(contractJSON.contract.monthlyPayments[0].amount == contractJSON.contract.monthlyPayments[sizeMP-1].amount){
-                    
+
                 html += `
                     <p class="fw-light text-start">${sizeMP} of $ ${contractJSON.contract.monthlyPayments[0].amount}</p>
                 `;
-                
+
             } else if (contractJSON.contract.monthlyPayments[0].amount > contractJSON.contract.monthlyPayments[1].amount) {
 
                 html += `
@@ -712,7 +777,7 @@ function adjustSummary(num){
             console.log(amountTC);
 
             totalContractAmount = parseFloat(amountTC);
-            
+
             document.getElementById("summaryTotalContract").innerText = parseFloat(totalContractAmount).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
             console.log(downPaymentAmount);
             console.log(totalMonthlyCharges);
@@ -742,7 +807,7 @@ formDP.addEventListener('submit', function (event) {
         event.stopPropagation();
     } else {
         event.preventDefault();
-        
+
         adjustSummary(1);
 
     }
@@ -781,18 +846,18 @@ formMC.addEventListener('submit', function (event) {
         if(sizeMP >= 1){
             contractJSON.contract.monthlyPayments.length = 0;
         }
-        
-        if(amountMonthlyCharges != 0 && totalMonthlyCharges != 0 && (numberOfMonthlyCharges != 0 || numberOfMonthlyCharges.length==0 || numberOfMonthlyCharges===null || 
+
+        if(amountMonthlyCharges != 0 && totalMonthlyCharges != 0 && (numberOfMonthlyCharges != 0 || numberOfMonthlyCharges.length==0 || numberOfMonthlyCharges===null ||
             numberOfMonthlyCharges==="" || numberOfMonthlyCharges === 0 || numberOfMonthlyCharges == 0 || numberOfMonthlyCharges === 0.0 || numberOfMonthlyCharges == 0.0 || numberOfMonthlyCharges === 0.00 || numberOfMonthlyCharges == 0.00 )){
-            
+
             let remainderNotFixed = 0;
             let exactAmountTotalNotFixed = 0;
             let exactNumberOfChargesNotFixed = 0;
-            
+
             let remainder = 0;
             let exactAmountTotal = 0;
             let exactNumberOfCharges = 0;
-            
+
             remainderNotFixed = totalMonthlyCharges % amountMonthlyCharges;
             exactAmountTotalNotFixed = totalMonthlyCharges - parseFloat(remainderNotFixed).toFixed(2);
             exactNumberOfChargesNotFixed = parseFloat(exactAmountTotalNotFixed).toFixed(2) / amountMonthlyCharges;
@@ -800,7 +865,7 @@ formMC.addEventListener('submit', function (event) {
             remainder = parseFloat(remainderNotFixed).toFixed(2);
             exactAmountTotal = parseFloat(exactAmountTotalNotFixed).toFixed(2);
             exactNumberOfCharges = parseInt(exactNumberOfChargesNotFixed);
-            
+
             console.log(remainder);
             console.log(parseFloat(amountMonthlyCharges).toFixed(2));
             console.log(remainder == parseFloat(amountMonthlyCharges).toFixed(2));
@@ -814,7 +879,7 @@ formMC.addEventListener('submit', function (event) {
                     monthsArray = setDates(exactNumberOfCharges);
 
                     let sizeMArray = monthsArray.length;
-                    
+
                     for(let i = 1; i <= exactNumberOfCharges; i++){
                         arrayCharges.push(parseFloat(amountMonthlyCharges).toFixed(2));
                     }
@@ -824,13 +889,13 @@ formMC.addEventListener('submit', function (event) {
                                 <td>from ${monthsArray[0]} to ${monthsArray[sizeMArray-1]}</td>
                                 <td>$ ${parseFloat(amountMonthlyCharges).toFixed(2)}</td>
                             </tr>`;
-                    
+
                     document.getElementById("numberOfMC").value = exactNumberOfCharges;
 
                 } else {
 
                     monthsArray = setDates(1+exactNumberOfCharges);
-                    
+
                     let sizeMArray = monthsArray.length;
 
                     for(let i = 1; i <= exactNumberOfCharges; i++){
@@ -849,7 +914,7 @@ formMC.addEventListener('submit', function (event) {
                                 <td>${monthsArray[sizeMArray-1]}</td>
                                 <td>$ ${remainder}</td>
                             </tr>`;
-                    
+
                     document.getElementById("numberOfMC").value = 1 + parseInt(exactNumberOfCharges);
                 }
 
@@ -861,7 +926,7 @@ formMC.addEventListener('submit', function (event) {
 
                     monthsArray = setDates(exactNumberOfCharges);
                     let sizeMArray = monthsArray.length;
-                    
+
                     for(let i = 1; i <= exactNumberOfCharges; i++){
                         arrayCharges.push(parseFloat(amountMonthlyCharges).toFixed(2));
                     }
@@ -871,7 +936,7 @@ formMC.addEventListener('submit', function (event) {
                                 <td>from ${monthsArray[0]} to ${monthsArray[sizeMArray-1]}</td>
                                 <td>$ ${parseFloat(amountMonthlyCharges).toFixed(2)}</td>
                             </tr>`;
-                    
+
                     document.getElementById("numberOfMC").value = exactNumberOfCharges;
 
                 } else {
@@ -904,12 +969,12 @@ formMC.addEventListener('submit', function (event) {
                                 <td>from ${monthsArray[1]} to ${monthsArray[sizeMArray-1]}</td>
                                 <td>$ ${parseFloat(amountMonthlyCharges).toFixed(2)}</td>
                             </tr>`;
-                    
+
                     document.getElementById("numberOfMC").value = exactNumberOfCharges;
                 }
             }
 
-        } else if(amountMonthlyCharges != 0 && numberOfMonthlyCharges != 0 && (totalMonthlyCharges.length==0 || totalMonthlyCharges===null || 
+        } else if(amountMonthlyCharges != 0 && numberOfMonthlyCharges != 0 && (totalMonthlyCharges.length==0 || totalMonthlyCharges===null ||
                     totalMonthlyCharges==="" || totalMonthlyCharges === 0 || totalMonthlyCharges == 0 || totalMonthlyCharges === 0.0 || totalMonthlyCharges == 0.0 || totalMonthlyCharges === 0.00 || totalMonthlyCharges == 0.00 )) {
 
             let calculatedTotal = amountMonthlyCharges * numberOfMonthlyCharges;
@@ -928,10 +993,10 @@ formMC.addEventListener('submit', function (event) {
                         <td>from ${monthsArray[0]} to ${monthsArray[sizeMArray-1]}</td>
                         <td>$ ${parseFloat(amountMonthlyCharges).toFixed(2)}</td>
                     </tr>`;
-            
-        } else if (numberOfMonthlyCharges != 0 && totalMonthlyCharges != 0 && (amountMonthlyCharges.length==0 || amountMonthlyCharges===null || 
+
+        } else if (numberOfMonthlyCharges != 0 && totalMonthlyCharges != 0 && (amountMonthlyCharges.length==0 || amountMonthlyCharges===null ||
             amountMonthlyCharges==="" || amountMonthlyCharges === 0 || amountMonthlyCharges == 0 || amountMonthlyCharges === 0.0 || amountMonthlyCharges == 0.0 || amountMonthlyCharges === 0.00 || amountMonthlyCharges == 0.00 )) {
-        
+
             let calculatedAmountMonthlyNotFixed = 0;
             let remainderNotFixed = 0;
             let exactAmountTotalNotFixed = 0;
@@ -966,16 +1031,16 @@ formMC.addEventListener('submit', function (event) {
             console.log(exactNumberOfCharges);
 
             document.getElementById("amountMC").value = calculatedAmountMonthly
-            
+
             if (remainder >= 50) {
                 if (remainder == parseFloat(amountMonthlyCharges).toFixed(2)) {
-                    
+
                     ++exactNumberOfCharges;
 
                     monthsArray = setDates(exactNumberOfCharges);
 
                     let sizeMArray = monthsArray.length;
-                    
+
                     for(let i = 1; i <= exactNumberOfCharges; i++){
                         arrayCharges.push(parseFloat(calculatedAmountMonthly).toFixed(2));
                     }
@@ -1015,21 +1080,21 @@ formMC.addEventListener('submit', function (event) {
 
                     monthsArray = setDates(numberOfMonthlyCharges);
                     let sizeMArray = monthsArray.length;
-    
+
                     for(let i = 1; i <= numberOfMonthlyCharges; i++){
                         arrayCharges.push(parseFloat(calculatedAmountMonthly).toFixed(2));
                     }
-    
+
                     html = `<tr>
                                 <th scope="row">${numberOfMonthlyCharges}</th>
                                 <td>from ${monthsArray[0]} to ${monthsArray[sizeMArray-1]}</td>
                                 <td>$ ${calculatedAmountMonthly}</td>
                             </tr>`;
-                    
+
                 } else {
-                    
+
                     monthsArray = setDates(exactNumberOfCharges);
-                     
+
                     let sizeMArray = monthsArray.length;
 
                     for(let i = 1; i <= exactNumberOfCharges; i++){
@@ -1038,7 +1103,7 @@ formMC.addEventListener('submit', function (event) {
                         } else {
                             arrayCharges.push(parseFloat(calculatedAmountMonthly).toFixed(2));
                         }
-                        
+
                     }
 
                     html = `<tr>
@@ -1053,7 +1118,7 @@ formMC.addEventListener('submit', function (event) {
                             </tr>`;
                     }
             }
-            
+
         } else {
             html = `<tr>
                         <th scope="row">0</th>
@@ -1142,7 +1207,7 @@ function validateInput(idInput, idInvalidFeedback, pattern, message) {
         isValid = nonEmptyPattern.test(inputText.value);
 
     }
-    
+
     inputText.setCustomValidity(isValid ? '' : message);
     invalidFeedback.style.display = isValid ? 'none' : 'block';
     if(isValid){
@@ -1201,7 +1266,7 @@ document.getElementById('totalContractAmount').addEventListener('blur', function
  * Creates an array of dates that is then used to store
  * the date information about the payment plan
  * @param {Number} numberOfMonthlyCharges , total months
- * @returns an array containing all the dates of a monthly charges plan 
+ * @returns an array containing all the dates of a monthly charges plan
  */
 function setDates(numberOfMonthlyCharges){
     let startDate = $( "#startDateMC" ).datepicker( "getDate" );
@@ -1262,7 +1327,7 @@ function getAllMonths(startDate, endDate){
 
             // new date variable so that we make sure that the nextMonthDate is truly the last day of the month
             let tempDate = new Date(nextMonthDate);
-                
+
             // Assign the new variable a date value which is 1 month further
             tempDate.setMonth(nextMonthDate.getMonth() + 1);
 
@@ -1276,7 +1341,7 @@ function getAllMonths(startDate, endDate){
 
             // evaluate if the date (day) of the first date is 30 or 31 to then assign the following months the last day they have
             if(startDate.getDate() == 31){
-                
+
                 // we check if nextMonthDate day is actually the last by checking that is the same as tempDate day, if not, we set the nextMonthDate day the day of tempDate
                 if(nextMonthDate.getDate() !== tempDate.getDate()){
                     nextMonthDate.setDate(tempDate.getDate());
@@ -1285,7 +1350,7 @@ function getAllMonths(startDate, endDate){
 
                 // we check if nextMonthDate day is actually the last by checking that is the same as tempDate day, if not, we set the nextMonthDate day the day of tempDate
                 if(nextMonthDate.getDate() !== tempDate.getDate()){
-                    
+
                     if(tempDate.getDate() == 28 || tempDate.getDate() == 29){
                         nextMonthDate.setDate(tempDate.getDate());
                     } else if(tempDate.getDate() == 31) {
@@ -1295,7 +1360,7 @@ function getAllMonths(startDate, endDate){
                     }
                 }
             }
-            
+
             // we format the date to mm/dd/yy
             const formattedDate = nextMonthDate.toLocaleDateString("en-US", {
                 month: "2-digit",
@@ -1320,7 +1385,7 @@ function getAllMonths(startDate, endDate){
  * Calculates the last payment date of a monthly charge plan
  * @param {Number} numberOfMonthlyCharges , number of months
  * @param {Date} dateInput , starting date. Value is obtained with .datepicker("getDate") method from jQuery UI date picker
- * @returns 
+ * @returns
  */
 function calculateDateEnd(numberOfMonthlyCharges, dateInput){
     //let dayFormatted = objectDateToFormattedDate(dateInput);
@@ -1383,7 +1448,7 @@ function addMonthlyPaymentsToJSON(monthsArray, chargesArray){
 /*document.getElementById("addMC").addEventListener("click", function(event) {
     event.preventDefault();
 });*/
-  
+
 function calculateTotal(){
 
 
@@ -1471,7 +1536,7 @@ let applicationsArray = [
     ],
 
     ["AOS I-929"],
-    [   
+    [
         ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
         ["52", "I-929 | Petition for Qualifying Family Member of a U-1 Nonimmigrant", "I-929"],
         ["67", "I-765 | Application for Employment Authorization", "I-765"],
@@ -1480,7 +1545,7 @@ let applicationsArray = [
     ],
 
     ["AOS SIJS"],
-    [        
+    [
         ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
         ["129", "Guardanship", "Guardanship"],
         ["67", "I-765 | Application for Employment Authorization", "I-765"],
@@ -1533,7 +1598,7 @@ let applicationsArray = [
         ["132", "FOIA-OBIM | FOIA petition before OBIM for client (Only if necessary).", "FOIA petition before OBIM for client (Only if necessary)."],
         ["133", "FBI | Request for Criminal Records with the FBI for client (Only if necessary).", "Request for Criminal Records with the FBI for client (Only if necessary)."]
     ],
-    
+
     ["B-CERT (I-918 B)"],
     [
         ["114", "I-918B (Supplement B) | U Nonimmigrant Status Certification", "I-918B"]
@@ -1546,7 +1611,7 @@ let applicationsArray = [
         ["114", "I-800 | Petition to Classify Convention Adoptee as an Immediate Relative", "I-800"],
         ["114", "I-800A | Application for Determination of Suitability to Adopt a Child from a Convention Country", "I-800A"]
     ],
-    
+
     ["Citizenship and Naturalization"],
     [
         ["19", "N-400 | Application for Naturalization", "N-400"],
@@ -1631,13 +1696,13 @@ let applicationsArray = [
     ],
 
     ["I-131 (Advanced Parole)"],
-    [        
+    [
         ["93", "I-131 | Application for Travel Document", "I-131"],
         ["78", "I-131A | Application for Travel Document (Carrier Documentation)", "I-131A"]
     ],
 
     ["I-134 (Declaration of Financial Support)"],
-    [        
+    [
         ["60", "I-134 | Declaration of Financial Support", "I-134"],
         ["61", "I-134A | Online Request to be a Supporter and Declaration of Financial Support", "I-134A"]
     ],
@@ -1730,7 +1795,7 @@ let applicationsArray = [
         ["114", "I-918B (Supplement B) | U Nonimmigrant Status Certification", "I-918B"],
         ["2", "I-192 | Application for Advance Permission to Enter as a Nonimmigrant", "I-192"]
     ],
-    
+
     ["VAWA"],
     [
         ["35", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant", "I-360"]
@@ -1767,7 +1832,7 @@ function getApplicationsArray(name){
  * @param {*} name , name of the service: u-visa, AOS Petition, etc
  * @param {*} numContact , contact view id to handle dom, html, etc
  * @param {*} numService , serviceId that contains all the applications
- * @returns 
+ * @returns
  */
 function addApplicationsToView(name, numContact, numService){
     // call method to get applications array and assign it to variable
@@ -1775,7 +1840,7 @@ function addApplicationsToView(name, numContact, numService){
     // check if there was an array for the name of the service
     if(applicationsFound) {
         for (let i = 0; i < applicationsFound.length; i++){
-            let index = contractJSON.contract.contacts[numContact].services[numService].applications.findIndex(function (applications){
+            let index = contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == numContact)].services[numService].applications.findIndex(function (applications){
                 return applications.applicationName === applicationsFound[i][1];
             });
             let html;
@@ -1786,7 +1851,7 @@ function addApplicationsToView(name, numContact, numService){
                                     <label class="form-check-label stretched-link" for="CB${applicationsFound[i][0]}Beneficiary${numContact}Service${numService}">${applicationsFound[i][1]}</label>
                                 </div>
                                 <div class="col-sm-2 text-end">
-                                    <input class="form-check-input me-1" type="checkbox" value="" id="CB${applicationsFound[i][0]}Beneficiary${numContact}Service${numService}" checked>
+                                    <input class="form-check-input me-1" name="checkboxGroup${numContact}" type="checkbox" value="" id="CB${applicationsFound[i][0]}Beneficiary${numContact}Service${numService}" checked>
                                 </div>
                             </div>
                         </li>`;
@@ -1797,7 +1862,7 @@ function addApplicationsToView(name, numContact, numService){
                                     <label class="form-check-label stretched-link" for="CB${applicationsFound[i][0]}Beneficiary${numContact}Service${numService}">${applicationsFound[i][1]}</label>
                                 </div>
                                 <div class="col-sm-2 text-end">
-                                    <input class="form-check-input me-1" type="checkbox" value="" id="CB${applicationsFound[i][0]}Beneficiary${numContact}Service${numService}">
+                                    <input class="form-check-input me-1" name="checkboxGroup${numContact}" type="checkbox" value="" id="CB${applicationsFound[i][0]}Beneficiary${numContact}Service${numService}">
                                 </div>
                             </div>
                         </li>`;
@@ -1887,26 +1952,198 @@ var contractJSON;
 function loadContract(){
     // make main contact in contract the same as the contact for the matter
     // load all values if update
-    contractJSON = 
-    {
-        "contract":{
-            'matterId':"",
-            'signDate':"",
-            'contractTotalAmount':"",
-            'downPaymentAmount':"",
-            'dateDownPayment':"",        
-            'numberOfMonthlyPayments':"",
-            'monthlyPaymentsTotalAmount':"",
-            'monthlyPayments':[],
-            'contacts':[]
-        }
-    };
-}
+    if(typeof contractArray === 'undefined' || typeof contractArray == 'undefined') {
+        contractJSON =
+        {
+            "contract":{
+                'matterId':matter_id,
+                'signDate': "",
+                'contractTotalAmount': "",
+                'downPaymentAmount': "",
+                'dateDownPayment': "",
+                'numberOfMonthlyPayments': "",
+                'monthlyPaymentsTotalAmount': "",
+                'monthlyPayments': [],
+                'contacts': []
+            }
+        };
+    } else {
+        if(Array.isArray(contractArray) && contractArray.length > 0) {
+            var contractData = contractArray[0];
+            contractJSON =
+            {
+                "contract":{
+                    'matterId': contractData.idMatter,
+                    'signDate': contractData.signDate,
+                    'contractTotalAmount': contractData.totalContract,
+                    'downPaymentAmount': "",
+                    'dateDownPayment': "",
+                    'numberOfMonthlyPayments': "",
+                    'monthlyPaymentsTotalAmount': "",
+                    'monthlyPayments': [],
+                    'contacts': []
+                }
+            };
 
+            //let inputDate;
+            
+            contractData.listPaymentPlan[0].forEach(itemPaymentPlan => {
+                // Split the input string based on the '-' separator
+                const parts = itemPaymentPlan.date.split('-');
+
+                // Rearrange the parts to the desired format
+                const outputDateString = `${parts[1]}/${parts[2]}/${parts[0]}`;
+                if (itemPaymentPlan.type == 1) {
+                    contractJSON.contract.monthlyPayments.push(
+                        {
+                            'date': outputDateString,
+                            'amount': parseFloat(itemPaymentPlan.amount).toFixed(2)
+                        }
+                    );
+                } else if (itemPaymentPlan.type == 2) {
+                    contractJSON.contract.downPaymentAmount = parseFloat(itemPaymentPlan.amount).toFixed(2);
+                    contractJSON.contract.dateDownPayment = outputDateString
+                }
+            });
+
+            let sizeMP = Object.keys(contractJSON.contract.monthlyPayments).length;
+            contractJSON.contract.numberOfMonthlyPayments = sizeMP;
+
+            contractJSON.contract.monthlyPaymentsTotalAmount = parseFloat(contractJSON.contract.contractTotalAmount) - parseFloat(contractJSON.contract.downPaymentAmount);
+
+            downPaymentAmount = parseFloat(contractJSON.contract.dateDownPayment);
+            downPaymentDate = contractJSON.contract.dateDownPayment;
+            totalMonthlyCharges = parseFloat(contractJSON.contract.monthlyPaymentsTotalAmount);
+            numberOfMonthlyCharges = sizeMP;
+            totalContractAmount = parseFloat(contractData.totalContract);
+
+            if(contractJSON.contract.monthlyPayments[0].amount == contractJSON.contract.monthlyPayments[sizeMP-1].amount){
+                amountMonthlyCharges = contractJSON.contract.monthlyPayments[0].amount;
+            } else if (contractJSON.contract.monthlyPayments[0].amount > contractJSON.contract.monthlyPayments[1].amount) {
+                amountMonthlyCharges = contractJSON.contract.monthlyPayments[1].amount;
+            } else {
+                amountMonthlyCharges = contractJSON.contract.monthlyPayments[0].amount;
+            }
+            
+            $( "#dateDP" ).datepicker("setDate", contractJSON.contract.dateDownPayment);
+            document.getElementById('amountDP').value= contractJSON.contract.downPaymentAmount;
+            adjustSummary(1);
+
+            document.getElementById('amountMC').value= amountMonthlyCharges;
+            document.getElementById('numberOfMC').value= numberOfMonthlyCharges;
+            $( "#startDateMC" ).datepicker("setDate", contractJSON.contract.monthlyPayments[0].date);
+            $( "#endDateMC" ).val(contractJSON.contract.monthlyPayments[sizeMP-1].date);
+            document.getElementById('totalMC').value= totalMonthlyCharges;
+            adjustSummary(2);
+            // Programmatically trigger a click event in JavaScript with the ID and jQuery
+            $('#expandTablePreview').trigger('click');
+            $('#expandTablePreview').trigger('click');
+
+            // Get the select element
+            const contactSelect = document.getElementById('ContactSelect');
+            contractData.listRoles[0].forEach((itemContact, index) => {
+                let indexSelect;
+                // Loop through options to find the index by value
+                for (let i = 1; i < contactSelect.options.length; i++) {
+                    if (contactSelect.options[i].value === itemContact.contact || contactSelect.options[i].value == itemContact.contact) {
+                        indexSelect = i; // Return the index and exit the loop
+                        break;
+                    }
+                }
+                if(typeof indexSelect == 'undefined') {
+                    // Cancel the confirmation
+                    shouldShowConfirmation = false;
+                    sweetAlert(2, 'There was an issue adding a contact, please contact an administrator', base_url + "matters/" + matter_id + "/main_view");
+                    return;
+                } else {
+                    // Set the selectedIndex to the one found before
+                    contactSelect.selectedIndex = indexSelect;
+                    addContact(itemContact.role);
+                    const selectService = document.getElementById('ContactServicesSelect'+index);
+                    contractData.listApplications[0].forEach((itemApplication, index2) => {
+                        let indexSelect2;
+                        if(itemApplication.contact == itemContact.contact || itemApplication.contact === itemContact.contact) {
+                            if(contractJSON.contract.contacts[index].services.some(el => el.serviceId == itemApplication.service)){
+                            } else {
+                                // Loop through options to find the index by value
+                                for (let i = 1; i < selectService.options.length; i++) {
+                                    if (selectService.options[i].value === itemApplication.service || selectService.options[i].value == itemApplication.service) {
+                                        indexSelect2 = i; // Return the index and exit the loop
+                                        break;
+                                    }
+                                }
+                                selectService.selectedIndex = indexSelect2;
+                                addService(index);
+                            }
+                            let serviceValues = servicesArray.find(innerArray => innerArray[0] == itemApplication.service);
+                            if(typeof serviceValues == 'undefined'){
+                                // Cancel the confirmation
+                                shouldShowConfirmation = false;
+                                sweetAlert(2, 'There was an issue with your request, please contact an administrator', base_url + "matters/" + matter_id + "/main_view");
+                                return;
+                            } else {
+                                let applicationsFound = getApplicationsArray(serviceValues[1]);
+                                applicationsFound.forEach(applications => {
+                                    if(applications[0] == itemApplication.application){
+                                        //console.log(contractJSON.contract.contacts[index].services.findIndex(item => item.serviceId == selectService.value));
+                                        let posistionService = contractJSON.contract.contacts[index].services.findIndex(function (item){
+                                            return item.serviceId == itemApplication.service
+                                        });
+                                        contractJSON.contract.contacts[index].services[posistionService].applications.push(
+                                            {
+                                                'applicationName':applications[1],
+                                                'applicationId': itemApplication.application
+                                            }
+                                        );
+                                    }
+                                });
+                            }
+                        }
+                        selectService.selectedIndex = indexSelect2;
+                        let posistionService2 = contractJSON.contract.contacts[index].services.findIndex(function (item){
+                            return item.serviceId == itemApplication.service
+                        });
+                        if(posistionService2 != -1) {
+                            updateApplicationsPerService(index, posistionService2, itemApplication.service);
+                        }
+                    });
+                }
+                contactSelect.selectedIndex = 0;
+            });
+            let indexSelect3;
+            // Get the select element
+            const languageSelect = document.getElementById('contractLanguage');
+            for (let i = 1; i < languageSelect.options.length; i++) {
+                if (languageSelect.options[i].text === contractData.language || languageSelect.options[i].text === contractData.language) {
+                    indexSelect3 = i; // Return the index and exit the loop
+                    break;
+                }
+            }
+            if(typeof indexSelect3 == 'undefined'){
+                Toast.fire({
+                    icon: "info",
+                    title: "Language was not loaded",
+                    html: `
+                        There was an issue loading the
+                        contracts language, please contact
+                        an administrator
+                    `
+                });
+            } else {
+                languageSelect.selectedIndex = indexSelect3;
+            }
+        } else {
+            // Cancel the confirmation
+                shouldShowConfirmation = false;
+            sweetAlert(2, 'There was an issue with your request, please contact an administrator', base_url + "matters/" + matter_id + "/main_view");
+        }
+    }
+
+}
 let nameMainClient;
 let clientsToWord;
 let servicesToWord;
-
+let numContacts = 0;
 
 /**
  * Prepares the request by building a json that is then sent to an endpoint.
@@ -1918,160 +2155,254 @@ let servicesToWord;
  * generate is the function that create the word document
  * saveRow is the funciton that saves the contract to the database
  */
-function sendRequest(){
-    let listOfWrongValues = checkContractValues();
-
-    if(listOfWrongValues == null || listOfWrongValues == undefined || listOfWrongValues.length == 0) {
+function sendRequest(transaction){
+    if (transaction == null || transaction == undefined || typeof transaction == 'undefined' || typeof transaction !== 'number' || transaction == 0 || transaction < 0 || transaction > 2) {
+        sweetAlert(2, 'There was an issue with your request, please contact an administrator', null);
+        console.log("here, first if");
+        return null;
+    } else {
         let data = {};
         let listContactsApplications = [];
         let listRoleContacts = [];
         let listPaymentPlans = [];
         let request = {};
+        if(transaction == 1) {
+            let listOfWrongValues = checkContractValues();
+            if(listOfWrongValues == null || listOfWrongValues == undefined || listOfWrongValues.length == 0) {
+                data.filenamecontract = "-";
+                data.idcontractlanguage = document.getElementById('contractLanguage').value;
+                data.idcontractstatus = "1";
+                data.idmatter = matter_id;
 
-        data.pathdocumentcontract = "-";
-        data.idcontractlanguage = document.getElementById('contractLanguage').value;
-        data.idcontractstatus = "1";
-        data.idmatter = "4416";
+                // Down Payment
+                let downPaymentPlan = {};
+                downPaymentPlan.amountpaymentplan = parseFloat(contractJSON.contract.downPaymentAmount);
+                downPaymentPlan.datepaymentplan = formatDates(contractJSON.contract.dateDownPayment);
+                downPaymentPlan.idpaymentplantype = 2;
 
-        // Down Payment
-        let downPaymentPlan = {};
-        downPaymentPlan.amountpaymentplan = parseFloat(contractJSON.contract.downPaymentAmount);
-        downPaymentPlan.datepaymentplan = formatDates(contractJSON.contract.dateDownPayment);
-        downPaymentPlan.idpaymentplantype = 2;
+                listPaymentPlans.push(downPaymentPlan);
 
-        listPaymentPlans.push(downPaymentPlan);
+                // Monthly Charges
+                for(let i = 0 ; i < Object.keys(contractJSON.contract.monthlyPayments).length ; i++){
+                    let montlhlyPlan = {};
+                    montlhlyPlan.amountpaymentplan = parseFloat(contractJSON.contract.monthlyPayments[i].amount);
+                    montlhlyPlan.datepaymentplan = formatDates(contractJSON.contract.monthlyPayments[i].date);
+                    montlhlyPlan.idpaymentplantype = 1;
 
-        // Monthly Charges
-        for(let i = 0 ; i < Object.keys(contractJSON.contract.monthlyPayments).length ; i++){
-            let montlhlyPlan = {};
-            montlhlyPlan.amountpaymentplan = parseFloat(contractJSON.contract.monthlyPayments[i].amount);
-            montlhlyPlan.datepaymentplan = formatDates(contractJSON.contract.monthlyPayments[i].date);
-            montlhlyPlan.idpaymentplantype = 1;
+                    listPaymentPlans.push(montlhlyPlan);
+                }
 
-            listPaymentPlans.push(montlhlyPlan);
-        }
+                //Roles
+                for(let i = 0 ; i < Object.keys(contractJSON.contract.contacts).length ; i++){
+                    let roleContacts = {};
+                    roleContacts.idcontractrole = parseInt(contractJSON.contract.contacts[i].contactRole);
+                    roleContacts.idcontact = parseInt(contractJSON.contract.contacts[i].contactId);
 
-        //Roles
-        for(let i = 0 ; i < Object.keys(contractJSON.contract.contacts).length ; i++){
-            let roleContacts = {};
-            roleContacts.idcontractrole = parseInt(contractJSON.contract.contacts[i].contactRole);
-            roleContacts.idcontact = parseInt(contractJSON.contract.contacts[i].contactId);
+                    listRoleContacts.push(roleContacts);
+                }
 
-            listRoleContacts.push(roleContacts);
-        }
+                //Applications
+                listContactsApplications = contractJSON.contract.contacts.flatMap(nameObj => {
+                    return nameObj.services.flatMap(typeObj => {
+                        return typeObj.applications.map(subtypeObj => ({
+                            idcontractapplication: subtypeObj.applicationId,
+                            idcontact: parseInt(nameObj.contactId),
+                            idcontractservice: parseInt(typeObj.serviceId)
+                        }));
+                    });
+                });
 
-        //Applications
-        listContactsApplications = contractJSON.contract.contacts.flatMap(nameObj => {
-            return nameObj.services.flatMap(typeObj => {
-            return typeObj.applications.map(subtypeObj => ({
-                idcontractapplication: subtypeObj.applicationId,
-                idcontact: parseInt(nameObj.contactId)
-            }));
-            });
-        });
-        
-        request.contracts = data;
-        request.applicationsContactsList = listContactsApplications;
-        request.roleContactsList = listRoleContacts;
-        request.contractPaymentPlansList = listPaymentPlans;
+                request.contracts = data;
+                request.applicationsContactsList = listContactsApplications;
+                request.roleContactsList = listRoleContacts;
+                request.contractPaymentPlansList = listPaymentPlans;
+                //generate();
+                console.log(JSON.stringify(request));
+                shouldShowConfirmation = false;
+                saveRow(base_url + create, null, request, null, base_url + "matters/" + matter_id + "/main_view", null);
+            } else {
+                console.log(listOfWrongValues);
 
-        nameMainClient = document.getElementById("0ContactName").value;
-
-        clientsToWord = [
-            {
-                'name_client': document.getElementById("0ContactName").value,
-                'role_client': "Victima"
-            },
-            {
-                'name_client': document.getElementById("1ContactName").value,
-                'role_client': "Derivativo"
+                swal.fire({
+                    title: 'Error',
+                    html: 'Cannot proceed with empty / invalid values: \n <pre class="text-start">' + listOfWrongValues + '</pre>',
+                    icon: 'error',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                });
             }
-        ];
-        
-        servicesToWord = [
-            {
-                service_message: "Socorro migratorio al que se aplica: VISA U. Comprende lo siguiente",
-                service_client: document.getElementById("0ContactName").value,
-                "applications": [
-                    {
-                        application_message: "Aplicación para Visa-U (I-918) a favor de"
-                    },
-                    {
-                        application_message: "Petición de Perdón (I-192) para"
-                    },
-                    {
-                        application_message: "Petición de Permiso de Trabajo I-765 (C14)"
-                    }
-                ]
-            },
-            {
-                service_message: "Peticiones para obtener registros de Cliente",
-                service_client: document.getElementById("0ContactName").value,
-                "applications": [
-                    {
-                        application_message: "Petición FOIA a USCIS para"
-                    },
-                    {
-                        application_message: "Petición FOIA a CBP para"
-                    },
-                    {
-                        application_message: "Petición FOIA frente a OBIM"
-                    },
-                    {
-                        application_message: "Peticiones de registro Criminal con el FBI para"
-                    }
-                ]
-            },
-            {
-                service_message: "Socorro migratorio al que se aplica: VISA U. Comprende lo siguiente",
-                service_client: "Epifanio Arenal",
-                "applications": [
-                    {
-                        application_message: "Aplicación para Visa-U (I-918A) a favor de"
-                    },
-                    {
-                        application_message: "Petición de Perdón (I-192) para"
-                    },
-                    {
-                        application_message: "Petición de Permiso de Trabajo I-765 (Categoria C14)"
-                    },
-                    {
-                        application_message: "Petición de Permiso de Trabajo I-765 (Categoria A20)"
-                    }
-                ]
-            },
-            {
-                service_message: "Peticiones para obtener registros de Cliente",
-                service_client: "Epifanio Arenal",
-                "applications": [
-                    {
-                        application_message: "Petición FOIA a USCIS para"
-                    },
-                    {
-                        application_message: "Petición FOIA a CBP para"
-                    },
-                    {
-                        application_message: "Peticiones de registro Criminal con el FBI para Cliente"
-                    }
-                ]
-            },
-        ];
+        } else if (transaction == 2) {
+            let listOfWrongValues = checkContractValues();
+            if(listOfWrongValues == null || listOfWrongValues == undefined || listOfWrongValues.length == 0) {
+                data.idcontract = contractArray[0].idContract;
+                data.filenamecontract = contractArray[0].fileNameContract;
+                data.idcontractlanguage = document.getElementById('contractLanguage').value;
+                data.idcontractstatus = "1";
+                data.idmatter = matter_id;
 
-        //generate();
-        //saveRow(create, null, request, null, null, null);
-        console.log(JSON.stringify(request));
-    } else {
-        console.log(listOfWrongValues);
+                // Down Payment
+                let downPaymentPlan = {};
+                downPaymentPlan.amountpaymentplan = parseFloat(contractJSON.contract.downPaymentAmount);
+                downPaymentPlan.datepaymentplan = formatDates(contractJSON.contract.dateDownPayment);
+                downPaymentPlan.idpaymentplantype = 2;
 
-        swal.fire({
-            title: 'Error',
-            html: 'Cannot proceed with empty / invalid values: \n <pre class="text-start">' + listOfWrongValues + '</pre>',
-            icon: 'error',
-            allowOutsideClick: false,
-            allowEscapeKey: false
-        });
+                listPaymentPlans.push(downPaymentPlan);
+
+                // Monthly Charges
+                for(let i = 0 ; i < Object.keys(contractJSON.contract.monthlyPayments).length ; i++){
+                    let montlhlyPlan = {};
+                    montlhlyPlan.amountpaymentplan = parseFloat(contractJSON.contract.monthlyPayments[i].amount);
+                    montlhlyPlan.datepaymentplan = formatDates(contractJSON.contract.monthlyPayments[i].date);
+                    montlhlyPlan.idpaymentplantype = 1;
+                    listPaymentPlans.push(montlhlyPlan);
+                }
+
+                //Roles
+                for(let i = 0 ; i < Object.keys(contractJSON.contract.contacts).length ; i++){
+                    let roleContacts = {};
+                    roleContacts.idcontractrole = parseInt(contractJSON.contract.contacts[i].contactRole);
+                    roleContacts.idcontact = parseInt(contractJSON.contract.contacts[i].contactId);
+
+                    listRoleContacts.push(roleContacts);
+                }
+
+                //Applications
+                listContactsApplications = contractJSON.contract.contacts.flatMap(nameObj => {
+                    return nameObj.services.flatMap(typeObj => {
+                        return typeObj.applications.map(subtypeObj => ({
+                            idcontractapplication: subtypeObj.applicationId,
+                            idcontact: parseInt(nameObj.contactId),
+                            idcontractservice: parseInt(typeObj.serviceId)
+                        }));
+                    });
+                });
+
+                let oldApplicationsList = [];
+                contractArray[0].listApplications[0].forEach(function(element) {
+                    oldApplicationsList.push(element.id);
+                });
+
+                let oldRoleList = [];
+                contractArray[0].listRoles[0].forEach(function(element) {
+                    oldRoleList.push(element.id);
+                });
+
+                let oldPaymentsList = [];
+                contractArray[0].listPaymentPlan[0].forEach(function(element) {
+                    oldPaymentsList.push(element.id);
+                });
+                
+                let contract_id = contractArray[0].idContract;
+
+                request.contracts = data;
+                request.applicationsContactsList = listContactsApplications;
+                request.roleContactsList = listRoleContacts;
+                request.contractPaymentPlansList = listPaymentPlans;
+                request.oldApplicationsList = oldApplicationsList;
+                request.oldRoleList = oldRoleList;
+                request.oldPaymentsList = oldPaymentsList;
+                //generate();
+                console.log(JSON.stringify(request));
+                shouldShowConfirmation = false;
+                saveRow(base_url + update + contract_id, null, request, null, base_url + "contract/" + contractArray[0].idContract + "/edit/?matter_id=" + matter_id, null);
+                console.log("" + base_url + update + contract_id + "");
+            } else {
+                console.log(listOfWrongValues);
+
+                swal.fire({
+                    title: 'Error',
+                    html: 'Cannot proceed with empty / invalid values: \n <pre class="text-start">' + listOfWrongValues + '</pre>',
+                    icon: 'error',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                });
+            }
+        } else {
+            sweetAlert(2, 'There was an issue with your request, please contact an administrator', null);
+            return null;
+        }
     }
 }
+
+// clientsToWord = [
+//     {
+//         'name_client': document.getElementById("0ContactName").value,
+//         'role_client': "Victima"
+//     },
+//     {
+//         'name_client': document.getElementById("1ContactName").value,
+//         'role_client': "Derivativo"
+//     }
+// ];
+
+// servicesToWord = [
+//     {
+//         service_message: "Socorro migratorio al que se aplica: VISA U. Comprende lo siguiente",
+//         service_client: document.getElementById("0ContactName").value,
+//         "applications": [
+//             {
+//                 application_message: "Aplicación para Visa-U (I-918) a favor de"
+//             },
+//             {
+//                 application_message: "Petición de Perdón (I-192) para"
+//             },
+//             {
+//                 application_message: "Petición de Permiso de Trabajo I-765 (C14)"
+//             }
+//         ]
+//     },
+//     {
+//         service_message: "Peticiones para obtener registros de Cliente",
+//         service_client: document.getElementById("0ContactName").value,
+//         "applications": [
+//             {
+//                 application_message: "Petición FOIA a USCIS para"
+//             },
+//             {
+//                 application_message: "Petición FOIA a CBP para"
+//             },
+//             {
+//                 application_message: "Petición FOIA frente a OBIM"
+//             },
+//             {
+//                 application_message: "Peticiones de registro Criminal con el FBI para"
+//             }
+//         ]
+//     },
+//     {
+//         service_message: "Socorro migratorio al que se aplica: VISA U. Comprende lo siguiente",
+//         service_client: "Epifanio Arenal",
+//         "applications": [
+//             {
+//                 application_message: "Aplicación para Visa-U (I-918A) a favor de"
+//             },
+//             {
+//                 application_message: "Petición de Perdón (I-192) para"
+//             },
+//             {
+//                 application_message: "Petición de Permiso de Trabajo I-765 (Categoria C14)"
+//             },
+//             {
+//                 application_message: "Petición de Permiso de Trabajo I-765 (Categoria A20)"
+//             }
+//         ]
+//     },
+//     {
+//         service_message: "Peticiones para obtener registros de Cliente",
+//         service_client: "Epifanio Arenal",
+//         "applications": [
+//             {
+//                 application_message: "Petición FOIA a USCIS para"
+//             },
+//             {
+//                 application_message: "Petición FOIA a CBP para"
+//             },
+//             {
+//                 application_message: "Peticiones de registro Criminal con el FBI para Cliente"
+//             }
+//         ]
+//     },
+// ];
 
 function loadContacts(num){
     // get contacts related values
@@ -2081,41 +2412,79 @@ function loadContacts(num){
 
 // necessary values: contact name, contact relationship, beneficiary or main client
 // insert contact to view and json with empty services
-function addContact(name, relation){
-    let numContacts = Object.keys(contractJSON.contract.contacts).length;
+function addContact(idrole){
+    //let numContacts = Object.keys(contractJSON.contract.contacts).length;
     let contactRole;
+    let name;
+    let contactId;
+    let relation;
+    let serviceSelect = document.getElementById("ContactSelect");
 
-    if(numContacts === 0){
-        contactRole = "1";
-        relation = "";
-        contractJSON.contract.contacts.push(
-            {
-                'contactName':name,
-                'contactRole': contactRole,
-                'contactRelation':relation,
-                'contactId': '5054',
-                'services':[]
-            }
-        );
+    contactId = serviceSelect.value;
+    name = serviceSelect.options[serviceSelect.selectedIndex].text;
+    if(contactId == 0 || contactId === 0 || contactId < 1){
+        console.log(contactId);
+        sweetAlert(2, 'This option cannot be added', null);
     } else {
-        contactRole = "2";
-        contractJSON.contract.contacts.push(
-            {
-                'contactName':name,
-                'contactRole': contactRole,
-                'contactRelation':relation,
-                'contactId': '110',
-                'services':[]
+        let checkIfAdded = contractJSON.contract.contacts.some(item => item.contactId === contactId);
+        if(checkIfAdded){
+            sweetAlert(2, name + ' is already added', null);
+        } else {
+            relation = document.getElementById(contactId).getAttribute('data-custom-relation');
+            const checkboxes = document.querySelectorAll('input[name="mainClientCheck"]');
+            let isAnyCheckboxSelected = false;
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    // Log or use the ID of the selected checkbox
+                    idCheckedCheckBox = checkbox.getAttribute('data-custom-id');
+                    // Set the flag to true since at least one checkbox is selected
+                    isAnyCheckboxSelected = true;
+                    //console.log(isAnyCheckboxSelected);
+                }
+            });
+            if(!isAnyCheckboxSelected){
+                if(idrole == -1 || idrole < 0 || idrole === -1) {
+                    contactRole = "1";
+                } else {
+                    contactRole = idrole.toString();
+                }
+                contractJSON.contract.contacts.push(
+                    {
+                        'contactName':name,
+                        'contactRole': contactRole,
+                        'contactRelation':relation,
+                        'contactId': contactId,
+                        'contactPos': numContacts,
+                        'services':[]
+                    }
+                );
+            } else {
+                if(idrole == -1 || idrole < 0 || idrole === -1) {
+                    contactRole = "2";
+                } else {
+                    contactRole = idrole.toString();
+                }
+                contractJSON.contract.contacts.push(
+                    {
+                        'contactName':name,
+                        'contactRole': contactRole,
+                        'contactRelation':relation,
+                        'contactId': contactId,
+                        'contactPos': numContacts,
+                        'services':[]
+                    }
+                );
             }
-        );
-    }
 
-    let html = addBeneficiaryViewContent(numContacts,relation, contactRole); // add query to get the relation of the contact in the contract (son, mom, brother, sibling, ...)
-    document.getElementById("listBeneficiaries").insertAdjacentHTML("beforeend", html);
-    setFstDropdown();
-    fillSelectFSByTagsArrayLocal(servicesArray, 'ContactServicesSelect'+numContacts+'', null);
-    document.querySelector('#ContactServicesSelect'+numContacts+'').fstdropdown.setValue(0);
-    // get num of contacts
+            let html = addBeneficiaryViewContent(numContacts, relation, contactRole, name, contactId); // add query to get the relation of the contact in the contract (son, mom, brother, sibling, ...)
+            document.getElementById("listBeneficiaries").insertAdjacentHTML("beforeend", html);
+            setFstDropdown();
+            fillSelectFSByTagsArrayLocal(servicesArray, 'ContactServicesSelect'+numContacts+'', null);
+            document.querySelector('#ContactServicesSelect'+numContacts+'').fstdropdown.setValue(0);
+            numContacts++;
+            // get num of contacts
+        }
+    }
 }
 
 function addServicet(num){
@@ -2134,7 +2503,7 @@ function addServicet(num){
             'role_client': checkRole
         }
         clientsToWord.push(elementClient);
-        
+
         for(let j = 0; j < Object.keys(contractJSON.contract.contacts[i].services).length; j++){
             let serviceMessage = '';
             if(contractJSON.contract.contacts[i].services[j].serviceId == '34') {
@@ -2161,11 +2530,11 @@ function addService(num){
     if(serviceId.length==0 || serviceId===null || serviceId==="" || serviceName === "Select an Option" || serviceId === 0 || serviceId == 0){
         sweetAlert(2, 'This option cannot be added', null);
     } else {
-        if(contractJSON.contract.contacts[num].services.some(el => el.serviceId === serviceId)){
+        if(contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == num)].services.some(el => el.serviceId === serviceId)){
             sweetAlert(2, 'Service already added to the list', null);
         } else {
             let numServices = Object.keys(contractJSON.contract.contacts).length;
-            contractJSON.contract.contacts[num].services.push(
+            contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == num)].services.push(
                 {
                     'serviceName':serviceName,
                     'serviceId':serviceId,
@@ -2186,7 +2555,7 @@ function addService(num){
                         </a>
                     </div>
                 </div>`;
-    
+
             document.getElementById('Contact' + num + 'ServicesContainer').insertAdjacentHTML("beforeend", html);
 
             $( "#Contact" + num + "ApplicationsSaveButton" ).toggleClass(function() {
@@ -2200,7 +2569,7 @@ function addService(num){
     }
 }
 
-/** 
+/**
  * Adds #; at the end of url when triggered.
  * This is to avoid unwanted behvaiour (the page moves up, refreshes, etc) when a button is clicked
  * */
@@ -2208,7 +2577,7 @@ function adjustmentPositioning(){
     const highlightedItems = document.querySelectorAll("a");
     [].forEach.call(highlightedItems, function(atag) {
         var attrValue = atag.getAttribute("href");
-        attrValue == "javascript:void(0);" ? null : atag.setAttribute("href", "#;");        
+        attrValue == "javascript:void(0);" ? null : atag.setAttribute("href", "#;");
     });
 }
 
@@ -2232,10 +2601,10 @@ function hideElementContacts(num, section){
         listElement.add("visually-hidden");
         iconContact.innerText = "visibility_off";
         if (section === 'Services') {
-            titleContact.innerText = section+' ('+Object.keys(contractJSON.contract.contacts[num].services).length+')';
+            titleContact.innerText = section+' ('+Object.keys(contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == num)].services).length+')';
         } else {
             titleContact.innerText = section;
-        }      
+        }
     }
 }
 
@@ -2244,9 +2613,9 @@ function hideElementContacts(num, section){
  * This functions is called by an onclick event
  * Shows a modal to confirm the transaction then
  * Querys all the elements with num to then remove them
- * @param {Number} num 
+ * @param {Number} num
  */
-function removeBeneficiary(num) {
+function removeBeneficiary(num, id) {
     const contact = document.getElementById(num+'Contact');
     if(contact.length==0 || contact===null || contact===""){
         sweetAlert(2, 'Unable to Perform this action right now', null);
@@ -2262,11 +2631,76 @@ function removeBeneficiary(num) {
             allowEscapeKey: false
         }).then(result => {
             // verify if Yes button is clicked
-            if (result.value) {                
-                contractJSON.contract.contacts.splice(num,1);
+            if (result.value) {
+                contractJSON.contract.contacts.splice(contractJSON.contract.contacts.findIndex(item => item.contactId == id), 1);
                 contact.remove();
+                scanPrincipalCheckBox();
             }
         });
+    }
+}
+
+function assignPrincipalCheckBox(checkbox) {
+    const idContactCheckBox = checkbox.getAttribute('data-custom-id');
+    let indexContactCheckBox = contractJSON.contract.contacts.findIndex(item => item.contactId == idContactCheckBox);
+    let indexPrincipalContact = contractJSON.contract.contacts.findIndex(item => item.contactRole == 1);
+    // cambiar id de anterior a 2
+    // asignar clickeado id 1
+    if (indexContactCheckBox == indexPrincipalContact || indexContactCheckBox === indexPrincipalContact) {
+    } else {
+        contractJSON.contract.contacts[indexPrincipalContact].contactRole = 2;
+        contractJSON.contract.contacts[indexContactCheckBox].contactRole = 1;
+    }
+}
+
+function allCheckboxesToggleChecked(checkbox, groupNum){
+    // Get all checkboxes with the specified name
+    const checkboxes = document.querySelectorAll('input[name="checkboxGroup' + groupNum + '"]');
+
+    if(checkboxes.length == 0 || checkboxes.length === 0) {
+    } else {
+        if(checkbox.checked) {
+            // Loop through checkboxes and set them as checked
+            checkboxes.forEach(checkbox => {
+            checkbox.checked = true;
+          });
+        } else {
+            // Loop through checkboxes and set them as not checked
+            checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+          });
+        }
+    }
+}
+
+function scanPrincipalCheckBox(){
+    // Get all checkboxes with the specified name
+    const checkboxes = document.querySelectorAll('input[name="mainClientCheck"]');
+    let isAnyCheckboxSelected = false;
+    let idCheckedCheckBox;
+    let idPrincipalContact = contractJSON.contract.contacts.findIndex(item => item.contactRole == 1);
+    // Loop through checkboxes to find the selected one
+    if (checkboxes.length === 0 || checkboxes.length == 0) {
+    } else {
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                // Log or use the ID of the selected checkbox
+                idCheckedCheckBox = checkbox.getAttribute('data-custom-id');
+                // Set the flag to true since at least one checkbox is selected
+                isAnyCheckboxSelected = true;
+                //console.log(isAnyCheckboxSelected);
+                if(idCheckedCheckBox != idPrincipalContact) {
+                    contractJSON.contract.contacts[idPrincipalContact].contactRole = 2;
+                    contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactId == idCheckedCheckBox)].contactRole = 1;
+                }
+            }
+        });
+        // Check if no checkbox is selected
+        if (!isAnyCheckboxSelected) {
+            checkboxes[0].checked = true;
+            contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactId == checkboxes[0].getAttribute('data-custom-id'))].contactRole = 1;
+            // You can take further action here, such as displaying an alert or performing another operation.
+        }
     }
 }
 
@@ -2288,7 +2722,7 @@ function removeService(num, nums){
     const textOfService = $( "#Contact"+num+"Service"+nums ).find( "li" ).contents().first().text();
     console.log(textOfService.trim());
     const servicesContainer = $( "#Contact"+num+"Service"+nums ).find( "row" ).contents();
-    console.log(servicesContainer);    
+    console.log(servicesContainer);
     if(service===null || service.length==0 || service===""){
         sweetAlert(2, 'Unable to Perform this action right now', null);
     } else {
@@ -2304,30 +2738,30 @@ function removeService(num, nums){
         }).then(result => {
             // verify if button is clicked
             if (result.value) {
-                let index = contractJSON.contract.contacts[num].services.findIndex(function (services){
+                let index = contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == num)].services.findIndex(function (services){
                     return services.serviceId == nums;
                 });
                 if(index >= 0){
-                    contractJSON.contract.contacts[num].services.splice(index,1);
+                    contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == num)].services.splice(index,1);
                     // check if current service is selected then remove the applications options
                     if($( "#Contact"+num+"Service"+nums ).find( "li" ).hasClass("active")){
                         document.getElementById("Contact" + num + "ApplicationsContainer").innerHTML = "";
                     }
                     service.remove();
-                    if (Object.keys(contractJSON.contract.contacts[num].services).length === 0) {
+                    if (Object.keys(contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == num)].services).length === 0) {
                         $( "#Contact" + num + "ApplicationsSaveButton" ).toggleClass(function() {
                             if ( $( this ).hasClass("disabled") ) {
                             return "";
                             } else {
                             return "disabled";
                             }
-                        });   
-                    }                
+                        });
+                    }
                 } else {
                     sweetAlert(2, 'There was an issue with your request, please contact an administrator', null);
-                }    
+                }
             }
-        });       
+        });
     }
 }
 
@@ -2340,7 +2774,7 @@ function removeService(num, nums){
         sweetAlert(2, 'Can'+ "'" +'t add morde than ' + maxContacts + ' Beneficiary', null);
     } else if (numOfContacts <= maxContacts) {
         let html = addBeneficiaryViewContent(numOfContacts, "Father"); // add query to get the relation of the contact in the contract (son, mom, brother, sibling, ...)
-        document.getElementById("listBeneficiaries").insertAdjacentHTML("beforeend", html);        
+        document.getElementById("listBeneficiaries").insertAdjacentHTML("beforeend", html);
         console.log(numOfContacts);
         numOfContacts +=1;
     } else {
@@ -2358,35 +2792,44 @@ function removeService(num, nums){
  * all contacts have a unique id that is shared with
  * the view elements of each contact
  */
-function addBeneficiaryViewContent(num, relation, role){
+function addBeneficiaryViewContent(num, relation, role, name, id){
     let roleContact;
     if(relation.length==0 || relation===null || relation===""){
         relation = '';
     }
     switch(role){
         case '1':
-            roleContact = 'Primary';
+            roleContact = '" checked';
             break;
         case '2':
-            roleContact = 'Beneficiary';
+            roleContact = '"';
             break;
         default:
-            roleContact = 'Part of Contract';
+            roleContact = '"';
     }
     let html = `<div class="row align-items-start mb-4" id="${num}Contact">
                     <div class="col">
                         <div class="mb-3">
                             <div class="d-flex">
-                                <div class="p-2">
-                                    <label for="${num}ContactName" class="form-label mb-2">${roleContact} (${relation})</label>
+                                <div class="p-2 ms-auto">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" data-custom-id="${id}" name="mainClientCheck" onclick="assignPrincipalCheckBox(this)" id="mainCheck${num}${roleContact}>
+                                        <label class="form-check-label" for="mainCheck${num}">
+                                            Mark as Principal Contact
+                                        </label>
+                                    </div>
                                 </div>
                                 <div class="p-2 ms-auto">
-                                    <a class="text-danger" href="#;" onclick="removeBeneficiary(${num})">
+                                    <a class="text-danger" href="#;" onclick="removeBeneficiary(${num}, ${id})">
                                         <span class="material-symbols-outlined">do_not_disturb_on</span>
                                     </a>
                                 </div>
-                            </div>  
-                            <input type="text" class="form-control" id="${num}ContactName" required>
+                            </div>
+                            <div class="card">
+                                <div class="card-body">
+                                    ${name} (${relation})
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col">
@@ -2403,7 +2846,6 @@ function addBeneficiaryViewContent(num, relation, role){
                         <div class="row" id="${num}ContactServices">
                             <div class="col">
                                 <ul class="list-group services-list list-group-flush mb-2" id="Contact${num}ServicesContainer">
-
                                 </ul>
                                 <div class="row align-items-center">
                                     <div class="col-sm-11">
@@ -2416,30 +2858,35 @@ function addBeneficiaryViewContent(num, relation, role){
                                     </div>
                                 </div>
                             </div>
-                        </div>                                        
+                        </div>
                     </div>
                     <div class="col">
                         <div class="d-flex">
                             <div class="p-2">
                                 <label class="ml-2 mb-2" id="${num}ContactApplicationsTitle">Applications</label>
                             </div>
-                            <div class="p-2 me-auto ms-auto">
+                            <div class="p-2 ms-auto">
                                 <a class="text-black" href="#;" onclick="hideElementContacts(${num}, 'Applications')">
                                     <span class="material-symbols-outlined visually-hidden" id="${num}ContactApplicationsIcon">visibility</span>
                                 </a>
+                                <label class="custom-checkbox pe-2" tab-index="0" aria-label="Select All">
+                                    <span class="label">Select All</span>
+                                    <input id="selectAll${num}" type="checkbox" onclick="allCheckboxesToggleChecked(this, ${num})">
+                                    <span class="checkmark"></span>
+                                </label>
                             </div>
                         </div>
                         <div class="row" id="${num}ContactApplications">
                             <div class="col">
-                                <ul class="list-group mb-2" id="Contact${num}ApplicationsContainer">                                
-                                </ul>                                
+                                <ul class="list-group mb-2" id="Contact${num}ApplicationsContainer">
+                                </ul>
                                 <a class="btn btn-secondary save-applications disabled" href="#" id="Contact${num}ApplicationsSaveButton" aria-describedby="${num}ContactApplicationsSaveDescription">Save Selection</a>
                                 <div id="${num}ContactApplicationsSaveDescription" class="form-text">
-                                    
+
                                 </div>
                             </div>
-                        </div>                                        
-                    </div>                        
+                        </div>
+                    </div>
                 </div>`;
 
     return html;
