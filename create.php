@@ -25,24 +25,130 @@
                 max-height:300px;
             }
 
+            #icontoflip {
+                -webkit-transform: scaleX(-1);
+                -moz-transform: scaleX(-1);
+                -o-transform: scaleX(-1);
+                transform: scaleX(-1);
+            }
+
+            .custom-checkbox {
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                margin: 10px 0;
+            }
+
+            .custom-checkbox .label {
+                font-size: 1.2em;
+                margin: 0 10px;
+            }
+
+            .custom-checkbox .checkmark {
+                width: 23px;
+                height: 23px;
+                border: 1px solid #adb5bd;
+                display: inline-block;
+                border-radius: 3px;
+                background: #0d6efd url(https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/White_check.svg/1200px-White_check.svg.png) center/1250% no-repeat;
+                transition: background-size 0.2s ease;
+            }
+
+            .custom-checkbox input:checked + .checkmark {
+                background-size: 60%;
+                transition: background-size 0.25s cubic-bezier(0.7, 0, 0.18, 1.24);
+            }
+
+            .custom-checkbox input {
+                display: none;
+            }
+
+            .error-message {
+                background-color: #fce4e4;
+                border: 1px solid #fcc2c3;
+                float: left;
+                padding: 20px 30px;
+            }
+
+            .error-text {
+                color: #cc0033;
+                font-family: Helvetica, Arial, sans-serif;
+                font-size: 13px;
+                font-weight: bold;
+                line-height: 20px;
+                text-shadow: 1px 1px rgba(250,250,250,.3);
+            }
         </style>
     </head>
     <body>
+        <?php
+        //FUNCTION
+        function titleCase($string, $delimiters = array(" ", "-", ".", "'", "O'", "Mc", "Mac"), $exceptions = array("de", "los", "lo", "las", "la", "del", "di", "della", "du", "von", "aus", "der", "den", "da", "das", "do", "dos", "I", "II", "III", "IV", "V", "VI"))
+        {
+            /*
+            * Exceptions in lower case are words you don't want converted
+            * Exceptions all in upper case are any words you don't want converted to title case
+            *   but should be converted to upper case, e.g.:
+            *   king henry viii or king henry Viii should be King Henry VIII
+            */
+            $string = mb_convert_case($string, MB_CASE_TITLE, "UTF-8");
+            foreach ($delimiters as $dlnr => $delimiter) {
+                $words = explode($delimiter, $string);
+                $newwords = array();
+                foreach ($words as $wordnr => $word) {
+                    if (in_array(mb_strtoupper($word, "UTF-8"), $exceptions)) {
+                        // check exceptions list for any words that should be in upper case
+                        $word = mb_strtoupper($word, "UTF-8");
+                    } elseif (in_array(mb_strtolower($word, "UTF-8"), $exceptions)) {
+                        // check exceptions list for any words that should be in upper case
+                        $word = mb_strtolower($word, "UTF-8");
+                    } elseif (!in_array($word, $exceptions)) {
+                        // convert to uppercase (non-utf8 only)
+                        $word = ucfirst($word);
+                    }
+                    array_push($newwords, $word);
+                }
+                $string = join($delimiter, $newwords);
+            }//foreach
+            return $string;
+        }
+        ?>
         <div class="container-fluid">
             <div class="row">
                 <div class="col">
                     <div class="row">
-                        <div class="d-flex flex-row align-items-center m-3">
+                        <p class="fs-5 mt-2">
+                            <a href="<?php echo base_url(); ?>matters/<?php echo $matter_id;?>/main_view" class="link-primary">
+                                <span class="material-symbols-outlined align-middle" id="icontoflip">move_item</span>
+                                Back to Matter
+                            </a>
+                        </p>
+                    </div>
+                    <div class="row">
+                        <div class="d-flex flex-row align-items-center ml-3 mr-3">
                             <div class="p-2">
                                 <h1 class="text-start">New Contract</h1>
-                                <h1 class="text-start"><?= $matter_id ?></h1>
-                            </div>
-                            <div class="p-2">
-                                <h4 class="text-start">I-539</h4>
                             </div>
                             <div class="vr m-2"></div>
                             <div class="p-2">
-                                <h5 class="text-start">PINEDA FUNES, Fernando Rodrigo - 5218</h5>
+                            <?php // Check if the index 'status_name' exists before attempting to access it
+                            if (is_array($name_matter) && isset($name_matter['0']['status_name'])):?>
+                                <script>
+                                    var unexpected = false;
+                                </script>
+                                <?php if($name_matter['0']['status_name'] == 'Matter Name not available'): ?>
+                                <h5 class="text-start text-muted"><?php echo $name_matter['0']['status_name']; ?></h5>
+                                <?php else: ?>
+                                <h5 class="text-start"><?php echo $name_matter['0']['status_name']; ?></h5>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <script>
+                                    unexpected = true;
+                                </script>
+                                <div class="error-message">
+                                    <span class="error-text">There was an error getting matter information. Please try again later. If the issue persists, contact an administrator</span>
+                                </div>
+                            <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -65,18 +171,18 @@
                     <div class="row">
                         <div class="col">
                             <div id="listBeneficiaries">
-                            </div>                                
+                            </div>
                             <div class="row">
                                 <div class="col-sm-3">
-                                    <select class="form-select form-select-lg mb-3" aria-label="Large select example">
-                                        <option selected>Available Contacts</option>
+                                    <select id="ContactSelect" class="form-select form-select-lg mb-3" aria-label="Contact Select">
+                                        <option value="0" selected>Select a Contact</option>
                                         <?php foreach ($related_contact as $contact):?>
-                                            <option value="<?php echo $contact['identifier']; ?>"> <?php echo $contact['sort_name']; ?> </option>
+                                            <option id="<?php echo $contact['identifier']; ?>" value="<?php echo $contact['identifier']; ?>" data-custom-relation="<?php echo $contact['relation']; ?>"> <?php echo titleCase($contact['name']); ?></option>
                                         <?php endforeach;?> 
                                     </select>
                                 </div>
                                 <div class="col-sm-9">
-                                    <a class="btn btn-primary mb-3" href="#" onclick="addContact('Fernando', 'Son')">Add Beneficiary</a>                                
+                                    <a class="btn btn-primary mb-3" href="#" onclick="addContact(-1)">Add Contact</a>                                
                                 </div>
                             </div>
                         </div>
@@ -278,7 +384,12 @@
                         <div class="col-sm-6">
                             <div class="card mb-4">
                                 <h4 class="card-header position-relative">Summary
-                                    <a data-bs-toggle="collapse" href="#detailsSummary" role="button" aria-expanded="false" class="text-reset fs-6 fw-light position-absolute top-50 start-50 translate-middle" aria-controls="detailsSummary">show details</a>
+                                    <a data-bs-toggle="collapse" href="#detailsSummary" role="button" aria-expanded="false" class="text-reset fs-6 fw-light position-absolute top-50 start-50 translate-middle" aria-controls="detailsSummary">
+                                        show details
+                                        <span class="material-symbols-outlined">
+                                            expand_all
+                                        </span>
+                                    </a>
                                 </h4>
                                 <div class="card-body">
                                     <div class="row text-center mb-4">
@@ -373,7 +484,7 @@
                             <div class="row align-items-center mb-4">
                                 <div class="col-sm-5"></div>
                                 <div class="col-sm-2">
-                                    <button type="submit" class="btn btn-primary mb-3"  onclick="sendRequest()">Generate Contract</button>
+                                    <button type="submit" class="btn btn-primary mb-3" id="saveButton" onclick="sendRequest(1)">Generate Contract</button>
                                 </div>
                                 <div class="col-sm-5"></div>
                             </div>
@@ -390,7 +501,8 @@
         <!-- Embed BASE_URL in a JavaScript script tag -->
         <script>
             var base_url = '<?php echo base_url();?>';
-
+            var matter_id = '<?php echo $matter_id;?>';
+            var selectedLang;
         </script>
         <script src="<?php echo base_url(); ?>js/contracts/docxloader.js" type="text/javascript"></script>
         <script src="<?php echo base_url(); ?>js/jquery-3.2.1.min.js" type="text/javascript"></script>
