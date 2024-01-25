@@ -168,6 +168,7 @@ $(document).ready(function() {
                             let applicationId = $(this).find("input")[0].id;
                             const match3 = applicationId.match(/\d+/);
                             let applicationName = $(this).find("label").text();
+                            let applicationShortName = $(this).find("label")[0].dataset.customShortName;
                             if (match3) {
                                 const extractedApplicationId = parseInt(match3[0]);
                                 let index = contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == extractedContactId)].services[servicePositionId].applications.findIndex(function (applications){
@@ -192,14 +193,16 @@ $(document).ready(function() {
                                             contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == extractedContactId)].services[servicePositionId].applications.push(
                                                 {
                                                     'applicationName':applicationName,
-                                                    'applicationId':extractedApplicationId
+                                                    'applicationId':extractedApplicationId,
+                                                    'applicationShortName': applicationShortName
                                                 }
                                             );
                                         } else if (!exists){
                                             contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactPos == extractedContactId)].services[servicePositionId].applications.push(
                                                 {
                                                     'applicationName':applicationName,
-                                                    'applicationId':extractedApplicationId
+                                                    'applicationId':extractedApplicationId,
+                                                    'applicationShortName': applicationShortName
                                                 }
                                             );
                                         }
@@ -429,7 +432,7 @@ Array.prototype.slice.call(forms).forEach((form) => {
     form.classList.add('was-validated');
   }, false);
 });*/
-
+let operation;
 let downPaymentAmount = 0;
 let downPaymentDate = "";
 let totalMonthlyCharges = 0;
@@ -1466,6 +1469,8 @@ function calculateTotal(){
  */
 let servicesArray = [
     [1, "AOS Asylum"],
+    [37, "AOS 245i"],
+    [38, "AOS 730"],
     [2, "AOS Petition"],
     [3, "AOS I-929"],
     [4, "AOS SIJS"],
@@ -1475,12 +1480,9 @@ let servicesArray = [
     [8, "Asylum"],
     [9, "Research"],
     [10, "B-CERT (I-918 B)"],
-    [11, "Adoption-Related Forms"],
-    [12, "Citizenship and Naturalization"],
     [13, "DACA"],
-    [14, "Department of State (DS) and Other Non-USCIS Forms"],
-    [15, "Documents"],
     [16, "Deportation Defense"],
+    [39, "Cancelation of Removal"],
     [17, "Employment Authorization"],
     [18, "N-400 (Naturalization)"],
     [19, "NVC"],
@@ -1489,17 +1491,20 @@ let servicesArray = [
     [22, "I-131 (Advanced Parole)"],
     [23, "I-134 (Declaration of Financial Support)"],
     [24, "I-539 | Application to Extend/Change Nonimmigrant Status"],
-    [25, "I-601A Application for Provisional Unlawful Presence Waiver"],
+    [25, "I-601A and I-601"],
     [26, "I-730 | Refugee/Asylee Relative Petition"],
     [27, "Permanent Residency (Green Card) Related"],
     [28, "Premium Processing and Fee Related Forms"],
     [29, "Representation"],
-    [30, "Benefits and Requests"],
+    [40, "Requests"],
     [31, "SIJS"],
     [32, "TPS"],
     [33, "T-Visa"],
     [34, "U-Visa"],
     [35, "VAWA"],
+    [41, "Appeals"],
+    [42, "I-129 and I-129F"],
+    [43, "Motion to reopen / Close"],
     [36, "Other Forms"]
 ];
 
@@ -1514,9 +1519,26 @@ let applicationsArray = [
     ["AOS Asylum"],
     [
         ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
-        ["67", "I-765 | Application for Employment Authorization", "I-765"],
         ["108", "I-765 (A-5) | (Asylee) Application for Employment Authorization", "I-765 (A-5)"],
-        ["109", "I-765 (C-9) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"]
+        ["46", "I-693 | Report of Immigration Medical Examination and Vaccination Record", "I-693"]
+    ],
+
+    ["AOS 245i"],
+    [
+        ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
+        ["38", "I-485A | Supplement A to Form I-485, Adjustment of Status Under Section 245(i)", "I-485"],
+        ["109", "I-765 (C-09) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-09)"],
+        ["70", "I-864 | Affidavit of Support Under Section 213A of the INA", "I-864"],
+        ["106", "I-864A | Contract Between Sponsor and Household Member", "I-864A"],
+        ["1", "I-130 | Petition for Alien Relative", "I-130"],
+        ["46", "I-693 | Report of Immigration Medical Examination and Vaccination Record", "I-693"]
+    ],
+
+    ["AOS 730"],
+    [
+        ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
+        ["109", "I-765 (C-09) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-09)"],
+        ["46", "I-693 | Report of Immigration Medical Examination and Vaccination Record", "I-693"]
     ],
 
     ["AOS Petition"],
@@ -1525,42 +1547,29 @@ let applicationsArray = [
         ["1", "I-130 | Petition for Alien Relative", "I-130"],
         ["107", "I-130A | Supplemental Information for Spouse Beneficiary", "I-130A"],
         ["70", "I-864 | Affidavit of Support Under Section 213A of the INA", "I-864"],
-        ["51", "I-864W | Request for Exemption for Intending Immigrant´s Affidavit of Support", "I-864W"],
-        ["71", "I-864EZ | Affidavit of Support Under Section 213A of the Act", "I-864EZ"],
-        ["81", "I-864P | 2023 HHS Poverty Guidelines for Affidavit of Support", "I-864P"],
-        ["106", "I-864A | Contract Between Sponsor and Household Member", "I-864A"],
-        ["67", "I-765 | Application for Employment Authorization", "I-765"],
-        ["108", "I-765 (A-5) | (Asylee) Application for Employment Authorization", "I-765 (A-5)"],
-        ["109", "I-765 (C-9) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"],
+        ["109", "I-765 (C-09) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-09)"],
         ["46", "I-693 | Report of Immigration Medical Examination and Vaccination Record", "I-693"]
     ],
 
     ["AOS I-929"],
     [
         ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
-        ["52", "I-929 | Petition for Qualifying Family Member of a U-1 Nonimmigrant", "I-929"],
-        ["67", "I-765 | Application for Employment Authorization", "I-765"],
-        ["108", "I-765 (A-5) | (Asylee) Application for Employment Authorization", "I-765 (A-5)"],
-        ["109", "I-765 (C-9) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"]
+        ["109", "I-765 (C-09) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-09)"],
+        ["46", "I-693 | Report of Immigration Medical Examination and Vaccination Record", "I-693"]
     ],
 
     ["AOS SIJS"],
     [
         ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
         ["129", "Guardanship", "Guardanship"],
-        ["67", "I-765 | Application for Employment Authorization", "I-765"],
-        ["108", "I-765 (A-5) | (Asylee) Application for Employment Authorization", "I-765 (A-5)"],
-        ["109", "I-765 (C-9) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"]
+        ["109", "I-765 (C-09) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-09)"],
+        ["46", "I-693 | Report of Immigration Medical Examination and Vaccination Record", "I-693"]
     ],
 
     ["AOS U-visa"],
     [
         ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
-        ["67", "I-765 | Application for Employment Authorization", "I-765"],
-        ["108", "I-765 (A-5) | (Asylee) Application for Employment Authorization", "I-765 (A-5)"],
-        ["109", "I-765 (C-9) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"],
-        ["17", "I-918 | Petition for U Nonimmigrant Status", "I-918"],
-        ["113", "I-918A (Supplement A) | Petition for Qualifying Family Member of U-1 Recipient", "I-918A"],
+        ["109", "I-765 (C-09) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-09)"],
         ["114", "I-918B (Supplement B) | U Nonimmigrant Status Certification", "I-918B"],
         ["46", "I-693 | Report of Immigration Medical Examination and Vaccination Record", "I-693"]
     ],
@@ -1568,16 +1577,16 @@ let applicationsArray = [
     ["AOS T-Visa"],
     [
         ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
-        ["16", "I-914 | Application for T Nonimmigrant Status", "I-914"],
-        ["115", "I-914A (Supplement A) | (Application for Family Member of T-1 Recipient) Application for T Nonimmigrant Status", "I-914A (Supplement A)"],
-        ["116", "I-914B (Supplement B) | (Delaration of Law Enforcement Officer for Victim of Trafficking in Persons) Application for T Nonimmigrant Status", "I-914B (Supplement B)"]
+        ["116", "I-914B (Supplement B) | (Delaration of Law Enforcement Officer for Victim of Trafficking in Persons) Application for T Nonimmigrant Status", "I-914B (Supplement B)"],
+        ["109", "I-765 (C-09) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-09)"],
+        ["46", "I-693 | Report of Immigration Medical Examination and Vaccination Record", "I-693"]
     ],
 
     ["AOS VAWA"],
     [
         ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
-        ["35", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant", "I-360"],
-        ["56", "EOIR-29 | Notice of Appeal to the Board of Immigration Appeals from a Decision of a DHS Officer", "EOIR-29"]
+        ["46", "I-693 | Report of Immigration Medical Examination and Vaccination Record", "I-693"],
+        ["109", "I-765 (C-09) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-09)"],
     ],
 
     ["Asylum"],
@@ -1586,17 +1595,18 @@ let applicationsArray = [
         ["135", "Affirmative Asylum", "Affirmative Asylum"],
         ["8", "I-589 | Application for Asylum and for Withholding of Removal", "I-589"],
         ["119", "I-589 (Under CAT) | Convention Against Torture", "I-589 (Under CAT)"],
-        ["67", "I-765 | Application for Employment Authorization", "I-765"],
-        ["108", "I-765 (A-5) | (Asylee) Application for Employment Authorization", "I-765 (A-5)"],
-        ["109", "I-765 (C-9) | (Pending adju stment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"]
+        ["143", "I-765 (C-08) | Application for Employment Authorization", "I-765 (C-08)"]
     ],
 
     ["Research"],
     [
-        ["130", "FOIA-USCIS | FOIA petition before USCIS for client (Only if necessary).", "FOIA petition before USCIS for client (Only if necessary)."],
-        ["131", "FOIA-CBP | FOIA petition before CBP for client (Only if necessary).", "FOIA petition before CBP for client (Only if necessary)."],
-        ["132", "FOIA-OBIM | FOIA petition before OBIM for client (Only if necessary).", "FOIA petition before OBIM for client (Only if necessary)."],
-        ["133", "FBI | Request for Criminal Records with the FBI for client (Only if necessary).", "Request for Criminal Records with the FBI for client (Only if necessary)."]
+        ["130", "FOIA-USCIS | FOIA petition before USCIS for client (Only if necessary).", "FOIA-USCIS"],
+        ["131", "FOIA-CBP | FOIA petition before CBP for client (Only if necessary).", "FOIA-CBP"],
+        ["132", "FOIA-OBIM | FOIA petition before OBIM for client (Only if necessary).", "FOIA-OBIM"],
+        ["133", "FBI | Request for Criminal Records with the FBI for client (Only if necessary).", "FBI"],
+        ["144", "FOIA-DOJ | FOIA petition before DOJ for client (Only if necessary).", "FOIA-DOJ"],
+        ["145", "FOIA-DOS | FOIA petition before DOS for client (Only if necessary).", "FOIA-DOS"],
+        ["146", "FBI | FBI Request (Only if necessary).", "FBI Request"]
     ],
 
     ["B-CERT (I-918 B)"],
@@ -1604,55 +1614,21 @@ let applicationsArray = [
         ["114", "I-918B (Supplement B) | U Nonimmigrant Status Certification", "I-918B"]
     ],
 
-    ["Adoption-Related Forms"],
-    [
-        ["65", "I-600 | Petition to Classify Orphan as an Immediate Relative", "I-600"],
-        ["41", "I-600A | Application for Advance Processing of an Orphan Petition", "I-600A"],
-        ["114", "I-800 | Petition to Classify Convention Adoptee as an Immediate Relative", "I-800"],
-        ["114", "I-800A | Application for Determination of Suitability to Adopt a Child from a Convention Country", "I-800A"]
-    ],
-
-    ["Citizenship and Naturalization"],
-    [
-        ["19", "N-400 | Application for Naturalization", "N-400"],
-        ["20", "N-470 | Application to Preserve Residence for Naturalization Purposes", "N-470"],
-        ["21", "N-600 | Application for Certificate of Citizenship", "N-600"],
-        ["22", "N-600K | Application for Citizenship and Issuance of Certificate Under Section 322", "N-600K"],
-        ["23", "N-644 | Application for Posthumous Citizenship", "N-644"],
-        ["54", "N-336 | Request for a Hearing on a Decision in Naturalization Proceedings", "N-336"],
-        ["23", "N-644 | Application for Posthumous Citizenship", "N-644"],
-        ["53", "I-956 | Application for Regional Center Designation", "I-956"],
-    ],
-
     ["DACA"],
     [
         ["49", "I-821D | Consideration of Deferred Action for Childhood Arrivals", "I-821D"],
-        ["28", "I-102 | Application for Replacement/Initial Nonimmigrant Arrival-Departure Document", "I-102"],
-        ["67", "I-765 | Application for Employment Authorization", "I-765"],
-        ["120", "I-765 Worksheet | I-765 under (c)(14), Deferred Action, or (c)(33), Consideration of Deferred Action for Childhood Arrivals, categories", "I-765 Worksheet"]
-    ],
-
-    ["Department of State (DS) and Other Non-USCIS Forms"],
-    [
-        ["140", "DS-260 | Application for Immigrant Visa and Alien Registration", "DS-260"],
-        ["141", "DS-160 | Electronic Nonimmigrant Visa Application", "DS-160"],
-        ["142", "DS-11 | DS-11 | Application for a U.S. Passport", "DS-11"]
-    ],
-
-    ["Documents"],
-    [
-        ["58", "G-845 | Verification Request", "G-845"],
-        ["25", "G-845 Supplement | Document Verification Request Supplement", "G-845 S"],
-        ["93", "I-131 | Application for Travel Document", "I-131"],
-        ["78", "I-131A | Application for Travel Document (Carrier Documentation)", "I-131A"]
+        ["147", "I-765 (C-33) | Consideration of Deferred Action for Childhood Arrivals", "I-765 (C-33)"]
     ],
 
     ["Deportation Defense"],
     [
         ["8", "I-589 | Application for Asylum and for Withholding of Removal", "I-589"],
         ["119", "I-589 (Under CAT) | Convention Against Torture", "I-589 (Under CAT)"],
-        ["56", "EOIR-29 | Notice of Appeal to the Board of Immigration Appeals from a Decision of a DHS Officer", "EOIR-29"],
-        ["137", "EOIR-40 | Application for Suspension of Deportation", "EOIR-40"],
+        ["15", "I-881 | Application for Suspension of Deportation or Special Rule Cancellation of Removal", "I-881"]
+    ],
+
+    ["Cancelation of Removal"],
+    [
         ["138", "EOIR-42A | Application for Cancellation of Removal for Certain Permanent Residents", "EOIR-42A"],
         ["139", "EOIR-42B | Application for Cancellation of Removal and Adjustment of Status for Certain Nonpermanent Residents", "EOIR-42B"]
     ],
@@ -1662,7 +1638,7 @@ let applicationsArray = [
         ["67", "I-765 | Application for Employment Authorization", "I-765"],
         ["120", "I-765 Worksheet | I-765 under (c)(14), Deferred Action, or (c)(33), Consideration of Deferred Action for Childhood Arrivals, categories", "I-765 Worksheet"],
         ["108", "I-765 (A-5) | (Asylee) Application for Employment Authorization", "I-765 (A-5)"],
-        ["109", "I-765 (C-9) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"],
+        ["109", "I-765 (C-09) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-09)"],
         ["121", "I-765 (C-14) | Deferred Action", "I-765 (C-14)"],
         ["122", "I-765 TPS (C-19) | Temporary Protected Status EAD", "I-765 TPS (C-19)"],
         ["123", "I-765 TPS (A-12) | Temporary Protected Status EAD", "I-765 TPS (A-12)"],
@@ -1675,13 +1651,17 @@ let applicationsArray = [
     ["N-400 (Naturalization)"],
     [
         ["19", "N-400 | Application for Naturalization", "N-400"],
-        ["54", "N-336 | Request for a Hearing on a Decision in Naturalization Proceedings", "N-336"],
-        ["94", "I-942 | Request for Reduced Fee", "I-942"]
+        ["74", "N-648 | Medical Certification for Disability Exceptions", "N-648"],
+        ["21", "N-600 | Application for Certificate of Citizenship", "N-600"]
     ],
 
     ["NVC"],
     [
-        ["110", "Representation for processing before the National Visa Center (NVC)", "Representation for processing before the National Visa Center (NVC)"]
+        ["110", "Representation for processing before the National Visa Center (NVC)", "Representation for processing before the National Visa Center (NVC)"],
+        ["140", "DS-260 | Application for Immigrant Visa and Alien Registration", "DS-260"],
+        ["141", "DS-160 | Electronic Nonimmigrant Visa Application", "DS-160"],
+        ["142", "DS-11 | DS-11 | Application for a U.S. Passport", "DS-11"],
+        ["70", "I-864 | Affidavit of Support Under Section 213A of the INA", "I-864"]
     ],
 
     ["I-90 Application to Replace Permanent Resident Card (Green Card)"],
@@ -1692,7 +1672,7 @@ let applicationsArray = [
     ["I-130 (Petition)"],
     [
         ["1", "I-130 | Petition for Alien Relative"],
-        ["56", "EOIR-29 | Notice of Appeal to the Board of Immigration Appeals from a Decision of a DHS Officer", "C", "Use this form to appeal a USCIS decision on a Form I-130 or Form I-360 Widow(er)."]
+        ["70", "I-864 | Affidavit of Support Under Section 213A of the INA", "I-864"]
     ],
 
     ["I-131 (Advanced Parole)"],
@@ -1712,9 +1692,10 @@ let applicationsArray = [
         ["40", "I-539 | Application to Extend/Change Nonimmigrant Status", "I-539"]
     ],
 
-    ["I-601A Application for Provisional Unlawful Presence Waiver"],
+    ["I-601A and I-601"],
     [
-        ["42", "I-601A | Application for Provisional Unlawful Presence Waiver", "I-601A"]
+        ["42", "I-601A | Application for Provisional Unlawful Presence Waiver", "I-601A"],
+        ["9", "I-601 | Application for Waiver of Grounds of Inadmissibility", "I-601"]
     ],
 
     ["I-730 | Refugee/Asylee Relative Petition"],
@@ -1724,60 +1705,42 @@ let applicationsArray = [
 
     ["Permanent Residency (Green Card) Related"],
     [
-        ["3", "I-407 | Record of Abandonment of Lawful Permanent Resident Status", "I-407"],
         ["4", "I-485 | Application to Register Permanent Residence or Adjust Status", "I-485"],
         ["11", "I-698 | Application to Adjust Status from Temporary to Permanent Resident", "I-698"],
-        ["48", "I-751 | Petition to Remove Conditions on Residence", "I-751"],
-        ["80", "I-829 | Petition by Investor to Remove Conditions on Permanent Resident Status", "I-829"]
+        ["48", "I-751 | Petition to Remove Conditions on Residence", "I-751"]
     ],
 
     ["Premium Processing and Fee Related Forms"],
     [
-        ["72", "I-907 | Request for Premium Processing Service", "I-907"],
-        ["85", "G-1450 | Authorization for Credit Card Transactions", "G-1450"],
-        ["82", "I-912 | Request for Fee Waiver", "I-912"],
-        ["83", "I-912P Supplement | 2023 HHS Poverty Guidelines for Fee Waiver Request", "I-912P S"]
+        ["82", "I-912 | Request for Fee Waiver", "I-912"]
     ],
 
     ["Representation"],
     [
         ["24", "G-28 | Notice of Entry of Appearance as Attorney or Accredited Representative", "G-28"],
-        ["84", "G-28I | Notice of Entry of Appearance as Attorney in Matters Outside the Geographical Confines of the United States", "G-28I"],
+        ["148", "E-28 | Notice of Entry of Appearance as Attorney or Representative Before the Immigration Court", "E-28"],
         ["110", "Representation for processing before the National Visa Center (NVC)", "Representation for processing before the National Visa Center (NVC)"],
         ["112", "Representacion and processing in favour of (client) before the National Visa Center (NVC)", "Representacion and processing in favour of (client) before the National Visa Center (NVC)"],
-        ["136", "Legal Representation for the following charges:", "Legal Representation for the following charges:"]
+        ["136", "Legal Representation for the following charges:", "Legal Representation for the following charges:"],
+        ["84", "G-28I | Notice of Entry of Appearance as Attorney in Matters Outside the Geographical Confines of the United States", "G-28I"]
     ],
 
-    ["Benefits and Requests"],
+    ["Requests"],
     [
-        ["9", "I-601 | Application for Waiver of Grounds of Inadmissibility", "I-601"],
-        ["10", "I-612 | Application for Waiver of the Foreign Residence Requirement", "I-612"],
-        ["13", "I-821 | Application for Temporary Protected Status", "I-821"],
-        ["14", "I-824 | Application for Action on an Approved Application or Petition", "I-824"],
-        ["15", "I-881 | Application for Suspension of Deportation or Special Rule Cancellation of Removal", "I-881"],
-        ["53", "I-956 | Application for Regional Center Designation", "I-956"],
-        ["90", "I-956K | Registration for Direct and Third-Party Promoters", "I-956K"],
-        ["96", "I-956F | Application for Approval of an Investment in a Commercial Enterprise", "I-956F"],
-        ["97", "I-956H | Bona Fides of Persons Involved with Regional Center Program", "I-956H"],
-        ["105", "I-956G | Regional Center Annual Statement", "I-956G"]
+        ["14", "I-824 | Application for Action on an Approved Application or Petition", "I-824"]
     ],
 
     ["SIJS"],
     [
         ["129", "Guardanship", "Guardanship"],
-        ["8", "I-589 | Application for Asylum and for Withholding of Removal", "I-589"],
-        ["119", "I-589 (Under CAT) | Convention Against Torture", "I-589 (Under CAT)"],
-        ["35", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant", "I-360"],
-        ["67", "I-765 | Application for Employment Authorization", "I-765"],
-        ["120", "I-765 Worksheet | I-765 under (c)(14), Deferred Action, or (c)(33), Consideration of Deferred Action for Childhood Arrivals, categories", "I-765 Worksheet"],
-        ["109", "I-765 (C-9) | (Pending adjustment of status under Section 245 of the Act) Application for Employment Authorization", "I-765 (C-9)"],
-        ["121", "I-765 (C-14) | Deferred Action", "I-765 (C-14)"]
+        ["35", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant", "I-360"]
     ],
 
     ["TPS"],
     [
         ["13", "I-821 | Application for Temporary Protected Status", "I-821"],
-        ["49", "I-821D | Consideration of Deferred Action for Childhood Arrivals", "I-821D"]
+        ["49", "I-821D | Consideration of Deferred Action for Childhood Arrivals", "I-821D"],
+        ["123", "I-765 TPS (A-12) | Temporary Protected Status EAD", "I-765 TPS (A-12)"]
     ],
 
     ["T-Visa"],
@@ -1785,7 +1748,9 @@ let applicationsArray = [
         ["16", "I-914 | Application for T Nonimmigrant Status", "I-914"],
         ["115", "I-914A (Supplement A) | (Application for Family Member of T-1 Recipient) Application for T Nonimmigrant Status", "I-914A (Supplement A)"],
         ["116", "I-914B (Supplement B) | (Delaration of Law Enforcement Officer for Victim of Trafficking in Persons) Application for T Nonimmigrant Status", "I-914B (Supplement B)"],
-        ["2", "I-192 | Application for Advance Permission to Enter as a Nonimmigrant", "I-192"]
+        ["2", "I-192 | Application for Advance Permission to Enter as a Nonimmigrant", "I-192"],
+        ["149", "I-765 (A-16) | T-1 nonimmigrant", "I-765 (A-16)"],
+        ["150", "I-765 (C-25) | T-2, T-3, T-4, T-5, or T-6 nonimmigrant", "I-765 (C-25)"]
     ],
 
     ["U-Visa"],
@@ -1793,7 +1758,9 @@ let applicationsArray = [
         ["17", "I-918 | Petition for U Nonimmigrant Status", "I-918"],
         ["113", "I-918A (Supplement A) | Petition for Qualifying Family Member of U-1 Recipient", "I-918A"],
         ["114", "I-918B (Supplement B) | U Nonimmigrant Status Certification", "I-918B"],
-        ["2", "I-192 | Application for Advance Permission to Enter as a Nonimmigrant", "I-192"]
+        ["2", "I-192 | Application for Advance Permission to Enter as a Nonimmigrant", "I-192"],
+        ["121", "I-765 (C-14) | Deferred Action", "I-765 (C-14)"],
+        ["127", "I-765 (A-20) | U-2, U-3, U-4, or U-5", "I-765 (A-20)"]
     ],
 
     ["VAWA"],
@@ -1801,17 +1768,39 @@ let applicationsArray = [
         ["35", "I-360 | Petition for Amerasian, Widow(er), or Special Immigrant", "I-360"]
     ],
 
+    ["Appeals"],
+    [
+        ["151", "BIA", "BIA"],
+        ["152", "9th circuit", "9th circuit"],
+        ["62", "I-290B | Notice of Appeal or Motion", "I-290B"]
+    ],
+
+    ["I-129 and I-129F"],
+    [
+        ["29", "I-129 | Petition for a Nonimmigrant Worker", "I-129"],
+        ["30", "I-129F | Petition for Alien Fiancé(e)", "I-129F"]
+    ],
+
+    ["Motion to reopen / Close"],
+    [
+        ["154", "Motion to reopen", "Motion to reopen"],
+        ["153", "Motion to Close", "Motion to Close"]
+    ],
+
     ["Other Forms"],
     [
         ["86", "G-1566 | Request for Certificate of Non-Existence", "G-1566"],
-        ["98", "G-1055 | Fee Schedule", "G-1055"],
-        ["104", "I-945 | Public Charge Bond", "I-945"],
-        ["63", "I-356 | Request for Cancellation of Public Charge Bond", "I-356"],
         ["100", "AR-11 | Alien’s Change of Address Card", "AR-11"],
-        ["75", "G-1145 | E-Notification of Application/Petition Acceptance", "G-1145"],
         ["103", "I-865 | Sponsor´s Notice of Change of Address", "I-865"],
-        ["101", "G-1041 | Genealogy Index Search Request", "G-1041"],
-        ["102", "G-1041A | Genealogy Records Request", "G-1041A"]
+        ["51", "I-864W | Request for Exemption for Intending Immigrant´s Affidavit of Support", "I-864W"],
+        ["71", "I-864EZ | Affidavit of Support Under Section 213A of the Act", "I-864EZ"],
+        ["81", "I-864P | 2023 HHS Poverty Guidelines for Affidavit of Support", "I-864P"],
+        ["106", "I-864A | Contract Between Sponsor and Household Member", "I-864A"],
+        ["58", "G-845 | Verification Request", "G-845"],
+        ["25", "G-845 Supplement | Document Verification Request Supplement", "G-845 S"],
+        ["80", "I-829 | Petition by Investor to Remove Conditions on Permanent Resident Status", "I-829"],
+        ["83", "I-912P Supplement | 2023 HHS Poverty Guidelines for Fee Waiver Request", "I-912P S"],
+        ["29", "I-129 | Petition for a Nonimmigrant Worker", "I-129"]
     ]
 ];
 
@@ -1848,7 +1837,7 @@ function addApplicationsToView(name, numContact, numService){
                 html = `<li class="list-group-item">
                             <div class="row">
                                 <div class="col-sm-10">
-                                    <label class="form-check-label stretched-link" for="CB${applicationsFound[i][0]}Beneficiary${numContact}Service${numService}">${applicationsFound[i][1]}</label>
+                                    <label class="form-check-label stretched-link" data-custom-short-name="${applicationsFound[i][2]}" for="CB${applicationsFound[i][0]}Beneficiary${numContact}Service${numService}">${applicationsFound[i][1]}</label>
                                 </div>
                                 <div class="col-sm-2 text-end">
                                     <input class="form-check-input me-1" name="checkboxGroup${numContact}" type="checkbox" value="" id="CB${applicationsFound[i][0]}Beneficiary${numContact}Service${numService}" checked>
@@ -1859,7 +1848,7 @@ function addApplicationsToView(name, numContact, numService){
                 html = `<li class="list-group-item">
                             <div class="row">
                                 <div class="col-sm-10">
-                                    <label class="form-check-label stretched-link" for="CB${applicationsFound[i][0]}Beneficiary${numContact}Service${numService}">${applicationsFound[i][1]}</label>
+                                    <label class="form-check-label stretched-link" data-custom-short-name="${applicationsFound[i][2]}" for="CB${applicationsFound[i][0]}Beneficiary${numContact}Service${numService}">${applicationsFound[i][1]}</label>
                                 </div>
                                 <div class="col-sm-2 text-end">
                                     <input class="form-check-input me-1" name="checkboxGroup${numContact}" type="checkbox" value="" id="CB${applicationsFound[i][0]}Beneficiary${numContact}Service${numService}">
@@ -1953,20 +1942,25 @@ function loadContract(){
     // make main contact in contract the same as the contact for the matter
     // load all values if update
     if(typeof contractArray === 'undefined' || typeof contractArray == 'undefined') {
-        contractJSON =
-        {
-            "contract":{
-                'matterId':matter_id,
-                'signDate': "",
-                'contractTotalAmount': "",
-                'downPaymentAmount': "",
-                'dateDownPayment': "",
-                'numberOfMonthlyPayments': "",
-                'monthlyPaymentsTotalAmount': "",
-                'monthlyPayments': [],
-                'contacts': []
-            }
-        };
+        if(unexpected) {
+            shouldShowConfirmation = false;
+            sweetAlert(2, 'An unexpected issue happened, please contact an administrator', base_url);
+        } else {
+            contractJSON =
+            {
+                "contract":{
+                    'matterId':matter_id,
+                    'signDate': "",
+                    'contractTotalAmount': "",
+                    'downPaymentAmount': "",
+                    'dateDownPayment': "",
+                    'numberOfMonthlyPayments': "",
+                    'monthlyPaymentsTotalAmount': "",
+                    'monthlyPayments': [],
+                    'contacts': []
+                }
+            };
+        }
     } else {
         if(Array.isArray(contractArray) && contractArray.length > 0) {
             var contractData = contractArray[0];
@@ -2053,7 +2047,12 @@ function loadContract(){
                 if(typeof indexSelect == 'undefined') {
                     // Cancel the confirmation
                     shouldShowConfirmation = false;
-                    sweetAlert(2, 'There was an issue adding a contact, please contact an administrator', base_url + "matters/" + matter_id + "/main_view");
+                    if (matter_id == undefined || matter_id == null || Object.keys(matter_id).length === 0 || matter_id === '' || !matter_id) {
+                        sweetAlert(2, 'There was an issue adding a contact, please contact an administrator', base_url);
+                      } else {
+                        //sweetAlert(2, 'There was an issue adding a contact, please contact an administrator', base_url + "matters/" + matter_id + "/main_view");
+                        sweetAlert(2, 'There was an issue adding a contact, please contact an administrator', base_url);
+                      }
                     return;
                 } else {
                     // Set the selectedIndex to the one found before
@@ -2092,7 +2091,8 @@ function loadContract(){
                                         contractJSON.contract.contacts[index].services[posistionService].applications.push(
                                             {
                                                 'applicationName':applications[1],
-                                                'applicationId': itemApplication.application
+                                                'applicationId': itemApplication.application,
+                                                'applicationShortName': applications[2]
                                             }
                                         );
                                     }
@@ -2140,10 +2140,60 @@ function loadContract(){
     }
 
 }
-let nameMainClient;
-let clientsToWord;
-let servicesToWord;
+
+// var clientsToWord = [];
+// var servicesToWord = [];
+// var nameMainClient;
 let numContacts = 0;
+
+function getContractDocumentName(){
+    let mainContact = contractJSON.contract.contacts[contractJSON.contract.contacts.findIndex(item => item.contactRole == 1)];
+    let mainContactServices = mainContact.services;
+    let applicationsPerServiceCount = 0;
+    let mainServiceName;
+    let result = "";
+    result += rearrangeNameContact(mainContact.contactName);
+    result += "_";
+    if(Object.keys(mainContactServices).length == 1) {
+        mainServiceName = cleanString(mainContactServices[0].serviceName);
+    } else {
+        mainContactServices.forEach(service => {
+            if(service.serviceId != 9){
+                if(Object.keys(service.applications).length >= applicationsPerServiceCount) {
+                    mainServiceName = service.serviceName;
+                    applicationsPerServiceCount = Object.keys(service.applications).length;
+                }
+            }
+        });
+        mainServiceName = cleanString(mainServiceName);
+    }
+    result += mainServiceName;
+    result += "_K";
+    return result;
+}
+
+function cleanString(inputString) {
+    // Remove unwanted symbols using a regular expression
+    const cleanedString = inputString.replace(/[*%?!<>&@=#$]/g, '');
+    // Convert the string to lowercase and replace spaces with underscores
+    const finalString = cleanedString.toLowerCase().replace(/\s+/g, '_');
+    return finalString;
+}
+
+function rearrangeNameContact(inputString) {
+    // Split the string into an array of words
+    const wordsArray = inputString.split(' ');
+  
+    // Rearrange the words based on the length of the array
+    const rearrangedWords = wordsArray.length >= 3
+      ? [wordsArray[2], wordsArray[0]]
+      : [wordsArray[1], wordsArray[0]];
+  
+    // Join the rearranged words with underscores
+    const result = rearrangedWords.join('_').toLowerCase();
+  
+    return result;
+}
 
 /**
  * Prepares the request by building a json that is then sent to an endpoint.
@@ -2158,18 +2208,26 @@ let numContacts = 0;
 function sendRequest(transaction){
     if (transaction == null || transaction == undefined || typeof transaction == 'undefined' || typeof transaction !== 'number' || transaction == 0 || transaction < 0 || transaction > 2) {
         sweetAlert(2, 'There was an issue with your request, please contact an administrator', null);
-        console.log("here, first if");
         return null;
     } else {
+        let saveButton = $("#saveButton");
+        if(saveButton.hasClass("disabled")){
+            sweetAlert(2, 'There was an issue with your request, please contact an administrator', base_url);
+        } else {
+            saveButton.addClass("disabled");
+        }
+
         let data = {};
         let listContactsApplications = [];
         let listRoleContacts = [];
         let listPaymentPlans = [];
+        let contractsDocuments = {};
         let request = {};
+        
         if(transaction == 1) {
             let listOfWrongValues = checkContractValues();
             if(listOfWrongValues == null || listOfWrongValues == undefined || listOfWrongValues.length == 0) {
-                data.filenamecontract = "-";
+                data.filenamecontract = "CARRANZA_JOSE_U_VISA_Contract.docx";
                 data.idcontractlanguage = document.getElementById('contractLanguage').value;
                 data.idcontractstatus = "1";
                 data.idmatter = matter_id;
@@ -2184,12 +2242,12 @@ function sendRequest(transaction){
 
                 // Monthly Charges
                 for(let i = 0 ; i < Object.keys(contractJSON.contract.monthlyPayments).length ; i++){
-                    let montlhlyPlan = {};
-                    montlhlyPlan.amountpaymentplan = parseFloat(contractJSON.contract.monthlyPayments[i].amount);
-                    montlhlyPlan.datepaymentplan = formatDates(contractJSON.contract.monthlyPayments[i].date);
-                    montlhlyPlan.idpaymentplantype = 1;
+                    let monthlyPlan = {};
+                    monthlyPlan.amountpaymentplan = parseFloat(contractJSON.contract.monthlyPayments[i].amount);
+                    monthlyPlan.datepaymentplan = formatDates(contractJSON.contract.monthlyPayments[i].date);
+                    monthlyPlan.idpaymentplantype = 1;
 
-                    listPaymentPlans.push(montlhlyPlan);
+                    listPaymentPlans.push(monthlyPlan);
                 }
 
                 //Roles
@@ -2212,14 +2270,27 @@ function sendRequest(transaction){
                     });
                 });
 
+                //Contract Documents
+                let directory_path = "./docsxup/files/matters/";
+                directory_path += matter_id;
+                directory_path += "/contracts/";
+                contractsDocuments.file_name_document_contract = getContractDocumentName();
+                contractsDocuments.type_document_contract = ".docx";
+                contractsDocuments.directory_path_contract = directory_path;
+                contractsDocuments.status_contract_document = true;
+                contractsDocuments.version_document_contract = 1;
+
+                console.log(contractsDocuments);
+
                 request.contracts = data;
                 request.applicationsContactsList = listContactsApplications;
                 request.roleContactsList = listRoleContacts;
                 request.contractPaymentPlansList = listPaymentPlans;
-                //generate();
+                request.contractsDocuments = contractsDocuments;
+                selectedLang = document.getElementById('contractLanguage').value;
                 console.log(JSON.stringify(request));
                 shouldShowConfirmation = false;
-                saveRow(base_url + create, null, request, null, base_url + "matters/" + matter_id + "/main_view", null);
+                saveRow(base_url + create, null, request, null, base_url + "matters/" + matter_id + "/main_view", 4);
             } else {
                 console.log(listOfWrongValues);
 
@@ -2250,11 +2321,11 @@ function sendRequest(transaction){
 
                 // Monthly Charges
                 for(let i = 0 ; i < Object.keys(contractJSON.contract.monthlyPayments).length ; i++){
-                    let montlhlyPlan = {};
-                    montlhlyPlan.amountpaymentplan = parseFloat(contractJSON.contract.monthlyPayments[i].amount);
-                    montlhlyPlan.datepaymentplan = formatDates(contractJSON.contract.monthlyPayments[i].date);
-                    montlhlyPlan.idpaymentplantype = 1;
-                    listPaymentPlans.push(montlhlyPlan);
+                    let monthlyPlan = {};
+                    monthlyPlan.amountpaymentplan = parseFloat(contractJSON.contract.monthlyPayments[i].amount);
+                    monthlyPlan.datepaymentplan = formatDates(contractJSON.contract.monthlyPayments[i].date);
+                    monthlyPlan.idpaymentplantype = 1;
+                    listPaymentPlans.push(monthlyPlan);
                 }
 
                 //Roles
@@ -2277,6 +2348,18 @@ function sendRequest(transaction){
                     });
                 });
 
+                //Contract Documents
+                let directory_path = "./docsxup/files/matters/";
+                directory_path += matter_id;
+                directory_path += "/contracts/";
+                contractsDocuments.file_name_document_contract = getContractDocumentName();
+                contractsDocuments.type_document_contract = ".docx";
+                contractsDocuments.directory_path_contract = directory_path;
+                contractsDocuments.status_contract_document = true;
+                contractsDocuments.version_document_contract = 1;
+
+                console.log(contractsDocuments);
+
                 let oldApplicationsList = [];
                 contractArray[0].listApplications[0].forEach(function(element) {
                     oldApplicationsList.push(element.id);
@@ -2298,13 +2381,15 @@ function sendRequest(transaction){
                 request.applicationsContactsList = listContactsApplications;
                 request.roleContactsList = listRoleContacts;
                 request.contractPaymentPlansList = listPaymentPlans;
+                request.contractsDocuments = contractsDocuments;
                 request.oldApplicationsList = oldApplicationsList;
                 request.oldRoleList = oldRoleList;
                 request.oldPaymentsList = oldPaymentsList;
-                //generate();
+                selectedLang = document.getElementById('contractLanguage').value;
+                
                 console.log(JSON.stringify(request));
                 shouldShowConfirmation = false;
-                saveRow(base_url + update + contract_id, null, request, null, base_url + "contract/" + contractArray[0].idContract + "/edit/?matter_id=" + matter_id, null);
+                saveRow(base_url + update + contract_id, null, request, null, base_url + "contract/" + contractArray[0].idContract + "/edit/?matter_id=" + matter_id, 4);
                 console.log("" + base_url + update + contract_id + "");
             } else {
                 console.log(listOfWrongValues);
@@ -2324,85 +2409,41 @@ function sendRequest(transaction){
     }
 }
 
-// clientsToWord = [
-//     {
-//         'name_client': document.getElementById("0ContactName").value,
-//         'role_client': "Victima"
-//     },
-//     {
-//         'name_client': document.getElementById("1ContactName").value,
-//         'role_client': "Derivativo"
-//     }
-// ];
+let contractDocument = {};
 
-// servicesToWord = [
-//     {
-//         service_message: "Socorro migratorio al que se aplica: VISA U. Comprende lo siguiente",
-//         service_client: document.getElementById("0ContactName").value,
-//         "applications": [
-//             {
-//                 application_message: "Aplicación para Visa-U (I-918) a favor de"
-//             },
-//             {
-//                 application_message: "Petición de Perdón (I-192) para"
-//             },
-//             {
-//                 application_message: "Petición de Permiso de Trabajo I-765 (C14)"
-//             }
-//         ]
-//     },
-//     {
-//         service_message: "Peticiones para obtener registros de Cliente",
-//         service_client: document.getElementById("0ContactName").value,
-//         "applications": [
-//             {
-//                 application_message: "Petición FOIA a USCIS para"
-//             },
-//             {
-//                 application_message: "Petición FOIA a CBP para"
-//             },
-//             {
-//                 application_message: "Petición FOIA frente a OBIM"
-//             },
-//             {
-//                 application_message: "Peticiones de registro Criminal con el FBI para"
-//             }
-//         ]
-//     },
-//     {
-//         service_message: "Socorro migratorio al que se aplica: VISA U. Comprende lo siguiente",
-//         service_client: "Epifanio Arenal",
-//         "applications": [
-//             {
-//                 application_message: "Aplicación para Visa-U (I-918A) a favor de"
-//             },
-//             {
-//                 application_message: "Petición de Perdón (I-192) para"
-//             },
-//             {
-//                 application_message: "Petición de Permiso de Trabajo I-765 (Categoria C14)"
-//             },
-//             {
-//                 application_message: "Petición de Permiso de Trabajo I-765 (Categoria A20)"
-//             }
-//         ]
-//     },
-//     {
-//         service_message: "Peticiones para obtener registros de Cliente",
-//         service_client: "Epifanio Arenal",
-//         "applications": [
-//             {
-//                 application_message: "Petición FOIA a USCIS para"
-//             },
-//             {
-//                 application_message: "Petición FOIA a CBP para"
-//             },
-//             {
-//                 application_message: "Peticiones de registro Criminal con el FBI para Cliente"
-//             }
-//         ]
-//     },
-// ];
+function readContractResponse(operation){
+    console.log(operation);
+    contractDocument.contractId = operation.dataset[0];
+    contractDocument.contractDocumentId = operation.dataset[1];
+    contractDocument.fileName = operation.dataset[2];
+    contractDocument.version = operation.dataset[3];
+    generate();
+}
+
+function exceptionContractResponse(){
+    let saveButton = $("#saveButton");
+    if(saveButton.hasClass("disabled")){
+        saveButton.removeClass("disabled");
+    }
+}
+
+function uploadDocument(blob) {
+    // Create a FormData object and append the Blob
+    var formData = new FormData();
+    formData.append('file', blob, contractDocument.fileName);
+
+    // Make a POST request to your PHP controller
+    fetch(base_url + 'contract/' + matter_id + '/' + contractDocument.contractId + '/store_file_contract/?matter_id=' + matter_id, {
+        method: 'POST',
+        body: formData,
+    }).then(response => response.json()) // Assuming your PHP controller returns JSON
+    .then(data => {
+        console.log('Response from PHP controller:', data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
 
 function loadContacts(num){
     // get contacts related values
@@ -2815,7 +2856,7 @@ function addBeneficiaryViewContent(num, relation, role, name, id){
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" data-custom-id="${id}" name="mainClientCheck" onclick="assignPrincipalCheckBox(this)" id="mainCheck${num}${roleContact}>
                                         <label class="form-check-label" for="mainCheck${num}">
-                                            Mark as Principal Contact
+                                            Mark as Principal | Victim
                                         </label>
                                     </div>
                                 </div>
