@@ -1,5 +1,6 @@
 const create = 'Contract/call_to_save_contract';
 const update = 'Contract/update/';
+const delete_contract_document_data = 'Contract/delete_contract_document_data';
 
 let shouldShowConfirmation = true;
 
@@ -256,7 +257,7 @@ $(document).ready(function() {
     $("#expandTablePreview").click(function(event) {
         event.preventDefault(); // Prevent the default behavior of the anchor tag
         $(this).toggleClass("highlight"); // Toggle the "highlight" class on the clicked element
-
+        let table_title = $("#table_title");
         let sizeMP = Object.keys(contractJSON.contract.monthlyPayments).length;
 
         // This code is executed when the button is clicked.
@@ -266,7 +267,6 @@ $(document).ready(function() {
             let html = '';
             // Toggle the text between "On" and "Off"
             if ($(this).text() === "expand view") {
-
                 for(let i = 0; i < sizeMP; ++i){
                     html += `
                         <tr>
@@ -276,7 +276,7 @@ $(document).ready(function() {
                         </tr>
                         `;
                 }
-
+                table_title.text("Table Preview - Detailed");
                 $(this).text("collapse view");
             } else {
                 if(contractJSON.contract.monthlyPayments[0].amount == contractJSON.contract.monthlyPayments[sizeMP-1].amount){
@@ -328,7 +328,7 @@ $(document).ready(function() {
                         </tr>
                         `;
                 }
-
+                table_title.text("Table Preview - Summary");
                 $(this).text("expand view");
             }
 
@@ -852,131 +852,154 @@ formMC.addEventListener('submit', function (event) {
 
         if(amountMonthlyCharges != 0 && totalMonthlyCharges != 0 && (numberOfMonthlyCharges != 0 || numberOfMonthlyCharges.length==0 || numberOfMonthlyCharges===null ||
             numberOfMonthlyCharges==="" || numberOfMonthlyCharges === 0 || numberOfMonthlyCharges == 0 || numberOfMonthlyCharges === 0.0 || numberOfMonthlyCharges == 0.0 || numberOfMonthlyCharges === 0.00 || numberOfMonthlyCharges == 0.00 )){
+            if(parseFloat(amountMonthlyCharges) <= parseFloat(totalMonthlyCharges)) {
+                let remainderNotFixed = 0;
+                let exactAmountTotalNotFixed = 0;
+                let exactNumberOfChargesNotFixed = 0;
 
-            let remainderNotFixed = 0;
-            let exactAmountTotalNotFixed = 0;
-            let exactNumberOfChargesNotFixed = 0;
+                let remainder = 0;
+                let exactAmountTotal = 0;
+                let exactNumberOfCharges = 0;
 
-            let remainder = 0;
-            let exactAmountTotal = 0;
-            let exactNumberOfCharges = 0;
+                remainderNotFixed = totalMonthlyCharges % amountMonthlyCharges;
+                exactAmountTotalNotFixed = totalMonthlyCharges - parseFloat(remainderNotFixed).toFixed(2);
+                exactNumberOfChargesNotFixed = parseFloat(exactAmountTotalNotFixed).toFixed(2) / amountMonthlyCharges;
 
-            remainderNotFixed = totalMonthlyCharges % amountMonthlyCharges;
-            exactAmountTotalNotFixed = totalMonthlyCharges - parseFloat(remainderNotFixed).toFixed(2);
-            exactNumberOfChargesNotFixed = parseFloat(exactAmountTotalNotFixed).toFixed(2) / amountMonthlyCharges;
+                remainder = parseFloat(remainderNotFixed).toFixed(2);
+                exactAmountTotal = parseFloat(exactAmountTotalNotFixed).toFixed(2);
+                exactNumberOfCharges = parseInt(exactNumberOfChargesNotFixed);
 
-            remainder = parseFloat(remainderNotFixed).toFixed(2);
-            exactAmountTotal = parseFloat(exactAmountTotalNotFixed).toFixed(2);
-            exactNumberOfCharges = parseInt(exactNumberOfChargesNotFixed);
+                console.log(remainder);
+                console.log(parseFloat(amountMonthlyCharges).toFixed(2));
+                console.log(remainder == parseFloat(amountMonthlyCharges).toFixed(2));
+                console.log(parseFloat(amountMonthlyCharges)+parseFloat(remainder));
 
-            console.log(remainder);
-            console.log(parseFloat(amountMonthlyCharges).toFixed(2));
-            console.log(remainder == parseFloat(amountMonthlyCharges).toFixed(2));
-            console.log(parseFloat(amountMonthlyCharges)+parseFloat(remainder));
+                if (remainder >= 50) {
+                    if (remainder == parseFloat(amountMonthlyCharges).toFixed(2)) {
 
-            if (remainder >= 50) {
-                if (remainder == parseFloat(amountMonthlyCharges).toFixed(2)) {
+                        ++exactNumberOfCharges;
 
-                    ++exactNumberOfCharges;
+                        monthsArray = setDates(exactNumberOfCharges);
 
-                    monthsArray = setDates(exactNumberOfCharges);
+                        let sizeMArray = monthsArray.length;
 
-                    let sizeMArray = monthsArray.length;
-
-                    for(let i = 1; i <= exactNumberOfCharges; i++){
-                        arrayCharges.push(parseFloat(amountMonthlyCharges).toFixed(2));
-                    }
-
-                    html = `<tr>
-                                <th scope="row">${exactNumberOfCharges}</th>
-                                <td>from ${monthsArray[0]} to ${monthsArray[sizeMArray-1]}</td>
-                                <td>$ ${parseFloat(amountMonthlyCharges).toFixed(2)}</td>
-                            </tr>`;
-
-                    document.getElementById("numberOfMC").value = exactNumberOfCharges;
-
-                } else {
-
-                    monthsArray = setDates(1+exactNumberOfCharges);
-
-                    let sizeMArray = monthsArray.length;
-
-                    for(let i = 1; i <= exactNumberOfCharges; i++){
-                        arrayCharges.push(parseFloat(amountMonthlyCharges).toFixed(2));
-                    }
-
-                    arrayCharges.push(parseFloat(remainder).toFixed(2));
-
-                    html = `<tr>
-                                <th scope="row">${exactNumberOfCharges}</th>
-                                <td>from ${monthsArray[0]} to ${monthsArray[sizeMArray-2]}</td>
-                                <td>$ ${parseFloat(amountMonthlyCharges).toFixed(2)}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">1</th>
-                                <td>${monthsArray[sizeMArray-1]}</td>
-                                <td>$ ${remainder}</td>
-                            </tr>`;
-
-                    document.getElementById("numberOfMC").value = 1 + parseInt(exactNumberOfCharges);
-                }
-
-            } else {
-
-                if(remainder == 0 || remainder === 0 || remainder == parseFloat(amountMonthlyCharges).toFixed(2)){
-
-                    console.log(remainder);
-
-                    monthsArray = setDates(exactNumberOfCharges);
-                    let sizeMArray = monthsArray.length;
-
-                    for(let i = 1; i <= exactNumberOfCharges; i++){
-                        arrayCharges.push(parseFloat(amountMonthlyCharges).toFixed(2));
-                    }
-
-                    html = `<tr>
-                                <th scope="row">${exactNumberOfCharges}</th>
-                                <td>from ${monthsArray[0]} to ${monthsArray[sizeMArray-1]}</td>
-                                <td>$ ${parseFloat(amountMonthlyCharges).toFixed(2)}</td>
-                            </tr>`;
-
-                    document.getElementById("numberOfMC").value = exactNumberOfCharges;
-
-                } else {
-
-                    console.log(remainder);
-
-                    monthsArray = setDates(exactNumberOfCharges);
-
-                    let sizeMArray = monthsArray.length;
-
-                    console.log(parseFloat(amountMonthlyCharges+remainder).toFixed(2));
-
-                    for(let i = 1; i <= exactNumberOfCharges; i++){
-                        if(i == 1 || i === 1){
-                            arrayCharges.push((parseFloat(amountMonthlyCharges)+parseFloat(remainder)).toFixed(2));
-                        } else {
+                        for(let i = 1; i <= exactNumberOfCharges; i++){
                             arrayCharges.push(parseFloat(amountMonthlyCharges).toFixed(2));
                         }
+
+                        html = `<tr>
+                                    <th scope="row">${exactNumberOfCharges}</th>
+                                    <td>from ${monthsArray[0]} to ${monthsArray[sizeMArray-1]}</td>
+                                    <td>$ ${parseFloat(amountMonthlyCharges).toFixed(2)}</td>
+                                </tr>`;
+
+                        document.getElementById("numberOfMC").value = exactNumberOfCharges;
+
+                    } else {
+
+                        monthsArray = setDates(1+exactNumberOfCharges);
+
+                        let sizeMArray = monthsArray.length;
+
+                        for(let i = 1; i <= exactNumberOfCharges; i++){
+                            arrayCharges.push(parseFloat(amountMonthlyCharges).toFixed(2));
+                        }
+
+                        arrayCharges.push(parseFloat(remainder).toFixed(2));
+
+                        html = `<tr>
+                                    <th scope="row">${exactNumberOfCharges}</th>
+                                    <td>from ${monthsArray[0]} to ${monthsArray[sizeMArray-2]}</td>
+                                    <td>$ ${parseFloat(amountMonthlyCharges).toFixed(2)}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>${monthsArray[sizeMArray-1]}</td>
+                                    <td>$ ${remainder}</td>
+                                </tr>`;
+
+                        document.getElementById("numberOfMC").value = 1 + parseInt(exactNumberOfCharges);
                     }
 
-                    console.log(arrayCharges);
+                } else {
 
-                    html = `<tr>
-                                <th scope="row">1</th>
-                                <td>${monthsArray[0]}</td>
-                                <td>$ ${(parseFloat(amountMonthlyCharges)+parseFloat(remainder)).toFixed(2)}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">${exactNumberOfCharges-1}</th>
-                                <td>from ${monthsArray[1]} to ${monthsArray[sizeMArray-1]}</td>
-                                <td>$ ${parseFloat(amountMonthlyCharges).toFixed(2)}</td>
-                            </tr>`;
+                    if(remainder == 0 || remainder === 0 || remainder == parseFloat(amountMonthlyCharges).toFixed(2)){
 
-                    document.getElementById("numberOfMC").value = exactNumberOfCharges;
+                        console.log(remainder);
+
+                        monthsArray = setDates(exactNumberOfCharges);
+                        let sizeMArray = monthsArray.length;
+
+                        for(let i = 1; i <= exactNumberOfCharges; i++){
+                            arrayCharges.push(parseFloat(amountMonthlyCharges).toFixed(2));
+                        }
+
+                        html = `<tr>
+                                    <th scope="row">${exactNumberOfCharges}</th>
+                                    <td>from ${monthsArray[0]} to ${monthsArray[sizeMArray-1]}</td>
+                                    <td>$ ${parseFloat(amountMonthlyCharges).toFixed(2)}</td>
+                                </tr>`;
+
+                        document.getElementById("numberOfMC").value = exactNumberOfCharges;
+
+                    } else {
+
+                        console.log(remainder);
+
+                        monthsArray = setDates(exactNumberOfCharges);
+
+                        let sizeMArray = monthsArray.length;
+                        if(sizeMArray == 1) {
+                            arrayCharges.push((parseFloat(amountMonthlyCharges)+parseFloat(remainder)).toFixed(2));
+                            console.log(arrayCharges);
+                            html = `<tr>
+                                        <th scope="row">1</th>
+                                        <td>${monthsArray[0]}</td>
+                                        <td>$ ${(parseFloat(amountMonthlyCharges)+parseFloat(remainder)).toFixed(2)}</td>
+                                    </tr>`;
+                        } else {
+                            for(let i = 1; i <= exactNumberOfCharges; i++){
+                                if(i == 1 || i === 1){
+                                    arrayCharges.push((parseFloat(amountMonthlyCharges)+parseFloat(remainder)).toFixed(2));
+                                } else {
+                                    arrayCharges.push(parseFloat(amountMonthlyCharges).toFixed(2));
+                                }
+                            }
+    
+                            console.log(arrayCharges);
+    
+                            html = `<tr>
+                                        <th scope="row">1</th>
+                                        <td>${monthsArray[0]}</td>
+                                        <td>$ ${(parseFloat(amountMonthlyCharges)+parseFloat(remainder)).toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">${exactNumberOfCharges-1}</th>
+                                        <td>from ${monthsArray[1]} to ${monthsArray[sizeMArray-1]}</td>
+                                        <td>$ ${parseFloat(amountMonthlyCharges).toFixed(2)}</td>
+                                    </tr>`;
+                        }
+                        console.log(parseFloat(amountMonthlyCharges+remainder).toFixed(2));
+
+                        
+
+                        document.getElementById("numberOfMC").value = exactNumberOfCharges;
+                    }
                 }
+            } else {
+                Toast.fire({
+                    icon: "error",
+                    title: "Inconsistency found",
+                    position: "center-start",
+                    width: "25%",
+                    timer: 10000,
+                    html: `
+                        Monthly Charge Amount <b>` + parseFloat(amountMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 }) + `</b>,
+                        <b>CANNOT BE</b> higher than the Total Amount: <b>` + parseFloat(totalMonthlyCharges).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 }) + `</b>
+                    `
+                });
+                return null;
             }
-
         } else if(amountMonthlyCharges != 0 && numberOfMonthlyCharges != 0 && (totalMonthlyCharges.length==0 || totalMonthlyCharges===null ||
                     totalMonthlyCharges==="" || totalMonthlyCharges === 0 || totalMonthlyCharges == 0 || totalMonthlyCharges === 0.0 || totalMonthlyCharges == 0.0 || totalMonthlyCharges === 0.00 || totalMonthlyCharges == 0.00 )) {
 
@@ -1157,6 +1180,197 @@ formTC.addEventListener('submit', function (event) {
     formTC.classList.add('was-validated');
 });
 
+/**
+ * Creates an array of dates that is then used to store
+ * the date information about the payment plan
+ * @param {Number} numberOfMonthlyCharges , total months
+ * @returns an array containing all the dates of a monthly charges plan
+ */
+function setDates(numberOfMonthlyCharges){
+    let startDate = $( "#startDateMC" ).datepicker( "getDate" );
+    console.log("start date: " + startDate.getMonth());
+    let endDate = calculateDateEnd(numberOfMonthlyCharges, startDate);
+    console.log(endDate);
+    let endDateFormatted = objectDateToFormattedDate(endDate);
+    console.log(endDateFormatted);
+    $("#endDateMC").val(endDateFormatted);
+    let monthsArray = [];
+    monthsArray = getAllMonths(startDate, endDate);
+    return monthsArray;
+}
+
+/**
+ * Get all the months between a start date and an end date.
+ * @param {Date} startDate - The start date (inclusive).
+ * @param {Date} endDate - The end date (inclusive).
+ * @returns {Array} - An array of formatted date strings representing each month.
+ */
+function getAllMonths(startDate, endDate){
+    // check that dates are valid
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        alert("Please enter valid dates (mm/dd/yy format).");
+    } else {
+        const outputElement = $("#output");
+        outputElement.empty();
+
+        let currentDate = new Date(startDate);
+        const monthsArray = [];
+
+        monthsArray.push(startDate.toLocaleDateString("en-US", {
+            month: "2-digit",
+            day: "2-digit",
+            year: "numeric"
+        }));
+
+        console.log(currentDate);
+        console.log(currentDate < endDate);
+
+        while (currentDate < endDate) {
+            //console.log(currentDate < endDate);
+            //console.log(currentDate + "  " + endDate);
+            const nextMonthDate = new Date(currentDate);
+            // go 1 month further, store it variable nextMonthDate
+            nextMonthDate.setMonth(currentDate.getMonth() + 1);
+
+            // checks if the value of nextMonthDate is truly 1 month ahead
+            // If the next month has a different number of days, set the day to the last day of the month
+            // it could happen that we are in January 31 and by adding 1 month we get March 2 instead of February 28
+            // is not incorrect but is not what we are looking for. So if this happens we use setDate(0) to set the Date to the last day of the previous month
+            // egg. we have: march 2 || we need: february 28 || we do: march 2 => setDate(0) => february 28
+            if (nextMonthDate.getDate() !== currentDate.getDate()) {
+                nextMonthDate.setDate(0);
+            }
+
+            // new date variable so that we make sure that the nextMonthDate is truly the last day of the month
+            let tempDate = new Date(nextMonthDate);
+
+            // Assign the new variable a date value which is 1 month further
+            tempDate.setMonth(nextMonthDate.getMonth() + 1);
+
+            // we make sure that tempDate is truly one month further, if not, we use setDate(0)
+            if(tempDate.getDate() !== nextMonthDate.getDate()){
+                tempDate.setDate(0);
+            }
+
+            // now that we know that we are 1 month further, we use setDate(0) to get the last day of the month that nextMonthDate has
+            tempDate.setDate(0);
+
+            console.log("Temp Date: " + tempDate.getDate() + " || nextMonthDate: " + nextMonthDate.getDate());
+
+            if(startDate.getDate() !== nextMonthDate.getDate()) {
+                if(startDate.getDate() > tempDate.getDate()){
+                    // evaluate if the date (day) of the first date is 30 or 31 to then assign the following months the last day they have
+                    if(startDate.getDate() == 31){
+                        // we check if nextMonthDate day is actually the last by checking that is the same as tempDate day, if not, we set the nextMonthDate day the day of tempDate
+                        if(nextMonthDate.getDate() !== tempDate.getDate()){
+                            nextMonthDate.setDate(tempDate.getDate());
+                        }
+                    } else if (startDate.getDate() == 30) {
+
+                        // we check if nextMonthDate day is actually the last by checking that is the same as tempDate day, if not, we set the nextMonthDate day the day of tempDate
+                        if(nextMonthDate.getDate() !== tempDate.getDate()){
+                            if(tempDate.getDate() == 28 || tempDate.getDate() == 29){
+                                nextMonthDate.setDate(tempDate.getDate());
+                            } else if(tempDate.getDate() == 31) {
+                                nextMonthDate.setDate(30);
+                            } else if (tempDate.getDate() == 30) {
+                                nextMonthDate.setDate(tempDate.getDate());
+                            }
+                        }
+                    }
+                } else {
+                    nextMonthDate.setDate(startDate.getDate());
+                }
+            }
+
+            // we format the date to mm/dd/yy
+            const formattedDate = nextMonthDate.toLocaleDateString("en-US", {
+                month: "2-digit",
+                day: "2-digit",
+                year: "numeric"
+            });
+
+            monthsArray.push(formattedDate);
+
+            currentDate = new Date(nextMonthDate);
+            //console.log(formattedDate + " currentDate " + currentDate);
+
+            console.log("---------------------------------------------------------------");
+        }
+        console.log(monthsArray);
+
+        return monthsArray;
+    }
+}
+
+/**
+ * Calculates the last payment date of a monthly charge plan
+ * @param {Number} numberOfMonthlyCharges , number of months
+ * @param {Date} dateInput , starting date. Value is obtained with .datepicker("getDate") method from jQuery UI date picker
+ * @returns
+ */
+function calculateDateEnd(numberOfMonthlyCharges, dateInput){
+    //let dayFormatted = objectDateToFormattedDate(dateInput);
+    let numMonthsAhead = parseInt(numberOfMonthlyCharges);
+
+    if (dateInput && !isNaN(numMonthsAhead)) {
+        const originalDate = new Date(dateInput);
+        const newDate = new Date(originalDate);
+         // Calculate the target month
+        const targetMonth = newDate.getMonth() + (numMonthsAhead - 1);
+        newDate.setMonth(targetMonth);
+        // Check if the day exceeds the last day of the target month
+        if (newDate.getDate() !== originalDate.getDate()) {
+            newDate.setDate(0); // Set the day to the last day of the previous month
+        }
+        return newDate;
+    } else {
+        alert("Please select a valid date and enter a valid number of months.");
+    }
+}
+
+/**
+ * Add all the payment information about monthly charges to contractJSON array
+ * @param {Array} monthsArray - Array with dates that represents the payments date.
+ * @param {Array} chargesArray - Array with doubles that represents the amount to be paid.
+ * @returns {null}
+ */
+function addMonthlyPaymentsToJSON(monthsArray, chargesArray){
+
+    for(let i = 0; i < monthsArray.length; ++i){
+
+        contractJSON.contract.monthlyPayments.push(
+            {
+                'date': monthsArray[i],
+                'amount': chargesArray[i]
+            }
+        );
+    }
+}
+
+/*document.getElementById("addDownPayment").addEventListener("click", function(event) {
+    event.preventDefault();
+
+    downPaymentAmount = document.getElementById("amountDP").value;
+
+    document.getElementById("summaryDownPayment").innerText = parseFloat(downPaymentAmount).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+    let dateInput = $( "#dateDP" ).datepicker( "getDate" );
+    let dayFormatted = objectDateToFormattedDate(dateInput);
+    document.getElementById("summaryDownPaymentDate").innerText = dayFormatted;
+});*/
+
+/*document.getElementById("addTotalContract").addEventListener("click", function(event) {
+    event.preventDefault();
+
+    totalContractAmount = document.getElementById("totalContractAmount").value;
+
+    document.getElementById("summaryTotalContract").innerText = parseFloat(totalContractAmount).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
+});*/
+
+/*document.getElementById("addMC").addEventListener("click", function(event) {
+    event.preventDefault();
+});*/
+
 // Regex patterns for input validation
 // validation for non empty values, money inputs and quantity
 
@@ -1264,193 +1478,6 @@ document.getElementById('totalContractAmount').addEventListener('input', functio
 document.getElementById('totalContractAmount').addEventListener('blur', function () {
     validateInput("totalContractAmount", "totalContractAmountValidation", "money", "Please enter a valid amount");
 });
-
-/**
- * Creates an array of dates that is then used to store
- * the date information about the payment plan
- * @param {Number} numberOfMonthlyCharges , total months
- * @returns an array containing all the dates of a monthly charges plan
- */
-function setDates(numberOfMonthlyCharges){
-    let startDate = $( "#startDateMC" ).datepicker( "getDate" );
-    console.log("start date: " + startDate.getMonth());
-    let endDate = calculateDateEnd(numberOfMonthlyCharges, startDate);
-    console.log(endDate);
-    let endDateFormatted = objectDateToFormattedDate(endDate);
-    console.log(endDateFormatted);
-    $("#endDateMC").val(endDateFormatted);
-    let monthsArray = [];
-    monthsArray = getAllMonths(startDate, endDate);
-    return monthsArray;
-}
-
-/**
- * Get all the months between a start date and an end date.
- * @param {Date} startDate - The start date (inclusive).
- * @param {Date} endDate - The end date (inclusive).
- * @returns {Array} - An array of formatted date strings representing each month.
- */
-function getAllMonths(startDate, endDate){
-    // check that dates are valid
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        alert("Please enter valid dates (mm/dd/yy format).");
-    } else {
-        const outputElement = $("#output");
-        outputElement.empty();
-
-        let currentDate = new Date(startDate);
-        const monthsArray = [];
-
-        monthsArray.push(startDate.toLocaleDateString("en-US", {
-            month: "2-digit",
-            day: "2-digit",
-            year: "numeric"
-        }));
-
-        console.log(currentDate);
-        console.log(currentDate < endDate);
-
-        while (currentDate < endDate) {
-            console.log(currentDate < endDate);
-            console.log(currentDate + "  " + endDate);
-            const nextMonthDate = new Date(currentDate);
-            // go 1 month further, store it variable nextMonthDate
-            nextMonthDate.setMonth(currentDate.getMonth() + 1);
-
-            console.log("next date in future " + nextMonthDate.getDate());
-
-            // checks if the value of nextMonthDate is truly 1 month ahead
-            // If the next month has a different number of days, set the day to the last day of the month
-            // it could happen that we are in January 31 and by adding 1 month we get March 2 instead of February 28
-            // is not incorrect but is not what we are looking for. So if this happens we use setDate(0) to set the Date to the last day of the previous month
-            // egg. march 2 || march 28 || march 15 => setDate(0) => february 28
-            if (nextMonthDate.getDate() !== currentDate.getDate()) {
-                nextMonthDate.setDate(0);
-            }
-
-            // new date variable so that we make sure that the nextMonthDate is truly the last day of the month
-            let tempDate = new Date(nextMonthDate);
-
-            // Assign the new variable a date value which is 1 month further
-            tempDate.setMonth(nextMonthDate.getMonth() + 1);
-
-            // we make sure that tempDate is truly one month further, if not, we use setDate(0)
-            if(tempDate.getDate() !== nextMonthDate.getDate()){
-                tempDate.setDate(0);
-            }
-
-            // now that we know that we are 1 month further, we use setDate(0) to get the last day of the month that nextMonthDate has
-            tempDate.setDate(0);
-
-            // evaluate if the date (day) of the first date is 30 or 31 to then assign the following months the last day they have
-            if(startDate.getDate() == 31){
-
-                // we check if nextMonthDate day is actually the last by checking that is the same as tempDate day, if not, we set the nextMonthDate day the day of tempDate
-                if(nextMonthDate.getDate() !== tempDate.getDate()){
-                    nextMonthDate.setDate(tempDate.getDate());
-                }
-            } else if (startDate.getDate() == 30) {
-
-                // we check if nextMonthDate day is actually the last by checking that is the same as tempDate day, if not, we set the nextMonthDate day the day of tempDate
-                if(nextMonthDate.getDate() !== tempDate.getDate()){
-
-                    if(tempDate.getDate() == 28 || tempDate.getDate() == 29){
-                        nextMonthDate.setDate(tempDate.getDate());
-                    } else if(tempDate.getDate() == 31) {
-                        nextMonthDate.setDate(30);
-                    } else if (tempDate.getDate() == 30) {
-                        nextMonthDate.setDate(tempDate.getDate());
-                    }
-                }
-            }
-
-            // we format the date to mm/dd/yy
-            const formattedDate = nextMonthDate.toLocaleDateString("en-US", {
-                month: "2-digit",
-                day: "2-digit",
-                year: "numeric"
-            });
-
-            monthsArray.push(formattedDate);
-
-            currentDate = new Date(nextMonthDate);
-            console.log(formattedDate + " currentDate " + currentDate);
-
-            console.log("---------------------------------------------------------------");
-        }
-        console.log(monthsArray);
-
-        return monthsArray;
-    }
-}
-
-/**
- * Calculates the last payment date of a monthly charge plan
- * @param {Number} numberOfMonthlyCharges , number of months
- * @param {Date} dateInput , starting date. Value is obtained with .datepicker("getDate") method from jQuery UI date picker
- * @returns
- */
-function calculateDateEnd(numberOfMonthlyCharges, dateInput){
-    //let dayFormatted = objectDateToFormattedDate(dateInput);
-    let numMonthsAhead = parseInt(numberOfMonthlyCharges);
-
-    if (dateInput && !isNaN(numMonthsAhead)) {
-        const originalDate = new Date(dateInput);
-        const newDate = new Date(originalDate);
-         // Calculate the target month
-        const targetMonth = newDate.getMonth() + (numMonthsAhead - 1);
-        newDate.setMonth(targetMonth);
-        // Check if the day exceeds the last day of the target month
-        if (newDate.getDate() !== originalDate.getDate()) {
-            newDate.setDate(0); // Set the day to the last day of the previous month
-        }
-        return newDate;
-    } else {
-        alert("Please select a valid date and enter a valid number of months.");
-    }
-}
-
-/**
- * Add all the payment information about monthly charges to contractJSON array
- * @param {Array} monthsArray - Array with dates that represents the payments date.
- * @param {Array} chargesArray - Array with doubles that represents the amount to be paid.
- * @returns {null}
- */
-function addMonthlyPaymentsToJSON(monthsArray, chargesArray){
-
-    for(let i = 0; i < monthsArray.length; ++i){
-
-        contractJSON.contract.monthlyPayments.push(
-            {
-                'date': monthsArray[i],
-                'amount': chargesArray[i]
-            }
-        );
-    }
-}
-
-/*document.getElementById("addDownPayment").addEventListener("click", function(event) {
-    event.preventDefault();
-
-    downPaymentAmount = document.getElementById("amountDP").value;
-
-    document.getElementById("summaryDownPayment").innerText = parseFloat(downPaymentAmount).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
-    let dateInput = $( "#dateDP" ).datepicker( "getDate" );
-    let dayFormatted = objectDateToFormattedDate(dateInput);
-    document.getElementById("summaryDownPaymentDate").innerText = dayFormatted;
-});*/
-
-/*document.getElementById("addTotalContract").addEventListener("click", function(event) {
-    event.preventDefault();
-
-    totalContractAmount = document.getElementById("totalContractAmount").value;
-
-    document.getElementById("summaryTotalContract").innerText = parseFloat(totalContractAmount).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits:2 });
-});*/
-
-/*document.getElementById("addMC").addEventListener("click", function(event) {
-    event.preventDefault();
-});*/
 
 function calculateTotal(){
 
@@ -2120,15 +2147,7 @@ function loadContract(){
                 }
             }
             if(typeof indexSelect3 == 'undefined'){
-                Toast.fire({
-                    icon: "info",
-                    title: "Language was not loaded",
-                    html: `
-                        There was an issue loading the
-                        contracts language, please contact
-                        an administrator
-                    `
-                });
+                sweetAlert(2, 'There was an issue loading the contracts language, please contact an administrator', base_url + "matters/" + matter_id + "/main_view");
             } else {
                 languageSelect.selectedIndex = indexSelect3;
             }
@@ -2291,7 +2310,11 @@ function sendRequest(transaction){
                 console.log(JSON.stringify(request));
                 shouldShowConfirmation = false;
                 saveRow(base_url + create, null, request, null, base_url + "matters/" + matter_id + "/main_view", 4);
+                startSwal();
             } else {
+                if(saveButton.hasClass("disabled")){
+                    saveButton.removeClass("disabled");
+                }
                 console.log(listOfWrongValues);
 
                 swal.fire({
@@ -2378,24 +2401,28 @@ function sendRequest(transaction){
                 let contract_id = contractArray[0].idContract;
 
                 request.contracts = data;
-                request.applicationsContactsList = listContactsApplications;
+                request.applicationsContactsList = listContactsApplications; 
                 request.roleContactsList = listRoleContacts;
                 request.contractPaymentPlansList = listPaymentPlans;
                 request.contractsDocuments = contractsDocuments;
-                request.oldApplicationsList = oldApplicationsList;
-                request.oldRoleList = oldRoleList;
-                request.oldPaymentsList = oldPaymentsList;
+                // request.oldApplicationsList = oldApplicationsList;
+                // request.oldRoleList = oldRoleList;
+                // request.oldPaymentsList = oldPaymentsList;
                 selectedLang = document.getElementById('contractLanguage').value;
                 
                 console.log(JSON.stringify(request));
                 shouldShowConfirmation = false;
                 saveRow(base_url + update + contract_id, null, request, null, base_url + "contract/" + contractArray[0].idContract + "/edit/?matter_id=" + matter_id, 4);
                 console.log("" + base_url + update + contract_id + "");
+                startSwal();
             } else {
+                if(saveButton.hasClass("disabled")){
+                    saveButton.removeClass("disabled");
+                }
                 console.log(listOfWrongValues);
 
                 swal.fire({
-                    title: 'Error',
+                    titleText: 'Error',
                     html: 'Cannot proceed with empty / invalid values: \n <pre class="text-start">' + listOfWrongValues + '</pre>',
                     icon: 'error',
                     allowOutsideClick: false,
@@ -2411,26 +2438,181 @@ function sendRequest(transaction){
 
 let contractDocument = {};
 
+function startSwal(){
+    swal.fire({
+        titleText: 'Contract Update',
+        html: `
+        <div class="container">
+            <div class="row mt-3">
+                <div class="col-sm-10 text-start">
+                    <p id="uploadDataText">Uploading Contract Information</p>
+                </div>
+                <div class="col-sm-2">
+                    <div style="display: flex;">
+                        <div style="display: inline-block;">
+                            <div id="uploadDataOnGoing" class="loader" style="position:absolute; display:block;"></div>
+                            <span id="uploadDataCompleted" class="material-symbols-outlined" style="font-size:25px; color:#4caf50; position:absolute; display:none;">check_circle</span>
+                            <span id="uploadDataError" class="material-symbols-outlined" style="font-size:25px; color:#dc3545; position:absolute; display:none;">cancel</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-sm-10 text-start">
+                    <p id="uploadDocText" class="text-muted">Uploading Contract Document</p>
+                </div>
+                <div class="col-sm-2">
+                    <div style="display: flex;">
+                        <div style="display: inline-block;">
+                            <div id="uploadDocOnGoing" class="loader" style="position:absolute; display:none;"></div>
+                            <span id="uploadDocCompleted" class="material-symbols-outlined" style="font-size:25px; color:#4caf50; position:absolute; display:none;">check_circle</span>
+                            <span id="uploadDocError" class="material-symbols-outlined" style="font-size:25px; color:#dc3545; position:absolute; display:none;">cancel</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="errorMessageRow" class="row mt-3" style="display: none;">
+                <div class="col-sm-12">
+                    <div class="error-message mb-3">
+                        <span id="errorMessage" class="error-text">There was an error getting matter information. Please try again later. If the issue persists, contact an administrator</span>
+                    </div>
+                </div>
+            </div>
+            <div id="optionsAfterUpload" class="row mt-3" style="display: none;">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <a id="optionBackToMatter" href="#;" type="button" class="btn btn-primary">
+                            <span class="material-symbols-outlined align-middle" id="icontoflip">
+                                move_item
+                            </span>
+                            Back to Matter
+                        </a>
+                    </div>
+                    <div class="col-sm-6">
+                        <a id="optionDownloadDoc" href="#;" type="button" class="btn btn-secondary">
+                            <span class="material-symbols-outlined align-middle" id="icontoflip">
+                                download_for_offline
+                            </span>
+                            Download Contract
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div id="closeSwalOption" class="row mt-3" style="display: none;">
+                <div class="row">
+                    <div class="col-sm">
+                        <button type="button" onclick="closeSwalProgrammatically()" class="btn btn-secondary">
+                            Ok
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>`,
+        allowEnterKey: false,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false
+    });
+    // .then(function () {
+    //     location.href = url
+    // });
+}
+
+function closeSwalProgrammatically(){
+    Swal.close();
+}
+
 function readContractResponse(operation){
-    console.log(operation);
-    contractDocument.contractId = operation.dataset[0];
-    contractDocument.contractDocumentId = operation.dataset[1];
-    contractDocument.fileName = operation.dataset[2];
-    contractDocument.version = operation.dataset[3];
-    generate();
+    if(operation.status == 1){
+        let uploadDataOnGoing = document.getElementById("uploadDataOnGoing");
+        uploadDataOnGoing.style.display = 'none';
+        let uploadDataCompleted = document.getElementById("uploadDataCompleted");
+        uploadDataCompleted.style.display = 'block';
+        let uploadDataText = $("#uploadDataText");
+        
+        uploadDataText.text("Contract Information Uploaded");
+
+        if(uploadDataText.hasClass("text-success")){
+        } else {
+            uploadDataText.addClass("text-success");
+        }
+
+        if(uploadDataText.hasClass("text-decoration-line-through")){
+        } else {
+            uploadDataText.addClass("text-decoration-line-through");
+        }
+
+        console.log(operation);
+        contractDocument.contractId = operation.dataset[0];
+        contractDocument.contractDocumentId = operation.dataset[1];
+        contractDocument.fileName = operation.dataset[2];
+        contractDocument.version = operation.dataset[3];
+        console.log(JSON.stringify(contractJSON, null, 2));
+        generate();
+    } else {
+        sweetAlert(2, 'There was an issue with your request, please contact an administrator', null);
+    }
 }
 
 function exceptionContractResponse(){
+    let uploadDataOnGoing = document.getElementById("uploadDataOnGoing");
+    uploadDataOnGoing.style.display = 'none';
+    let uploadDataError = document.getElementById("uploadDataError");
+    uploadDataError.style.display = 'block';
+    let uploadDataText = $("#uploadDataText");
+    uploadDataText.text("Uploading Contract Information - Failed");
+    if(uploadDataText.hasClass("text-danger")){
+    } else {
+        uploadDataText.addClass("text-danger");
+    }
+    let errorMessageRow = document.getElementById("errorMessageRow");
+    errorMessageRow.style.display = 'block';
+    let errorMessage  = $("#errorMessage");
+    errorMessage.text("There was an issue with your request, please try again later. If the issue persists, contact an administrator");
+    document.getElementById("closeSwalOption").style.display = 'block';
     let saveButton = $("#saveButton");
     if(saveButton.hasClass("disabled")){
         saveButton.removeClass("disabled");
     }
+    Swal.getCloseButton().style.display = 'block';
+}
+
+function deleteContractDocumentData() {
+    let data;
+    data = contractDocument.contractDocumentId;
+    fetch(base_url + delete_contract_document_data, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(data)
+    }).then(function (request) {
+        if (request.ok) {
+            request.json().then(function (response) {
+                if (response.status != 0) {
+
+                } else {
+                    
+                }
+            });
+        } else {
+            console.log(request.status + ' ' + request.text);
+        }
+    }).catch(function (error) {
+        console.log(error);
+    });
 }
 
 function uploadDocument(blob) {
     // Create a FormData object and append the Blob
     var formData = new FormData();
     formData.append('file', blob, contractDocument.fileName);
+
+    let uploadDocText = $("#uploadDocText");
+    if(uploadDocText.hasClass("text-muted")) {
+        uploadDocText.removeClass("text-muted");
+    }
+
+    let uploadDocOnGoing = document.getElementById("uploadDocOnGoing");
+    uploadDocOnGoing.style.display = 'block';
 
     // Make a POST request to your PHP controller
     fetch(base_url + 'contract/' + matter_id + '/' + contractDocument.contractId + '/store_file_contract/?matter_id=' + matter_id, {
@@ -2439,6 +2621,88 @@ function uploadDocument(blob) {
     }).then(response => response.json()) // Assuming your PHP controller returns JSON
     .then(data => {
         console.log('Response from PHP controller:', data);
+        if(data.success){
+            uploadDocOnGoing.style.display = 'none';
+            let uploadDocCompleted = document.getElementById("uploadDocCompleted");
+            uploadDocCompleted.style.display = 'block';
+
+            uploadDocText.text("Contract Document Uploaded");
+
+            if(uploadDocText.hasClass("text-success")){
+            } else {
+                uploadDocText.addClass("text-success");
+            }
+
+            if(uploadDocText.hasClass("text-decoration-line-through")){
+            } else {
+                uploadDocText.addClass("text-decoration-line-through");
+            }
+
+            let optionsAfterUpload = document.getElementById("optionsAfterUpload");
+            optionsAfterUpload.style.display = 'block';
+
+            let backToMatterLink = '';
+            backToMatterLink += base_url;
+            backToMatterLink += 'matters/';
+            backToMatterLink += matter_id;
+            backToMatterLink += '/main_view';
+
+            let newDocLink = '';
+            newDocLink += base_url;
+            newDocLink += './docsxup/files/matters/';
+            newDocLink += matter_id;
+            newDocLink += '/contracts/';
+            newDocLink += contractDocument.contractId;
+            newDocLink += '/';
+            newDocLink += contractDocument.fileName;
+
+            $("#optionBackToMatter").attr('href', backToMatterLink);
+            $("#optionDownloadDoc").attr('href', newDocLink);
+            let mainContainer = $("#mainContainer");
+            if(mainContainer.hasClass("blur")){
+            } else {
+                mainContainer.addClass("blur");
+            }
+        } else {
+            uploadDocOnGoing.style.display = 'none';
+            let uploadDocError = document.getElementById("uploadDocError");
+            uploadDocError.style.display = 'block';
+            uploadDocText = $("#uploadDocText");
+            uploadDocText.text("Uploading Contract Document - Failed");
+            if(uploadDocText.hasClass("text-danger")){
+            } else {
+                uploadDocText.addClass("text-danger");
+            }
+            
+            let uploadDataCompleted = document.getElementById("uploadDataCompleted");
+            uploadDataCompleted.style.display = 'none';
+            let uploadDataError = document.getElementById("uploadDataError");
+            uploadDataError.style.display = 'block';
+            let uploadDataText = $("#uploadDataText");
+            if(uploadDataText.hasClass("text-success")){
+                uploadDataText.removeClass("text-success");
+            }
+            if(uploadDataText.hasClass("text-decoration-line-through")){
+                uploadDataText.removeClass("text-decoration-line-through");
+            }
+            uploadDataText.text("Contract Information Uploaded - Cancelled");
+            if(uploadDataText.hasClass("text-danger")){
+            } else {
+                uploadDataText.addClass("text-danger");
+            }
+
+            let errorMessageRow = document.getElementById("errorMessageRow");
+            errorMessageRow.style.display = 'block';
+            let errorMessage  = $("#errorMessage");
+            errorMessage.text("There was an issue with your request, please try again later. If the issue persists, contact an administrator");
+            deleteContractDocumentData();
+            document.getElementById("closeSwalOption").style.display = 'block';
+            let saveButton = $("#saveButton");
+            if(saveButton.hasClass("disabled")){
+                saveButton.removeClass("disabled");
+            }
+            Swal.getCloseButton().style.display = 'block';
+        }
     })
     .catch(error => {
         console.error('Error:', error);
