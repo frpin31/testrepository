@@ -56,18 +56,18 @@
     }
 
     :root {
-        /* theme color variables to use in RGB declarations
+        /* theme color variables to use in RGB declarations */
         --redSettings: 78;
         --greenSettings: 115;
         --blueSettings: 223;
-        // the threshold at which colors are considered "light". 
-        // Range: decimals from 0 to 1,
-        // recommended 0.9 - 0.6
+        /*the threshold at which colors are considered "light". 
+        Range: decimals from 0 to 1,
+        recommended 0.9 - 0.6*/
         --thresholdSettings: 0.9;
-        // the threshold at which a darker border will be applied.
-        // Range: decimals from 0 to 1,
-        // recommended 0.8+
-        --border-thresholdSettings: 0.8; */
+        /*the threshold at which a darker border will be applied.
+        Range: decimals from 0 to 1,
+        recommended 0.8+*/
+        --border-thresholdSettings: 0.8;
     }
 
     .btncust {
@@ -283,197 +283,195 @@ if (isset($contracts) && is_array($contracts)):
                 </p>
             </td>
             <td class="contract_text">
-                <a data-toggle="collapse" href="#detailsContract<?= $container ?>" role="button" aria-expanded="false" class="btn btn-secondary" aria-controls="detailsContract<?= $container ?>" style="background-color: #6c757d; color: #FFFFFF;">
-                    Details</a>
+                <a href="#;" class="btn btn-secondary view_details"
+                    style="background-color: #6c757d; color: #FFFFFF;">Details</a>
                 <a href="<?php echo base_url("contract/" . $contract['idContract'] . "/edit/?matter_id=$matter->Id") ?>"
                     class="btn btn-primary" style="background-color: #0d6efd; color: #FFFFFF;">Edit</a>
                 <a href="#;" onclick="deleteContract(<?php echo $contract['idContract'] ?>)" class="btn btn-danger"
                     style="background-color: #dc3545; color: #FFFFFF;">Delete</a>
             </td>
         </tr>
-        <tr id="detailsContract<?= $container ?>" class="collapse">
-            <td colspan="11">
-                <div>
-                    <!-- APPLICATION ACCORDION -->
-                    <div class="panel-group" id="accordion-applications-<?= $container ?>" role="tablist"
-                        aria-multiselectable="true">
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingOne-<?= $container ?>">
-                                <h4 class="panel-title">
-                                    <a role="button" data-toggle="collapse" data-parent="#accordion-applications-<?= $container ?>"
-                                        href="#collapseOne-<?= $container ?>" aria-expanded="false"
-                                        aria-controls="collapseOne-<?= $container ?>">
-                                        Contact's Service and Applications
-                                    </a>
-                                </h4>
-                            </div>
-                            <!-- body -->
-                            <div id="collapseOne-<?= $container ?>" class="panel-collapse collapse" role="tabpanel"
-                                aria-labelledby="headingOne-<?= $container ?>">
-                                <div class="panel-body">
-                                    <div class="container">
-                                        <table class="table table-hover table-striped" id="appliactions">
-                                            <thead class="table-primary t_head">
+        <tr class="accordion-row">
+            <td colspan="10">
+                <!-- APPLICATION ACCORDION -->
+                <div class="panel-group" id="accordion-applications-<?= $container ?>" role="tablist"
+                    aria-multiselectable="true">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingOne-<?= $container ?>">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion-applications-<?= $container ?>"
+                                    href="#collapseOne-<?= $container ?>" aria-expanded="true"
+                                    aria-controls="collapseOne-<?= $container ?>">
+                                    Applications
+                                </a>
+                            </h4>
+                        </div>
+                        <!-- body -->
+                        <div id="collapseOne-<?= $container ?>" class="panel-collapse collapse in" role="tabpanel"
+                            aria-labelledby="headingOne-<?= $container ?>">
+                            <div class="panel-body">
+                                <div class="container">
+                                    <table class="table table-hover table-striped" id="appliactions">
+                                        <thead class="table-primary t_head">
+                                            <tr>
+                                                <th scope="col">Name Contact</th>
+                                                <th scope="col">Role Contact</th>
+                                                <th scope="col">Primary Service</th>
+                                                <th scope="col">Contact Appplications</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php $serviceContactPrint = 0;
+                                            foreach ($roles as $role): ?>
                                                 <tr>
-                                                    <th scope="col">Name</th>
-                                                    <th scope="col">Role</th>
-                                                    <th scope="col">Primary Service</th>
-                                                    <th scope="col">Contact Appplications</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php $serviceContactPrint = 0;
-                                                foreach ($roles as $role): ?>
-                                                    <tr>
-                                                        <td class="contract_text">
-                                                            <?= $role['f2'] ?>
+                                                    <td class="contract_text">
+                                                        <?= $role['f2'] ?>
+                                                    </td>
+                                                    <td class="contract_text">
+                                                        <?= $role['f3'] ?>
+                                                    </td>
+                                                    <?php if (is_null($services)): ?>
+                                                        <td>
+                                                            <em class="fst-italic fw-normal">Not Available</em>
                                                         </td>
-                                                        <td class="contract_text">
-                                                            <?= $role['f3'] ?>
-                                                        </td>
-                                                        <?php if (is_null($services)): ?>
-                                                            <td>
-                                                                <em class="fst-italic fw-normal">Not Available</em>
-                                                            </td>
-                                                        <?php else: ?>
-                                                            <?php foreach ($services as $servicePerContact): ?>
-                                                                <?php if ($servicePerContact['f1'] == $role['f1']): ?>
-                                                                    <?php $colors = generateColors($servicePerContact['f4']); ?>
-                                                                    <td>
-                                                                        <span class="contract_text pill-style"
-                                                                            style="background-color: <?php echo $colors['color']; ?>; color: <?php echo $colors['text_color']; ?>">
-                                                                            <?php echo $servicePerContact['f2'] ?>
-                                                                        </span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <?php foreach ($applications as $application): ?>
+                                                    <?php else: ?>
+                                                        <?php foreach ($services as $servicePerContact): ?>
+                                                            <?php if ($servicePerContact['f1'] == $role['f1']): ?>
+                                                                <?php $colors = generateColors($servicePerContact['f4']); ?>
+                                                                <td>
+                                                                    <span class="contract_text pill-style"
+                                                                        style="background-color: <?php echo $colors['color']; ?>; color: <?php echo $colors['text_color']; ?>">
+                                                                        <?php echo $servicePerContact['f2'] ?>
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <?php foreach ($applications as $application): ?>
 
-                                                                            <?php if ($role['f1'] == $application['f1']): ?>
-                                                                                <?php $colors = generateColors($servicePerContact['f4']); ?>
-                                                                                <span class="contract_text pill-style"
-                                                                                    style="background-color: <?php echo $colors['secondary_color']; ?>; color: <?php echo $colors['text_color_second']; ?>">
-                                                                                    <?php echo $application['f2'] ?>
-                                                                                </span>
-                                                                                <?= ' / ' ?>
-                                                                            <?php endif; ?>
-                                                                        <?php endforeach; ?>
-                                                                    </td>
-                                                                <?php endif; ?>
-                                                            <?php endforeach; ?>
-                                                        <?php endif; ?>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                                        <?php if ($role['f1'] == $application['f1']): ?>
+                                                                            <?php $colors = generateColors($servicePerContact['f4']); ?>
+                                                                            <span class="contract_text pill-style"
+                                                                                style="background-color: <?php echo $colors['secondary_color']; ?>; color: <?php echo $colors['text_color_second']; ?>">
+                                                                                <?php echo $application['f2'] ?>
+                                                                            </span>
+                                                                            <?= ' / ' ?>
+                                                                        <?php endif; ?>
+                                                                    <?php endforeach; ?>
+                                                                </td>
+                                                            <?php endif; ?>
+                                                        <?php endforeach; ?>
+                                                    <?php endif; ?>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- PAYMENT PLAN ACCORDION -->
-                    <div class="panel-group" id="accordion-payment-<?= $container ?>" role="tablist" aria-multiselectable="true">
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingTwo-<?= $container ?>">
-                                <h4 class="panel-title">
-                                    <a role="button" data-toggle="collapse" data-parent="#accordion-payment-<?= $container ?>"
-                                        href="#collapseTwo-<?= $container ?>" aria-expanded="false"
-                                        aria-controls="collapseTwo-<?= $container ?>">
-                                        Payment Plan
-                                    </a>
-                                </h4>
-                            </div>
-                            <!-- body -->
-                            <div id="collapseTwo-<?= $container ?>" class="panel-collapse collapse" role="tabpanel"
-                                aria-labelledby="headingTwo-<?= $container ?>">
-                                <div class="panel-body">
-                                    <div class="row mb-2">
-                                        <div class="col-md-6 payment_t">
-                                            <table class="table table-hover table-striped" id="payments-contract">
-                                                <thead class="table-primary t_head">
-                                                    <tr>
-                                                        <th scope="col">#</th>
-                                                        <th scope="col">Amount</th>
-                                                        <th scope="col">Date <small style="color: #555;">(Month/Day/Year)</small>
-                                                        </th>
-                                                        <th scope="col">Type Plan</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody class="t_body">
-                                                    <!-- Procesamiento de datos de Deposit -->
-                                                    <?php foreach ($payments as $payment): ?>
-                                                        <?php if ($payment['f3'] == 'deposit'): ?>
-                                                            <tr>
-                                                                <td>
-                                                                    <?= $countdp ?>
-                                                                </td>
-                                                                <td>
-                                                                    <?php echo $fmt->formatCurrency($payment['f1'], "USD"); ?>
-                                                                </td>
-                                                                <td>
-                                                                    <?php
-                                                                    // Create a DateTime object from the input date
-                                                                    $dateObject = new DateTime($payment['f2']);
-                                                                    // Format the date as "m-d-Y"
-                                                                    $formattedDate = $dateObject->format("m-d-Y"); ?>
-                                                                    <?php echo $formattedDate; ?>
-                                                                </td>
-                                                                <td>Deposit</td>
-                                                            </tr>
-                                                            <?php $dpamount += $payment['f1']; ?>
-                                                            <?php $countdp++; ?>
-                                                        <?php endif; ?>
-                                                    <?php endforeach; ?>
+                </div>
+                <!-- PAYMENT PLAN ACCORDION -->
+                <div class="panel-group" id="accordion-payment-<?= $container ?>" role="tablist" aria-multiselectable="true">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingTwo-<?= $container ?>">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion-payment-<?= $container ?>"
+                                    href="#collapseTwo-<?= $container ?>" aria-expanded="true"
+                                    aria-controls="collapseTwo-<?= $container ?>">
+                                    Payment Plan
+                                </a>
+                            </h4>
+                        </div>
+                        <!-- body -->
+                        <div id="collapseTwo-<?= $container ?>" class="panel-collapse collapse in" role="tabpanel"
+                            aria-labelledby="headingTwo-<?= $container ?>">
+                            <div class="panel-body">
+                                <div class="row mb-2">
+                                    <div class="col-md-6 payment_t">
+                                        <table class="table table-hover table-striped" id="payments-contract">
+                                            <thead class="table-primary t_head">
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">Amount</th>
+                                                    <th scope="col">Date <small style="color: #555;">(Month/Day/Year)</small>
+                                                    </th>
+                                                    <th scope="col">Type Plan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="t_body">
+                                                <!-- Procesamiento de datos de Deposit -->
+                                                <?php foreach ($payments as $payment): ?>
+                                                    <?php if ($payment['f3'] == 'deposit'): ?>
+                                                        <tr>
+                                                            <td>
+                                                                <?= $countdp ?>
+                                                            </td>
+                                                            <td>
+                                                                <?php echo $fmt->formatCurrency($payment['f1'], "USD"); ?>
+                                                            </td>
+                                                            <td>
+                                                                <?php
+                                                                // Create a DateTime object from the input date
+                                                                $dateObject = new DateTime($payment['f2']);
+                                                                // Format the date as "m-d-Y"
+                                                                $formattedDate = $dateObject->format("m-d-Y"); ?>
+                                                                <?php echo $formattedDate; ?>
+                                                            </td>
+                                                            <td>Deposit</td>
+                                                        </tr>
+                                                        <?php $dpamount += $payment['f1']; ?>
+                                                        <?php $countdp++; ?>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
 
-                                                    <!-- Procesamiento de datos de Monthly Charge -->
-                                                    <?php foreach ($payments as $payment): ?>
-                                                        <?php if ($payment['f3'] != 'deposit'): ?>
-                                                            <tr>
-                                                                <td>
-                                                                    <?= $countmc++ ?>
-                                                                </td>
-                                                                <td>
-                                                                    <?php echo $fmt->formatCurrency($payment['f1'], "USD"); ?>
-                                                                </td>
-                                                                <td>
-                                                                    <?php
-                                                                    // Create a DateTime object from the input date
-                                                                    $dateObject = new DateTime($payment['f2']);
-                                                                    // Format the date as "m-d-Y"
-                                                                    $formattedDate = $dateObject->format("m-d-Y"); ?>
-                                                                    <?php echo $formattedDate; ?>
-                                                                </td>
-                                                                <td>Monthly Charge</td>
-                                                            </tr>
-                                                            <?php $mcamount += $payment['f1']; ?>
-                                                        <?php endif; ?>
-                                                    <?php endforeach; ?>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="row text-center mb-4">
-                                                <div class="col-sm-12">
-                                                    <div class="d-flex justify-content-evenly" style="color:black;">
-                                                        <h4 class="card-header position-relative">Summary</h4>
-                                                        <hr>
-                                                        <div class="flex-fill">
-                                                            <h2>Down Payment</h2>
-                                                            <h3 id="summaryDownPayment">
-                                                                <?php echo $fmt->formatCurrency($dpamount, "USD"); ?>
-                                                            </h3>
-                                                        </div>
-                                                        <div class="flex-fill">
-                                                            <h2>Monthly Charges</h2>
-                                                            <h3 id="summaryMC">
-                                                                <?php echo $fmt->formatCurrency($mcamount, "USD"); ?>
-                                                            </h3>
-                                                        </div>
-                                                        <div class="flex-fill">
-                                                            <h2>Total Contract</h2>
-                                                            <h3 id="summaryTotalContract">
-                                                                <?php echo $fmt->formatCurrency(($mcamount + $dpamount), "USD"); ?>
-                                                            </h3>
-                                                        </div>
+                                                <!-- Procesamiento de datos de Monthly Charge -->
+                                                <?php foreach ($payments as $payment): ?>
+                                                    <?php if ($payment['f3'] != 'deposit'): ?>
+                                                        <tr>
+                                                            <td>
+                                                                <?= $countmc++ ?>
+                                                            </td>
+                                                            <td>
+                                                                <?php echo $fmt->formatCurrency($payment['f1'], "USD"); ?>
+                                                            </td>
+                                                            <td>
+                                                                <?php
+                                                                // Create a DateTime object from the input date
+                                                                $dateObject = new DateTime($payment['f2']);
+                                                                // Format the date as "m-d-Y"
+                                                                $formattedDate = $dateObject->format("m-d-Y"); ?>
+                                                                <?php echo $formattedDate; ?>
+                                                            </td>
+                                                            <td>Monthly Charge</td>
+                                                        </tr>
+                                                        <?php $mcamount += $payment['f1']; ?>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="row text-center mb-4">
+                                            <div class="col-sm-12">
+                                                <div class="d-flex justify-content-evenly">
+                                                    <h4 class="card-header position-relative">Summary</h4>
+                                                    <hr>
+                                                    <div class="flex-fill">
+                                                        <h2>Down Payment</h2>
+                                                        <h3 id="summaryDownPayment">
+                                                            <?php echo $fmt->formatCurrency($dpamount, "USD"); ?>
+                                                        </h3>
+                                                    </div>
+                                                    <div class="flex-fill">
+                                                        <h2>Monthly Charges</h2>
+                                                        <h3 id="summaryMC">
+                                                            <?php echo $fmt->formatCurrency($mcamount, "USD"); ?>
+                                                        </h3>
+                                                    </div>
+                                                    <div class="flex-fill">
+                                                        <h2>Total Contract</h2>
+                                                        <h3 id="summaryTotalContract">
+                                                            <?php echo $fmt->formatCurrency(($mcamount + $dpamount), "USD"); ?>
+                                                        </h3>
                                                     </div>
                                                 </div>
                                             </div>
@@ -483,73 +481,70 @@ if (isset($contracts) && is_array($contracts)):
                             </div>
                         </div>
                     </div>
-                    <!-- DOCUMENTS ACCORDION -->
-                    <div class="panel-group" id="accordion-documents-contract-<?= $container ?>" role="tablist"
-                        aria-multiselectable="true">
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingThree-<?= $container ?>">
-                                <h4 class="panel-title">
-                                    <a role="button" data-toggle="collapse" data-parent="#accordion-documents-contract-<?= $container ?>"
-                                        href="#collapseThree-<?= $container ?>" aria-expanded="false"
-                                        aria-controls="collapseThree-<?= $container ?>">
-                                        Documents
-                                        <span> || Version(s) Available: </span>
-                                        <?php if(empty($docs)): ?>
-                                            <span>0</span>
-                                        <?php else: ?>
-                                            <span><?php echo count($docs); ?></span>
-                                        <?php endif; ?>
-                                    </a>
-                                </h4>
-                            </div>
-                            <!-- body -->
-                            <div id="collapseThree-<?= $container ?>" class="panel-collapse collapse" role="tabpanel"
-                                aria-labelledby="headingThree-<?= $container ?>">
-                                <div class="panel-body">
-                                    <div class="container" style="color:#0055a5; max-height:400px; overflow-y:auto;">
-                                        <table class="table table-hover table-striped" id="documents-contract">
-                                            <thead class="table-primary t_head">
+                </div>
+                <!-- DOCUMENTS ACCORDION -->
+                <div class="panel-group" id="accordion-documents-contract-<?= $container ?>" role="tablist"
+                    aria-multiselectable="true">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingThree-<?= $container ?>">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion-documents-contract-<?= $container ?>"
+                                    href="#collapseThree-<?= $container ?>" aria-expanded="true"
+                                    aria-controls="collapseThree-<?= $container ?>">
+                                    Documents
+                                    <span class="text-muted"> || Version(s) Available</span>
+                                    <span>Version(s) Available</span>
+                                    <span>5</span>
+                                </a>
+                            </h4>
+                        </div>
+                        <!-- body -->
+                        <div id="collapseThree-<?= $container ?>" class="panel-collapse collapse in" role="tabpanel"
+                            aria-labelledby="headingThree-<?= $container ?>">
+                            <div class="panel-body">
+                                <div class="container" style="max-height: 400px; overflow-y: auto;">
+                                    <table class="table table-hover table-striped" id="documents-contract">
+                                        <thead class="table-primary t_head">
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">File Name</th>
+                                                <th scope="col">Type</th>
+                                                <th scope="col">Version</th>
+                                                <th scope="col">Created At</th>
+                                                <th scope="col">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="t_body">
+                                            <?php foreach ($docs as $doc): ?>
                                                 <tr>
-                                                    <th scope="col">#</th>
-                                                    <th scope="col">File Name</th>
-                                                    <th scope="col">Type</th>
-                                                    <th scope="col">Version</th>
-                                                    <th scope="col">Created At</th>
-                                                    <th scope="col">Actions</th>
+                                                    <td class="contract_text">
+                                                        <?php echo $countcontractdocs ?>
+                                                    </td>
+                                                    <td class="contract_text">
+                                                        <?php echo $doc['f2'] ?>
+                                                    </td>
+                                                    <td class="contract_text">
+                                                        <?php echo $doc['f3'] ?>
+                                                    </td>
+                                                    <td class="contract_text">
+                                                        <?php echo $doc['f5'] ?>
+                                                    </td>
+                                                    <td class="contract_text">
+                                                        <?php echo $doc['f6'] ?>
+                                                    </td>
+                                                    <td class="contract_text">
+                                                        <a href="<?php echo base_url(rawurldecode($doc['f4'] . $doc['f2'])) ?>" target="_blank" class="btn btn-sm btn-primary view" style="background-color: #0d6efd; color: #FFFFFF;">
+                                                            View File
+                                                        </a>
+                                                        <button class="btn btn-sm btn-danger" style="background-color: #dc3545; color: #FFFFFF;" onclick="deleteDocumentContract(<?php echo $doc['f1'] ?>)">
+                                                            Delete
+                                                        </button>
+                                                    </td>
                                                 </tr>
-                                            </thead>
-                                            <tbody class="t_body">
-                                                <?php foreach ($docs as $doc): ?>
-                                                    <tr>
-                                                        <td class="contract_text">
-                                                            <?php echo $countcontractdocs ?>
-                                                        </td>
-                                                        <td class="contract_text">
-                                                            <?php echo $doc['f2'] ?>
-                                                        </td>
-                                                        <td class="contract_text">
-                                                            <?php echo $doc['f3'] ?>
-                                                        </td>
-                                                        <td class="contract_text">
-                                                            <?php echo $doc['f5'] ?>
-                                                        </td>
-                                                        <td class="contract_text">
-                                                            <?php echo $doc['f6'] ?>
-                                                        </td>
-                                                        <td class="contract_text">
-                                                            <a href="<?php echo base_url(rawurldecode($doc['f4'] . $doc['f2'])) ?>" target="_blank" class="btn btn-sm btn-primary view" style="background-color: #0d6efd; color: #FFFFFF;">
-                                                                View File
-                                                            </a>
-                                                            <button class="btn btn-sm btn-danger" style="background-color: #dc3545; color: #FFFFFF;" onclick="deleteDocumentContract(<?php echo $doc['f1'] ?>)">
-                                                                Delete
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <?php $countcontractdocs++; ?>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                <?php $countcontractdocs++; ?>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -814,20 +809,20 @@ function generateColors($id)
 
 <script>
 
-    // $(document).ready(function() {
+    $(document).ready(function() {
 
-    //     $('.view_details').on('click', function(ev) {
-    //         ev.preventDefault();
+        $('.view_details').on('click', function(ev) {
+            ev.preventDefault();
 
-    //         $('.panel-collapse').collapse('hide');
+            $('.panel-collapse').collapse('hide');
             
-    //         let parentRow = $(this).closest('tr');
-    //         let accordionRow = parentRow.next('.accordion-row');
-    //         accordionRow.toggle();
-    //         let accordionPanel = accordionRow.find('.panel');
-    //         accordionPanel.find('.panel-collapse').collapse('show');
-    //     });
-    // });
+            let parentRow = $(this).closest('tr');
+            let accordionRow = parentRow.next('.accordion-row');
+            accordionRow.toggle();
+            let accordionPanel = accordionRow.find('.panel');
+            accordionPanel.find('.panel-collapse').collapse('show');
+        });
+    });
 
     const destroy = 'Contract/delete';
     const delete_contract_document = 'Contract/delete_contract_document';
