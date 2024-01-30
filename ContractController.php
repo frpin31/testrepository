@@ -122,6 +122,18 @@ class Contract extends CI_Controller {
     // $sender = json_decode($jsonData, true);
     echo json_encode(preprocess_API_petitions('http://44.214.240.74:8010/api/delete-contract', 'POST', file_get_contents('php://input')));
   }
+  
+  function delete_contract_document() {
+    // $jsonData = file_get_contents('php://input');
+    // $sender = json_decode($jsonData, true);
+    echo json_encode(preprocess_API_petitions('http://44.214.240.74:8010/api/delete-contract-document', 'POST', file_get_contents('php://input')));
+  }
+
+  function delete_contract_document_data() {
+    // $jsonData = file_get_contents('php://input');
+    // $sender = json_decode($jsonData, true);
+    echo json_encode(preprocess_API_petitions('http://44.214.240.74:8010/api/delete-contract-document-data', 'POST', file_get_contents('php://input')));
+  }
 
   function testing_document() {
     $view = [
