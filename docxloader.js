@@ -225,7 +225,8 @@ function adjustDOCXData() {
             });
         });
     }
-
+    console.log(clientsToWord);
+    console.log(servicesToWord);
 }
 
 /* window.generate =*/ function generate() {
@@ -272,7 +273,7 @@ function adjustDOCXData() {
                 compression: "DEFLATE",
             });
             // Output the document using Data-URI
-            //saveAs(blob, "CARRANZA_JOSE_U_VISA_Contract.docx");
+            // saveAs(blob, "CARRANZA_JOSE_U_VISA_Contract.docx");
             uploadDocument(blob);
         }
     );
