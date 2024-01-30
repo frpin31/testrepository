@@ -78,6 +78,29 @@
                 line-height: 20px;
                 text-shadow: 1px 1px rgba(250,250,250,.3);
             }
+
+            /* HTML: <div class="loader"></div> */
+            .loader {
+                width: 25px;
+                padding: 4px;
+                aspect-ratio: 1;
+                border-radius: 50%;
+                background: #4caf50;
+                --_m: 
+                    conic-gradient(#0000 10%,#000),
+                    linear-gradient(#000 0 0) content-box;
+                -webkit-mask: var(--_m);
+                        mask: var(--_m);
+                -webkit-mask-composite: source-out;
+                        mask-composite: subtract;
+                animation: l3 1s infinite linear;
+            }
+            @keyframes l3 {to{transform: rotate(1turn)}}
+
+            body.swal2-shown .blur {
+                -webkit-filter: blur(1px);
+                opacity: 0.9;
+            }
         </style>
     </head>
     <body>
@@ -114,7 +137,7 @@
             return $string;
         }
         ?>
-        <div class="container-fluid">
+        <div id="mainContainer" class="container-fluid">
             <div class="row">
                 <div class="col">
                     <div class="row">
@@ -176,7 +199,7 @@
                                     </select>
                                 </div>
                                 <div class="col-sm-9">
-                                    <a class="btn btn-primary mb-3" href="#" onclick="addContact(-1)">Add Contact</a>                                
+                                    <a class="btn btn-primary mb-3" href="#;" onclick="addContact(-1)">Add Contact</a>                                
                                 </div>
                             </div>
                         </div>
