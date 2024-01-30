@@ -1,0 +1,842 @@
+<!-- Styles -->
+<link rel="stylesheet" href="<?php echo base_url(); ?>css/icons/flags/css/flag-icon.css" rel="stylesheet"
+    type="text/css">
+<style>
+    .accordion-row {
+        display: none;
+        color: black;
+    }
+
+    .contract_text {
+        font-size: 13px;
+    }
+
+    .pill-style {
+        border-radius: 40px;
+        padding: 6px;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    .panel-group {
+        border: 2px solid black;
+        border-radius: 20px;
+        padding: 4px;
+    }
+
+    .panel {
+        box-shadow: none;
+    }
+
+    #appliactions {
+        color: black;
+    }
+
+    .t_head {
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 1;
+    }
+
+    .t_body {
+        color: black;
+    }
+
+    .color {
+        background-color: skyblue;
+        border-radius: 50px;
+        padding: 5px;
+    }
+
+    .payment_t {
+        color: black;
+        max-height: 260px;
+        overflow-y: auto;
+    }
+
+    :root {
+        /* theme color variables to use in RGB declarations
+        --redSettings: 78;
+        --greenSettings: 115;
+        --blueSettings: 223;
+        // the threshold at which colors are considered "light". 
+        // Range: decimals from 0 to 1,
+        // recommended 0.9 - 0.6
+        --thresholdSettings: 0.9;
+        // the threshold at which a darker border will be applied.
+        // Range: decimals from 0 to 1,
+        // recommended 0.8+
+        --border-thresholdSettings: 0.8; */
+    }
+
+    .btncust {
+        /*sets the background for the base class/
+        background: rgb(var(--redSettings, 255), var(--greenSettings, 255), var(--blueSettings, 255));
+        /* 
+        Calcs perceived brightness using the 
+        sRGB Luma method
+        lightness = (red * 0.2126 + green * 0.7152 + blue * 0.0722) / 255
+        
+        --r: calc(var(--redSettings) * 0.2126);
+        --g: calc(var(--greenSettings) * 0.7152);
+        --b: calc(var(--blueSettings) * 0.0722);
+        --sum: calc(var(--r) + var(--g) + var(--b));
+        --perceived-lightness: calc(var(--sum) / 255);
+        /*
+        1) Any lightness value above the threshold will be considered "light", therefore apply a black text color. Any bellow will be considered dark, and use white color. 
+        This results from appying either a sub-zero (negative) or a higher-than-100 lightness value, which are capped to 0 and 100 respectively, to a HSL declaration
+        /
+        color: hsl(0, 0%, calc((var(--perceived-lightness) - var(--thresholdSettings)) * -10000000%));
+        /*
+        2) sets the border as a 50% darker shade of the base color, ONLY if background color luma is higher than the border threshold.
+        To achieve this I use the same sub-zero or higher-than-max technique, only this time using the Alpha value from an RGBA declaration. 
+        This results in a border that's either fully transparent or fully opaque
+        /
+        --border-alpha: calc((var(--perceived-lightness) - var(--border-thresholdSettings)) * 100);
+        border-width: 0.2em;
+        border-style: solid;
+        border-color: rgba(calc(var(--redSettings) - 50), calc(var(--greenSettings) - 50), calc(var(--blueSettings) - 50), var(--border-alpha));*/ 
+    }
+
+    .btncust-secondary {
+        /* sets the background for the base class
+        background: rgb(var(--redSettings, 255), var(--greenSettings, 255), var(--blueSettings, 255));
+        /* 
+        Calcs perceived brightness using the 
+        sRGB Luma method
+        lightness = (red * 0.2126 + green * 0.7152 + blue * 0.0722) / 255
+        /
+        --r: calc(var(--redSettings) * 0.2126);
+        --g: calc(var(--greenSettings) * 0.7152);
+        --b: calc(var(--blueSettings) * 0.0722);
+        --sum: calc(var(--r) + var(--g) + var(--b));
+        --perceived-lightness: calc(var(--sum) / 255);
+        /*
+        1) Any lightness value above the threshold will be considered "light", therefore apply a black text color. Any bellow will be considered dark, and use white color. 
+        This results from appying either a sub-zero (negative) or a higher-than-100 lightness value, which are capped to 0 and 100 respectively, to a HSL declaration
+        /
+        color: hsl(0, 0%, calc((var(--perceived-lightness) - var(--thresholdSettings)) * -10000000%));
+        /*
+        2) sets the border as a 50% darker shade of the base color, ONLY if background color luma is higher than the border threshold.
+        To achieve this I use the same sub-zero or higher-than-max technique, only this time using the Alpha value from an RGBA declaration. 
+        This results in a border that's either fully transparent or fully opaque
+        /
+        --border-alpha: calc((var(--perceived-lightness) - var(--border-thresholdSettings)) * 100);
+        border-width: 0.2em;
+        border-style: solid;
+        border-color: rgba(calc(var(--redSettings) - 50), calc(var(--greenSettings) - 50), calc(var(--blueSettings) - 50), var(--border-alpha));
+        /* 3) sets the background color as a 60º rotated hue /
+        filter: opacity(0.7); */
+    }
+
+    /* Styles for PDF paragraphs */
+    .pdf-paragraph {
+        background-color: #dc3545;
+        /* Red color for PDF */
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 11px;
+    }
+
+    /* Styles for DOCX paragraphs */
+    .docx-paragraph {
+        background-color: #0d6efd;
+        /* Blue color for DOCX */
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 11px;
+    }
+</style>
+<!-- Tabla contratos -->
+<?php
+$fmt = new NumberFormatter('en_US', NumberFormatter::CURRENCY);
+if (isset($contracts) && is_array($contracts)):
+    $count_t = 1;
+    $container = 1;
+    // var_dump(json_encode($contracts));
+    foreach ($contracts as $contract):
+        $roles_table = $contract['listRoles']['0']['0'];
+        $roles = $contract['listRoles']['0'];
+        $applications = $contract['listApplications']['0'];
+        $payments = $contract['listPaymentPlan']['0'];
+        $services = $contract['listMainServices']['0'];
+        $docs = $contract['listDocuments']['0'];
+        // Iterate through the array
+        foreach ($roles as $roleContact):
+            // Check the condition
+            if ($roleContact['f3'] == 'Primary'):
+                $mainContactId = $roleContact['f1'];
+                $primaryContactName = $roleContact['f2'];
+            endif;
+        endforeach;
+
+        if ($services == 'null' || is_null($services)):
+            $mainContactService = 'Not Available';
+        else:
+            foreach ($services as $serviceContact):
+                // Check the condition
+                if ($serviceContact['f1'] == $mainContactId):
+                    $mainContactService = $serviceContact['f2'];
+                endif;
+            endforeach;
+        endif;
+
+        $countdp = 1;
+        $countmc = 2;
+        $countcontractdocs = 1;
+        $dpamount = 0;
+        $mcamount = 0;
+        ?>
+        <tr>
+            <td class="contract_text">
+                <?= $count_t; ?>
+            </td>
+            <td class="contract_text">
+                <?= $contract['fileNameContract']; ?>
+            </td>
+            <td class="contract_text">
+                <?= $primaryContactName ?>
+            </td>
+            <td>
+                <?php $colors = generateColors($serviceContact['f4']);
+                if ($mainContactService == 'null' || $mainContactService == 'NULL' || is_null($mainContactService)): ?>
+                    <em class="pill-style contract_text"
+                        style="background-color: <?php echo $colors['color']; ?>; color: <?php echo $colors['text_color']; ?>">
+                        <?php echo $mainContactService ?>
+                    </em>
+                <?php else: ?>
+                    <span class="pill-style contract_text"
+                        style="background-color: <?php echo $colors['color']; ?>;  color: <?php echo $colors['text_color']; ?>">
+                        <?php echo $mainContactService ?>
+                    </span>
+                <?php endif; ?>
+            </td>
+            <td>
+                <?php if ($contract['language'] == 'Spanish'): ?>
+                    <span class="flag-icon flag-icon-esp"></span>
+                    <p class="contract_text">
+                        <?php echo $contract['language']; ?>
+                    </p>
+                <?php elseif ($contract['language'] == 'English'): ?>
+                    <span class="flag-icon flag-icon-usa"></span>
+                    <p class="contract_text">
+                        <?php echo $contract['language']; ?>
+                    </p>
+                <?php else: ?>
+                    <p class="contract_text">
+                        <?php echo $contract['language']; ?>
+                    </p>
+                <?php endif; ?>
+            </td>
+            <td class="contract_text">
+                <?php if (is_null($contract['signDate']) || $contract['signDate'] == null || $contract['signDate'] == 'null'): ?>
+                    <p class="text-muted contract_text">Not Been Signed yet</p>
+                <?php else: ?>
+                    <p class="contract_text">
+                        <?php echo $contract['signDate']; ?>
+                    </p>
+                <?php endif; ?>
+            </td>
+            <td>
+                <p class="contract_text">
+                    <?= $contract['status']; ?>
+                </p>
+            </td>
+            <td class="contract_text">
+                <?php if ((pathinfo($contract['fileNameContract'], PATHINFO_EXTENSION)) == 'docx'): ?>
+                    <div style="display: flex;">
+                        <div style="display: inline-block;">
+                            <span class="flag-icon flag-icon-wordi" style="font-size: 20px;"></span>
+                        </div>
+                        <div style="display: inline-block;">
+                            <p class="contract_text">
+                                <?php echo strtoupper(pathinfo($contract['fileNameContract'], PATHINFO_EXTENSION)); ?>
+                            </p>
+                        </div>
+                    </div>
+                <?php elseif ((pathinfo($contract['fileNameContract'], PATHINFO_EXTENSION)) == 'pdf'): ?>
+                    <div style="display: flex;">
+                        <div style="display: inline-block;">
+                            <span class="flag-icon flag-icon-pdfi contract_text" style="font-size: 20px;"></span>
+                        </div>
+                        <div style="display: inline-block;">
+                            <p class="contract_text">
+                                <?php echo strtoupper(pathinfo($contract['fileNameContract'], PATHINFO_EXTENSION)); ?>
+                            </p>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <p class="contract_text">
+                        <?php echo strtoupper(pathinfo($contract['fileNameContract'], PATHINFO_EXTENSION)); ?>
+                    </p>
+                <?php endif; ?>
+            </td>
+            <td>
+                <p class="contract_text">
+                    <?= $contract['creationDate']; ?>
+                </p>
+            </td>
+            <td>
+                <p class="contract_text">
+                    <?php echo $fmt->formatCurrency($contract['totalContract'], "USD"); ?>
+                </p>
+            </td>
+            <td class="contract_text">
+                <a data-toggle="collapse" href="#detailsContract<?= $container ?>" role="button" aria-expanded="false" class="btn btn-secondary" aria-controls="detailsContract<?= $container ?>" style="background-color: #6c757d; color: #FFFFFF;">
+                    Details</a>
+                <a href="<?php echo base_url("contract/" . $contract['idContract'] . "/edit/?matter_id=$matter->Id") ?>"
+                    class="btn btn-primary" style="background-color: #0d6efd; color: #FFFFFF;">Edit</a>
+                <a href="#;" onclick="deleteContract(<?php echo $contract['idContract'] ?>)" class="btn btn-danger"
+                    style="background-color: #dc3545; color: #FFFFFF;">Delete</a>
+            </td>
+        </tr>
+        <tr id="detailsContract<?= $container ?>" class="collapse">
+            <td colspan="11">
+                <div>
+                    <!-- APPLICATION ACCORDION -->
+                    <div class="panel-group" id="accordion-applications-<?= $container ?>" role="tablist"
+                        aria-multiselectable="true">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingOne-<?= $container ?>">
+                                <h4 class="panel-title">
+                                    <a role="button" data-toggle="collapse" data-parent="#accordion-applications-<?= $container ?>"
+                                        href="#collapseOne-<?= $container ?>" aria-expanded="false"
+                                        aria-controls="collapseOne-<?= $container ?>">
+                                        Contact's Service and Applications
+                                    </a>
+                                </h4>
+                            </div>
+                            <!-- body -->
+                            <div id="collapseOne-<?= $container ?>" class="panel-collapse collapse" role="tabpanel"
+                                aria-labelledby="headingOne-<?= $container ?>">
+                                <div class="panel-body">
+                                    <div class="container">
+                                        <table class="table table-hover table-striped" id="appliactions">
+                                            <thead class="table-primary t_head">
+                                                <tr>
+                                                    <th scope="col">Name</th>
+                                                    <th scope="col">Role</th>
+                                                    <th scope="col">Primary Service</th>
+                                                    <th scope="col">Contact Appplications</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php $serviceContactPrint = 0;
+                                                foreach ($roles as $role): ?>
+                                                    <tr>
+                                                        <td class="contract_text">
+                                                            <?= $role['f2'] ?>
+                                                        </td>
+                                                        <td class="contract_text">
+                                                            <?= $role['f3'] ?>
+                                                        </td>
+                                                        <?php if (is_null($services)): ?>
+                                                            <td>
+                                                                <em class="fst-italic fw-normal">Not Available</em>
+                                                            </td>
+                                                        <?php else: ?>
+                                                            <?php foreach ($services as $servicePerContact): ?>
+                                                                <?php if ($servicePerContact['f1'] == $role['f1']): ?>
+                                                                    <?php $colors = generateColors($servicePerContact['f4']); ?>
+                                                                    <td>
+                                                                        <span class="contract_text pill-style"
+                                                                            style="background-color: <?php echo $colors['color']; ?>; color: <?php echo $colors['text_color']; ?>">
+                                                                            <?php echo $servicePerContact['f2'] ?>
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <?php foreach ($applications as $application): ?>
+
+                                                                            <?php if ($role['f1'] == $application['f1']): ?>
+                                                                                <?php $colors = generateColors($servicePerContact['f4']); ?>
+                                                                                <span class="contract_text pill-style"
+                                                                                    style="background-color: <?php echo $colors['secondary_color']; ?>; color: <?php echo $colors['text_color_second']; ?>">
+                                                                                    <?php echo $application['f2'] ?>
+                                                                                </span>
+                                                                                <?= ' / ' ?>
+                                                                            <?php endif; ?>
+                                                                        <?php endforeach; ?>
+                                                                    </td>
+                                                                <?php endif; ?>
+                                                            <?php endforeach; ?>
+                                                        <?php endif; ?>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- PAYMENT PLAN ACCORDION -->
+                    <div class="panel-group" id="accordion-payment-<?= $container ?>" role="tablist" aria-multiselectable="true">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingTwo-<?= $container ?>">
+                                <h4 class="panel-title">
+                                    <a role="button" data-toggle="collapse" data-parent="#accordion-payment-<?= $container ?>"
+                                        href="#collapseTwo-<?= $container ?>" aria-expanded="false"
+                                        aria-controls="collapseTwo-<?= $container ?>">
+                                        Payment Plan
+                                    </a>
+                                </h4>
+                            </div>
+                            <!-- body -->
+                            <div id="collapseTwo-<?= $container ?>" class="panel-collapse collapse" role="tabpanel"
+                                aria-labelledby="headingTwo-<?= $container ?>">
+                                <div class="panel-body">
+                                    <div class="row mb-2">
+                                        <div class="col-md-6 payment_t">
+                                            <table class="table table-hover table-striped" id="payments-contract">
+                                                <thead class="table-primary t_head">
+                                                    <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">Amount</th>
+                                                        <th scope="col">Date <small style="color: #555;">(Month/Day/Year)</small>
+                                                        </th>
+                                                        <th scope="col">Type Plan</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="t_body">
+                                                    <!-- Procesamiento de datos de Deposit -->
+                                                    <?php foreach ($payments as $payment): ?>
+                                                        <?php if ($payment['f3'] == 'deposit'): ?>
+                                                            <tr>
+                                                                <td>
+                                                                    <?= $countdp ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php echo $fmt->formatCurrency($payment['f1'], "USD"); ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php
+                                                                    // Create a DateTime object from the input date
+                                                                    $dateObject = new DateTime($payment['f2']);
+                                                                    // Format the date as "m-d-Y"
+                                                                    $formattedDate = $dateObject->format("m-d-Y"); ?>
+                                                                    <?php echo $formattedDate; ?>
+                                                                </td>
+                                                                <td>Deposit</td>
+                                                            </tr>
+                                                            <?php $dpamount += $payment['f1']; ?>
+                                                            <?php $countdp++; ?>
+                                                        <?php endif; ?>
+                                                    <?php endforeach; ?>
+
+                                                    <!-- Procesamiento de datos de Monthly Charge -->
+                                                    <?php foreach ($payments as $payment): ?>
+                                                        <?php if ($payment['f3'] != 'deposit'): ?>
+                                                            <tr>
+                                                                <td>
+                                                                    <?= $countmc++ ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php echo $fmt->formatCurrency($payment['f1'], "USD"); ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php
+                                                                    // Create a DateTime object from the input date
+                                                                    $dateObject = new DateTime($payment['f2']);
+                                                                    // Format the date as "m-d-Y"
+                                                                    $formattedDate = $dateObject->format("m-d-Y"); ?>
+                                                                    <?php echo $formattedDate; ?>
+                                                                </td>
+                                                                <td>Monthly Charge</td>
+                                                            </tr>
+                                                            <?php $mcamount += $payment['f1']; ?>
+                                                        <?php endif; ?>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="row text-center mb-4">
+                                                <div class="col-sm-12">
+                                                    <div class="d-flex justify-content-evenly" style="color:black;">
+                                                        <h4 class="card-header position-relative">Summary</h4>
+                                                        <hr>
+                                                        <div class="flex-fill">
+                                                            <h2>Down Payment</h2>
+                                                            <h3 id="summaryDownPayment">
+                                                                <?php echo $fmt->formatCurrency($dpamount, "USD"); ?>
+                                                            </h3>
+                                                        </div>
+                                                        <div class="flex-fill">
+                                                            <h2>Monthly Charges</h2>
+                                                            <h3 id="summaryMC">
+                                                                <?php echo $fmt->formatCurrency($mcamount, "USD"); ?>
+                                                            </h3>
+                                                        </div>
+                                                        <div class="flex-fill">
+                                                            <h2>Total Contract</h2>
+                                                            <h3 id="summaryTotalContract">
+                                                                <?php echo $fmt->formatCurrency(($mcamount + $dpamount), "USD"); ?>
+                                                            </h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- DOCUMENTS ACCORDION -->
+                    <div class="panel-group" id="accordion-documents-contract-<?= $container ?>" role="tablist"
+                        aria-multiselectable="true">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingThree-<?= $container ?>">
+                                <h4 class="panel-title">
+                                    <a role="button" data-toggle="collapse" data-parent="#accordion-documents-contract-<?= $container ?>"
+                                        href="#collapseThree-<?= $container ?>" aria-expanded="false"
+                                        aria-controls="collapseThree-<?= $container ?>">
+                                        Documents
+                                        <span> || Version(s) Available: </span>
+                                        <?php if(empty($docs)): ?>
+                                            <span>0</span>
+                                        <?php else: ?>
+                                            <span><?php echo count($docs); ?></span>
+                                        <?php endif; ?>
+                                    </a>
+                                </h4>
+                            </div>
+                            <!-- body -->
+                            <div id="collapseThree-<?= $container ?>" class="panel-collapse collapse" role="tabpanel"
+                                aria-labelledby="headingThree-<?= $container ?>">
+                                <div class="panel-body">
+                                    <div class="container" style="color:#0055a5; max-height:400px; overflow-y:auto;">
+                                        <table class="table table-hover table-striped" id="documents-contract">
+                                            <thead class="table-primary t_head">
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">File Name</th>
+                                                    <th scope="col">Type</th>
+                                                    <th scope="col">Version</th>
+                                                    <th scope="col">Created At</th>
+                                                    <th scope="col">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="t_body">
+                                                <?php foreach ($docs as $doc): ?>
+                                                    <tr>
+                                                        <td class="contract_text">
+                                                            <?php echo $countcontractdocs ?>
+                                                        </td>
+                                                        <td class="contract_text">
+                                                            <?php echo $doc['f2'] ?>
+                                                        </td>
+                                                        <td class="contract_text">
+                                                            <?php echo $doc['f3'] ?>
+                                                        </td>
+                                                        <td class="contract_text">
+                                                            <?php echo $doc['f5'] ?>
+                                                        </td>
+                                                        <td class="contract_text">
+                                                            <?php echo $doc['f6'] ?>
+                                                        </td>
+                                                        <td class="contract_text">
+                                                            <a href="<?php echo base_url(rawurldecode($doc['f4'] . $doc['f2'])) ?>" target="_blank" class="btn btn-sm btn-primary view" style="background-color: #0d6efd; color: #FFFFFF;">
+                                                                View File
+                                                            </a>
+                                                            <button class="btn btn-sm btn-danger" style="background-color: #dc3545; color: #FFFFFF;" onclick="deleteDocumentContract(<?php echo $doc['f1'] ?>)">
+                                                                Delete
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <?php $countcontractdocs++; ?>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <?php $count_t++ ?>
+        <?php $container++ ?>
+    <?php endforeach ?>
+<?php endif ?>
+
+<?php
+function generateColors($id)
+{
+    switch ($id) {
+        case 1:
+            $color = "#052c65";
+            $secondary_color = "#084298";
+            break;
+
+        case 2:
+            $color = "#290661";
+            $secondary_color = "#3d0a91";
+            break;
+
+        case 3:
+            $color = "#673ab7";
+            $secondary_color = "#7e57c2";
+            break;
+
+        case 4:
+            $color = "#2b0a1a";
+            $secondary_color = "#561435";
+            break;
+
+        case 5:
+            $color = "#58151c";
+            $secondary_color = "#842029";
+            break;
+
+        case 6:
+            $color = "#653208";
+            $secondary_color = "#984c0c";
+            break;
+
+        case 7:
+            $color = "#664d03";
+            $secondary_color = "#997404";
+            break;
+
+        case 8:
+            $color = "#0a3622";
+            $secondary_color = "#0f5132";
+            break;
+
+        case 9:
+            $color = "#0d503c";
+            $secondary_color = "#13795b";
+            break;
+
+        case 10:
+            $color = "#087990";
+            $secondary_color = "#087990";
+            break;
+
+        case 11:
+            $color = "#343a40";
+            $secondary_color = "#495057";
+            break;
+
+        case 12:
+            $color = "#0d6efd";
+            $secondary_color = "#3d8bfd";
+            break;
+
+        case 13:
+            $color = "#6610f2";
+            $secondary_color = "#8540f5";
+            break;
+
+        case 14:
+            $color = "#6f42c1";
+            $secondary_color = "#8c68cd";
+            break;
+
+        case 15:
+            $color = "#d63384";
+            $secondary_color = "#de5c9d";
+            break;
+
+        case 16:
+            $color = "#dc3545";
+            $secondary_color = "#e35d6a";
+            break;
+
+        case 17:
+            $color = "#fd7e14";
+            $secondary_color = "#fd9843"; ////////
+            break;
+
+        case 18:
+            $color = "#ffc107";
+            $secondary_color = "#ffcd39"; /////
+            break;
+
+        case 19:
+            $color = "#198754";
+            $secondary_color = "#479f76";
+            break;
+
+        case 20:
+            $color = "#20c997";
+            $secondary_color = "#4dd4ac";
+            break;
+
+        case 21:
+            $color = "#0dcaf0";
+            $secondary_color = "#3dd5f3";
+            break;
+
+        case 22:
+            $color = "#adb5bd";
+            $secondary_color = "#ced4da";
+            break;
+
+        case 23:
+            $color = "#33691e";
+            $secondary_color = "#558b2f";
+            break;
+
+        case 24:
+            $color = "#827717";
+            $secondary_color = "#9e9d24";
+            break;
+
+        case 25:
+            $color = "#00C853";
+            $secondary_color = "#00E676";
+            break;
+
+        case 26:
+            $color = "#64dd17";
+            $secondary_color = "#76ff03";
+            break;
+
+        case 27:
+            $color = "#ffd600";
+            $secondary_color = "#ffea00";
+            break;
+
+        case 28:
+            $color = "#ffab00";
+            $secondary_color = "#ffc400";
+            break;
+
+        case 29:
+            $color = "#ff6d00";
+            $secondary_color = "#ff9100";
+            break;
+
+        case 30:
+            $color = "#bf360c";
+            $secondary_color = "#d84315";
+            break;
+
+        case 31:
+            $color = "#3e2723";
+            $secondary_color = "#6d4c41";
+            break;
+
+        case 32:
+            $color = "#00b8d4";
+            $secondary_color = "#00e5ff";
+            break;
+
+        case 33:
+            $color = "#18ffff";
+            $secondary_color = "#84ffff";
+            break;
+
+        case 34:
+            $color = "#00bfa5";
+            $secondary_color = "#1de9b6";
+            break;
+
+        case 35:
+            $color = "#64ffda";
+            $secondary_color = "#a7ffeb";
+            break;
+
+        case 36:
+            $color = "#827717";
+            $secondary_color = "#9e9d24";
+            break;
+
+        case 37:
+            $color = "#f57f17 ";
+            $secondary_color = "#f9a825";
+            break;
+
+        case 38:
+            $color = "#795548";
+            $secondary_color = "#8d6e63";
+            break;
+
+        case 39:
+            $color = "#607d8b";
+            $secondary_color = "#78909c";
+            break;
+
+        case 40:
+            $color = "#90a4ae";
+            $secondary_color = "#b0bec5";
+            break;
+
+        case 41:
+            $color = "#4CAF50";
+            $secondary_color = "#81C784";
+            break;
+
+        case 42:
+            $color = "#7e57c2";
+            $secondary_color = "#9575cd";
+            break;
+
+        case 43:
+            $color = "#4db6ac";
+            $secondary_color = "#80cbc4";
+            break;
+
+        default:
+            $color = "#ffffff";
+            $secondary_color = "#ffffff";
+            break;
+    }
+
+    $red = hexdec(substr($color, 1, 2));
+    $green = hexdec(substr($color, 3, 2));
+    $blue = hexdec(substr($color, 5, 2));
+    // Calcular el brillo usando la fórmula sRGB Luma
+    $brightness = ($red * 0.2126 + $green * 0.7152 + $blue * 0.0722) / 255;
+
+
+    $red_second = hexdec(substr($color, 1, 2));
+    $green_second = hexdec(substr($color, 3, 2));
+    $blue_second = hexdec(substr($color, 3, 2));
+
+    $brightness_second = ($red_second * 0.2126 + $green_second * 0.7152 + $blue_second * 0.0722) / 255;
+
+    $text_color = ($brightness < 0.5) ? "#ffffff" : "#000000";
+    $text_color_second = ($brightness_second < 0.5) ? "#ffffff" : "#000000";
+
+    return [
+        'color' => $color,
+        'secondary_color' => $secondary_color,
+        'text_color' => $text_color,
+        'text_color_second' => $text_color_second
+    ];
+}
+?>
+
+<script>
+
+    // $(document).ready(function() {
+
+    //     $('.view_details').on('click', function(ev) {
+    //         ev.preventDefault();
+
+    //         $('.panel-collapse').collapse('hide');
+            
+    //         let parentRow = $(this).closest('tr');
+    //         let accordionRow = parentRow.next('.accordion-row');
+    //         accordionRow.toggle();
+    //         let accordionPanel = accordionRow.find('.panel');
+    //         accordionPanel.find('.panel-collapse').collapse('show');
+    //     });
+    // });
+
+    const destroy = 'Contract/delete';
+    const delete_contract_document = 'Contract/delete_contract_document';
+
+    function deleteContract(id) {
+        confirmDelete(base_url + destroy, id, null, base_url + "matters/" + 4416 + "/main_view");
+    }
+
+    function deleteDocumentContract(id) {
+        confirmDelete(base_url + delete_contract_document, id, null, base_url + "matters/" + 4416 + "/main_view");
+    }
+</script>
