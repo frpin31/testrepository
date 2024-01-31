@@ -26,6 +26,389 @@ function newT(text, bold, underline) {
     return r;
 }
 
+const caseMapping = {
+    1: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Petition for Alien Relative ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    2: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Waiver Request (", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(") for ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    4: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Submission of Form ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(", Adjustment of Status to Permanent Resident in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    8: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Application ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    13: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Submission of Form ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" TPS (Temporary Protected Status)", true, null );
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    17: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Applications to U-Visa (", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(") for ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    19: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Presentation and submission of application ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" for the Client ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    35: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Petition for Amerasian, Widow(er), Special Immigrant ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    46: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Application ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" (Medical and Vaccination Report) in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    57: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" FOIA ", true, null );
+        xmlDoc += newT("petition with ", null, null );
+        xmlDoc += newT("USCIS", true, null );
+        xmlDoc += newT(" for ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    76: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Application ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" (Renewal of Permanent Resident Card) ", true, null );
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    107: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" Petition for ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    108: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Work Permit Request ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    109: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Work Permit Request ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    114: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Petition of Certification 918-B", true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    118: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT(appShortName, null, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    119: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Convention Against Torture, ", null, null);
+        xmlDoc += newT("I-589 (CAT)", true, null );
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    121: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Work Permit Request ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    122: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Work Permit Request based on TPS ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    123: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Work Permit Request based on TPS ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    124: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Work Permit Request ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    125: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Work Permit Request ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    126: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Work Permit Request ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    127: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Work Permit Request ", null, null );
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    129: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT(appShortName, true, null);
+        xmlDoc += newT(" Petition for abandoned child in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    130: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("FOIA", true, null );
+        xmlDoc += newT(" petition before ", null, null);
+        xmlDoc += newT("USCIS", true, null );
+        xmlDoc += newT(" for ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += newT(" (Only if necessary).", null, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    131: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("FOIA", true, null );
+        xmlDoc += newT(" petition before ", null, null);
+        xmlDoc += newT("CBP", true, null );
+        xmlDoc += newT(" for ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += newT(" (Only if necessary).", null, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    132: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("FOIA", true, null );
+        xmlDoc += newT(" petition before ", null, null);
+        xmlDoc += newT("OBIM", true, null );
+        xmlDoc += newT(" for ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += newT(" (Only if necessary).", null, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    133: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Request for Criminal Record with the ", null, null );
+        xmlDoc += newT("FBI", true, null);
+        xmlDoc += newT(" for ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    134: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Application ", null, null );
+        xmlDoc += newT("I-589 (Defensive Asylum)", true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    135: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Application ", null, null );
+        xmlDoc += newT("I-589 (Affirmative Asylum)", true, null);
+        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    144: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("FOIA", true, null );
+        xmlDoc += newT(" petition before ", null, null);
+        xmlDoc += newT("DOJ", true, null );
+        xmlDoc += newT(" for ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += newT(" (Only if necessary).", null, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    145: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("FOIA", true, null );
+        xmlDoc += newT(" petition before ", null, null);
+        xmlDoc += newT("DOS", true, null );
+        xmlDoc += newT(" for ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += newT(" (Only if necessary).", null, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    146: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT("Request for Criminal Record with the ", null, null );
+        xmlDoc += newT("FBI", true, null);
+        xmlDoc += newT(" for ", null, null );
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    153: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT(appShortName, null, null );
+        xmlDoc += newT(" Case in favor of ", null, null);
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    },
+    154: function(appShortName, contactName) {
+        let xmlDoc = "<w:p>";
+        xmlDoc += addpPr();
+        xmlDoc += newT(appShortName, null, null );
+        xmlDoc += newT(" Case in favor of ", null, null);
+        xmlDoc += newT(contactName, true, null);
+        xmlDoc += "</w:p>";
+        return xmlDoc;
+    }
+};
+
+const defaultCase = function(appShortName, contactName) {
+    // Default logic when no mapping is found
+    let xmlDoc = "<w:p>";
+    xmlDoc += addpPr();
+    xmlDoc += newT("Application for ", null, null );
+    xmlDoc += newT(appShortName, true, null);
+    xmlDoc += newT(" in favor of ", null, null );
+    xmlDoc += newT(contactName, true, null);
+    xmlDoc += "</w:p>";
+    return xmlDoc;
+};
+
 var docDir;
 var newArray;
 var clientsToWord = [];
@@ -60,71 +443,12 @@ function adjustDOCXData() {
             currentContact.services.forEach((currentService) => {
                 var applicationsArray = [];
                 currentService.applications.forEach((currentApplication) => {
-                    // Create a new XML document
-                    var xmlDoc = "<w:p>";
-                    // applications id's from 130 to 133 and from 144 and 146 corresponds to research applications
-                    if((currentApplication.applicationId >= 130 && currentApplication.applicationId <= 133) || (currentApplication.applicationId >= 144 && currentApplication.applicationId <= 146)) {
-                        if (currentApplication.applicationId == 133 || currentApplication.applicationId == 146) {
-                            xmlDoc += addpPr();
-                            xmlDoc += newT("Request for Criminal Record with the ", null, null );
-                            xmlDoc += newT("FBI", true, null);
-                            xmlDoc += newT(" for ", null, null );
-                            xmlDoc += newT(currentContact.contactName.toUpperCase(), true, null);
-                            xmlDoc += "</w:p>";
-                            applicationsArray.push(
-                                {
-                                    "complexXml": xmlDoc
-                                }
-                            );
-                        } else {
-                            xmlDoc += addpPr();
-                            xmlDoc += newT("Petition ", null, null);
-                            xmlDoc += newT(currentApplication.applicationShortName, true, null);
-                            xmlDoc += newT(" for ", null, null);
-                            xmlDoc += newT(currentContact.contactName.toUpperCase(), true, null);
-                            xmlDoc += "</w:p>";
-                            applicationsArray.push(
-                                {
-                                    "complexXml": xmlDoc
-                                }
-                            );
+                    applicationsArray.push(
+                        {
+                            "complexXml": caseMapping[currentApplication.applicationId] ? caseMapping[currentApplication.applicationId](currentApplication.applicationShortName, currentContact.contactName.toUpperCase()) : defaultCase(currentApplication.applicationShortName, currentContact.contactName.toUpperCase())
                         }
-                    } else if (currentApplication.applicationId == 1) {
-                        xmlDoc += addpPr();
-                        xmlDoc += newT("Petition for Alien Relative ", null, null );
-                        xmlDoc += newT(currentApplication.applicationShortName, true, null);
-                        xmlDoc += newT(" in favour of ", null, null );
-                        xmlDoc += newT(currentContact.contactName.toUpperCase(), true, null);
-                        xmlDoc += "</w:p>";
-                        applicationsArray.push(
-                            {
-                                "complexXml": xmlDoc
-                            }
-                        );
-                    } else if (currentApplication.applicationId == 107) {
-                        xmlDoc += addpPr();
-                        xmlDoc += newT(currentApplication.applicationShortName, true, null);
-                        xmlDoc += newT("Petition for ", null, null );
-                        xmlDoc += newT(currentContact.contactName.toUpperCase(), true, null);
-                        xmlDoc += "</w:p>";
-                        applicationsArray.push(
-                            {
-                                "complexXml": xmlDoc
-                            }
-                        );
-                    } else {
-                        xmlDoc += addpPr();
-                        xmlDoc += newT("Application for ", null, null );
-                        xmlDoc += newT(currentApplication.applicationShortName, true, null);
-                        xmlDoc += newT(" in favour of ", null, null );
-                        xmlDoc += newT(currentContact.contactName.toUpperCase(), true, null);
-                        xmlDoc += "</w:p>";
-                        applicationsArray.push(
-                            {
-                                "complexXml": xmlDoc
-                            }
-                        );
-                    }
+                    );
+                    
                     
                 });
 
@@ -273,8 +597,87 @@ function adjustDOCXData() {
                 compression: "DEFLATE",
             });
             // Output the document using Data-URI
-            // saveAs(blob, "CARRANZA_JOSE_U_VISA_Contract.docx");
-            uploadDocument(blob);
+            saveAs(blob, "CARRANZA_JOSE_U_VISA_Contract.docx");
+            //uploadDocument(blob);
         }
     );
 };
+
+/** OLD APPLICATIONS LOGIC */
+// // Create a new XML document
+// var xmlDoc = "<w:p>";
+// // applications id's from 130 to 133 and from 144 and 146 corresponds to research applications
+// if((currentApplication.applicationId >= 130 && currentApplication.applicationId <= 133) || (currentApplication.applicationId >= 144 && currentApplication.applicationId <= 146)) {
+//     if (currentApplication.applicationId == 133 || currentApplication.applicationId == 146) {
+//         xmlDoc += addpPr();
+//         xmlDoc += newT("Request for Criminal Record with the ", null, null );
+//         xmlDoc += newT("FBI", true, null);
+//         xmlDoc += newT(" for ", null, null );
+//         xmlDoc += newT(currentContact.contactName.toUpperCase(), true, null);
+//         xmlDoc += "</w:p>";
+//         applicationsArray.push(
+//             {
+//                 "complexXml": xmlDoc
+//             }
+//         );
+//     } else {
+//         xmlDoc += addpPr();
+//         xmlDoc += newT("Petition ", null, null);
+//         xmlDoc += newT(currentApplication.applicationShortName, true, null);
+//         xmlDoc += newT(" for ", null, null);
+//         xmlDoc += newT(currentContact.contactName.toUpperCase(), true, null);
+//         xmlDoc += "</w:p>";
+//         applicationsArray.push(
+//             {
+//                 "complexXml": xmlDoc
+//             }
+//         );
+//     }
+// } else if (currentApplication.applicationId == 1) {
+//     xmlDoc += addpPr();
+//     xmlDoc += newT("Petition for Alien Relative ", null, null );
+//     xmlDoc += newT(currentApplication.applicationShortName, true, null);
+//     xmlDoc += newT(" in favor of ", null, null );
+//     xmlDoc += newT(currentContact.contactName.toUpperCase(), true, null);
+//     xmlDoc += "</w:p>";
+//     applicationsArray.push(
+//         {
+//             "complexXml": xmlDoc
+//         }
+//     );
+// } else if (currentApplication.applicationId == 4) {
+//     xmlDoc += addpPr();
+//     xmlDoc += newT("Submission of Form ", null, null );
+//     xmlDoc += newT(currentApplication.applicationShortName, true, null);
+//     xmlDoc += newT(", Adjustment of Status to Permanent Resident in favor of ", null, null );
+//     xmlDoc += newT(currentContact.contactName.toUpperCase(), true, null);
+//     xmlDoc += "</w:p>";
+//     applicationsArray.push(
+//         {
+//             "complexXml": xmlDoc
+//         }
+//     );
+// } else if (currentApplication.applicationId == 107) {
+//     xmlDoc += addpPr();
+//     xmlDoc += newT(currentApplication.applicationShortName, true, null);
+//     xmlDoc += newT("Petition for ", null, null );
+//     xmlDoc += newT(currentContact.contactName.toUpperCase(), true, null);
+//     xmlDoc += "</w:p>";
+//     applicationsArray.push(
+//         {
+//             "complexXml": xmlDoc
+//         }
+//     );
+// } else {
+//     xmlDoc += addpPr();
+//     xmlDoc += newT("Application for ", null, null );
+//     xmlDoc += newT(currentApplication.applicationShortName, true, null);
+//     xmlDoc += newT(" in favor of ", null, null );
+//     xmlDoc += newT(currentContact.contactName.toUpperCase(), true, null);
+//     xmlDoc += "</w:p>";
+//     applicationsArray.push(
+//         {
+//             "complexXml": xmlDoc
+//         }
+//     );
+// }
