@@ -824,7 +824,7 @@ const caseMappingEN = {
         xmlDoc += newT("Appeal before the Board of Immigration Appeals (BIA) in favor of", null, true );
         xmlDoc += newT(" ", null, null );
         xmlDoc += newT(contactName, true, null);
-        xmlDoc += newT(": Legal Representation for filing of appeal to be submitted to the Board of Immigration Appeals (BIA) (Appeal to be submitted by the XX day of the month xxxx, XXXX).", null, null );
+        xmlDoc += newT(": Legal Representation for filing of appeal to be submitted to the Board of Immigration Appeals (BIA).", null, null );
         xmlDoc += "</w:p>";
         return xmlDoc;
     },
@@ -899,9 +899,9 @@ const caseMappingES = {
     9: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Request for Forgiveness ", null, null );
+        xmlDoc += newT("Petición de Perdón ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -909,10 +909,10 @@ const caseMappingES = {
     13: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Submission of Form ", null, null );
+        xmlDoc += newT("Presentación de Forma ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" TPS (Temporary Protected Status)", true, null );
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" TPS (Estatus de Protección Temporal)", true, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -920,9 +920,9 @@ const caseMappingES = {
     16: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Applications for T Nonimmigrant Status (", null, null );
+        xmlDoc += newT("Aplicación para Visa-T (", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(") for ", null, null );
+        xmlDoc += newT(") a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -940,9 +940,9 @@ const caseMappingES = {
     19: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Presentation and submission of application ", null, null );
+        xmlDoc += newT("Presentación de Aplicación ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" for the Client ", null, null );
+        xmlDoc += newT(" para ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -950,9 +950,9 @@ const caseMappingES = {
     21: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Presentation and submission of application ", null, null );
+        xmlDoc += newT("Presentación de Aplicación ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" for the Client ", null, null );
+        xmlDoc += newT(" para ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -960,9 +960,9 @@ const caseMappingES = {
     24: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Submission of application ", null, null );
+        xmlDoc += newT("Presentación de forma ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" before USCIS, Notice to Appear as Attorney or Authorized Representative in favor of ", null, null );
+        xmlDoc += newT(" ante USCIS, Notificación sobre Comparecencia como Abogado o Representante Autorizado a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -970,9 +970,9 @@ const caseMappingES = {
     25: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Submission of application ", null, null );
+        xmlDoc += newT("Presentación de forma ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" before USCIS, Document Verification Request Supplement in favor of ", null, null );
+        xmlDoc += newT(" ante USCIS, Solicitud de Verificación a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -980,9 +980,9 @@ const caseMappingES = {
     29: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Petition for a Nonimmigrant Worker ", null, null );
+        xmlDoc += newT("Petición para Trabajador No Inmigrante ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -990,9 +990,9 @@ const caseMappingES = {
     30: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Petition for a Alien Fiancé(e) ", null, null );
+        xmlDoc += newT("Petición de Prometido o Prometida Extranjero(a) ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1010,9 +1010,9 @@ const caseMappingES = {
     40: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Application ", null, null );
+        xmlDoc += newT("Aplicación ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" to Extend/Change Nonimmigrant Status in favor of ", null, null );
+        xmlDoc += newT(" para Extender/Cambiar de Estatus de No Inmigrante a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1041,7 +1041,7 @@ const caseMappingES = {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" Petition for Refugee/Asylee Relative in favor of ", null, null );
+        xmlDoc += newT(" Petición de Familiar Refugiado/Asilado a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1050,7 +1050,7 @@ const caseMappingES = {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" Petition to Remove Conditions on Residence in favor of ", null, null );
+        xmlDoc += newT(" Petición para Cancelar las Condiciones en la Residencia a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1058,9 +1058,9 @@ const caseMappingES = {
     51: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Request for Exemption for Intending Immigrant's Affidavit of Support ", null, null );
+        xmlDoc += newT("Solicitud de Excención de la Declaración Jurada de Patrocinio Económico de Posible Inmigrante ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1081,9 +1081,9 @@ const caseMappingES = {
     58: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Verification Request ", null, null );
+        xmlDoc += newT("Solicitud de Verificación ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1091,9 +1091,9 @@ const caseMappingES = {
     62: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Notice of Appeal or Motion ", null, true );
+        xmlDoc += newT("Aviso de Apelación o Moción ", null, true );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1122,9 +1122,9 @@ const caseMappingES = {
     71: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Submission of Form ", null, null );
+        xmlDoc += newT("Presentación de forma ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1132,9 +1132,9 @@ const caseMappingES = {
     74: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Application ", null, null );
+        xmlDoc += newT("Aplicación ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" (Medical Certification for Disability Exceptions) in favor of ", null, null );
+        xmlDoc += newT(" (Certificación Médica para Excenciones por Discapacidad) a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1142,10 +1142,10 @@ const caseMappingES = {
     76: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Application ", null, null );
+        xmlDoc += newT("Aplicación ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" (Renewal of Permanent Resident Card) ", true, null );
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" (Renovación de tarjeta de Residente Permanente)", true, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1163,9 +1163,9 @@ const caseMappingES = {
     80: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Petition by Investor to Remove Conditions on Permanent Resident Status ", null, null );
+        xmlDoc += newT("Petición de Inversionista para Eliminar Condiciones en Estatus de Residente Permanente ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1173,9 +1173,9 @@ const caseMappingES = {
     82: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Request for Fee Waiver ", null, null );
+        xmlDoc += newT("Petición de Exención de Tarifas ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1183,9 +1183,9 @@ const caseMappingES = {
     83: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Application ", null, null );
+        xmlDoc += newT("Aplicación ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" (Supplement, 2023 HHS Poverty Guidelines for Fee Waiver Request) in favor of ", null, null );
+        xmlDoc += newT(" (Guías de Pobreza de HHS para Solicitud de Exención de Tarifas de 2023) a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1193,9 +1193,9 @@ const caseMappingES = {
     84: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Submission of application ", null, null );
+        xmlDoc += newT("Presentación de forma ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" (Notice of Entry of Appearance as Attorney in Matters Outside the Geographical Confines of the United States) in favor of ", null, null );
+        xmlDoc += newT(" (Notificación sobre Comparecencia como Abogado en Asuntos Fuera de los Límites Geográficos de los Estados Unidos) a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1203,9 +1203,9 @@ const caseMappingES = {
     86: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Request for Certificate of Non-Existence ", null, null );
+        xmlDoc += newT("Solicitud de Certificado de Inexistencia ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1223,9 +1223,9 @@ const caseMappingES = {
     106: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Application ", null, null );
+        xmlDoc += newT("Aplicación ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" (Contract Between Sponsor and Household Member) in favor of ", null, null );
+        xmlDoc += newT(" (Contrato entre el Patrocinador y el Miembro del Grupo Familiar) a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1294,9 +1294,9 @@ const caseMappingES = {
     113: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Application to U-Visa (", null, null );
+        xmlDoc += newT("Aplicación para Visa-U (", null, null );
         xmlDoc += newT("I-918A", true, null);
-        xmlDoc += newT(") in favor of ", null, null );
+        xmlDoc += newT(") a favor de ", null, null );
         xmlDoc += newT(contactName, true, null );
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1304,8 +1304,8 @@ const caseMappingES = {
     114: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Petition of Certification 918-B", true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT("Petición de Certificación 918-B", true, null);
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1313,9 +1313,9 @@ const caseMappingES = {
     115: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Application to T-Visa (", null, null );
+        xmlDoc += newT("Aplicación para Visa-T (", null, null );
         xmlDoc += newT("I-914A", true, null);
-        xmlDoc += newT(") in favor of ", null, null );
+        xmlDoc += newT(") a favor de ", null, null );
         xmlDoc += newT(contactName, true, null );
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1323,8 +1323,8 @@ const caseMappingES = {
     116: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Petition of Delaration of Law Enforcement Officer 914-B", true, null );
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT("Petición de Declaración de un Oficial del Orden Público 914-B", true, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null );
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1332,7 +1332,7 @@ const caseMappingES = {
     117: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Political Asylum in favor of ", null, null );
+        xmlDoc += newT("Asilo Político a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1340,7 +1340,7 @@ const caseMappingES = {
     118: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Deferral of Deportation in favor of ", null, null );
+        xmlDoc += newT("Aplazamiento de Deportación a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1348,9 +1348,9 @@ const caseMappingES = {
     119: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Convention Against Torture, ", null, null);
-        xmlDoc += newT("I-589 (CAT)", true, null );
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT("Convención Contra Tortura, ", null, null);
+        xmlDoc += newT("I-589 (Bajo amparo CAT)", true, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1358,8 +1358,8 @@ const caseMappingES = {
     120: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT("I-765 WS (Hoja de Trabajo)", true, null);
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1387,9 +1387,9 @@ const caseMappingES = {
     123: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Work Permit Request based on TPS ", null, null );
+        xmlDoc += newT("Permiso de trabajo basado en TPS ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1494,9 +1494,9 @@ const caseMappingES = {
     134: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Application ", null, null );
-        xmlDoc += newT("I-589 (Defensive Asylum)", true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT("Aplicación ", null, null );
+        xmlDoc += newT("I-589 (Asilo Defensivo)", true, null);
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1504,9 +1504,9 @@ const caseMappingES = {
     135: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Application ", null, null );
-        xmlDoc += newT("I-589 (Affirmative Asylum)", true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT("Aplicación ", null, null );
+        xmlDoc += newT("I-589 (Asilo Afirmativo)", true, null);
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1514,18 +1514,18 @@ const caseMappingES = {
     136: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Legal Representation in favor of ", null, null );
+        xmlDoc += newT("Representación Legal a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
-        xmlDoc += newT(" for the following charges:", null, null);
+        xmlDoc += newT(" para los siguientes cargos:", null, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
     },
     138: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Application ", null, null );
+        xmlDoc += newT("Aplicación ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" (Cancellation of Removal for Certain Permanent Residents) in favor of ", null, null );
+        xmlDoc += newT(" (Cancelación de Remoción para Determinados Residentes Permanentes) a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1535,7 +1535,7 @@ const caseMappingES = {
         xmlDoc += addpPr();
         xmlDoc += newT("Application ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" (Cancellation of Removal and Adjustment of Status for Certain Nonpermanent Residents) in favor of ", null, null );
+        xmlDoc += newT(" (Cancelación de Remoción y Ajuste de Estado para Determinados Residentes No Permanentes) a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1543,9 +1543,9 @@ const caseMappingES = {
     140: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Submission of Form ", null, null );
+        xmlDoc += newT("Presentación de Forma ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1553,9 +1553,9 @@ const caseMappingES = {
     141: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Electronic Nonimmigrant Visa Application ", null, null );
+        xmlDoc += newT("Aplicación Electrónica para Visa de No Inmigrante ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1563,9 +1563,9 @@ const caseMappingES = {
     142: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Application for a U.S. Passport ", null, null );
+        xmlDoc += newT("Solicitud de Pasaporte Estadounidense ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" in favor of ", null, null );
+        xmlDoc += newT(" a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1589,7 +1589,7 @@ const caseMappingES = {
         xmlDoc += newT("DOJ", true, null );
         xmlDoc += newT(" para ", null, null );
         xmlDoc += newT(contactName, true, null);
-        xmlDoc += newT(" (Only if necessary).", null, null);
+        xmlDoc += newT(" (Solo si es necesario).", null, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
     },
@@ -1602,7 +1602,7 @@ const caseMappingES = {
         xmlDoc += newT("DOS", true, null );
         xmlDoc += newT(" para ", null, null );
         xmlDoc += newT(contactName, true, null);
-        xmlDoc += newT(" (Only if necessary).", null, null);
+        xmlDoc += newT(" (Solo si es necesario).", null, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
     },
@@ -1631,7 +1631,7 @@ const caseMappingES = {
         xmlDoc += addpPr();
         xmlDoc += newT("Submission of application ", null, null );
         xmlDoc += newT(appShortName, true, null);
-        xmlDoc += newT(" before the Immigration Court, Notice of Entry of Appearance as Attorney or Representative in favor of ", null, null );
+        xmlDoc += newT(" ante la Corte de Inmigración, Notificación sobre Comparecencia como Abogado o Representante a favor de ", null, null );
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1659,25 +1659,24 @@ const caseMappingES = {
     151: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Appeal before the Board of Immigration Appeals (BIA) in favor of", null, true );
+        xmlDoc += newT("Apelación frente a la Barra de Apelaciones de Inmigracion (BIA por sus siglas en inglés) a favor de", null, true );
         xmlDoc += newT(" ", null, null );
         xmlDoc += newT(contactName, true, null);
-        xmlDoc += newT(": Legal Representation for filing of appeal to be submitted to the Board of Immigration Appeals (BIA) (Appeal to be submitted by the XX day of the month xxxx, XXXX).", null, null );
+        xmlDoc += newT(": Representación Legal para presentación de apelación a ser sometida frente a la Barra de Apelaciones o BIA por sus siglas en inglés.", null, null );
         xmlDoc += "</w:p>";
         return xmlDoc;
     },
     152: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT("Appellate filing before the 9th Circuit Federal Court", null, null);
+        xmlDoc += newT("Presentación de Apelación frente a la Corte Federal del 9no Circuito", null, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
     },
     153: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT(appShortName, null, null );
-        xmlDoc += newT(" Case in favor of ", null, null);
+        xmlDoc += newT("Moción para Cerrar el Caso a favor de ", null, null);
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1685,8 +1684,7 @@ const caseMappingES = {
     154: function(appShortName, contactName) {
         let xmlDoc = "<w:p>";
         xmlDoc += addpPr();
-        xmlDoc += newT(appShortName, null, null );
-        xmlDoc += newT(" Case in favor of ", null, null);
+        xmlDoc += newT("Moción para Reabrir el Caso a favor de", null, null);
         xmlDoc += newT(contactName, true, null);
         xmlDoc += "</w:p>";
         return xmlDoc;
@@ -1709,9 +1707,9 @@ const defaultESCase = function(appShortName, contactName) {
     // Default logic when no mapping is found
     let xmlDoc = "<w:p>";
     xmlDoc += addpPr();
-    xmlDoc += newT("Application ", null, null );
+    xmlDoc += newT("Aplicación ", null, null );
     xmlDoc += newT(appShortName, true, null);
-    xmlDoc += newT(" in favor of ", null, null );
+    xmlDoc += newT(" a favor de ", null, null );
     xmlDoc += newT(contactName, true, null);
     xmlDoc += "</w:p>";
     return xmlDoc;
@@ -1781,7 +1779,7 @@ function adjustDOCXData() {
                             {
                                 'service_text1': "Immigration relief being applied to:",
                                 'service_boldunder1': "Petition for Alien Relative.",
-                                'service_text2': "Consists of the following:",
+                                'service_text2': " Consists of the following:",
                                 'service_client': currentContact.contactName.toUpperCase(),
                                 'applications': applicationsArray,
                                 'hasText1': true,
@@ -1796,7 +1794,7 @@ function adjustDOCXData() {
                             {
                                 'service_text1': "Immigration relief being applied to:",
                                 'service_boldunder1': currentService.serviceName,
-                                'service_text2': "It comprises the following",
+                                'service_text2': ". It comprises the following:",
                                 'service_client': currentContact.contactName.toUpperCase(),
                                 'applications': applicationsArray,
                                 'hasText1': true,
@@ -1849,7 +1847,7 @@ function adjustDOCXData() {
                     case 'Research':
                         servicesToWord.push(
                             {
-                                'service_text1': "Application to obtain records",
+                                'service_text1': "Aplicación para obtener registros",
                                 'service_boldunder1': null,
                                 'service_text2': null,
                                 'service_client': currentContact.contactName.toUpperCase(),
@@ -1864,9 +1862,9 @@ function adjustDOCXData() {
                     case 'I-130 (Petition)':
                         servicesToWord.push(
                             {
-                                'service_text1': "Immigration relief being applied to:",
-                                'service_boldunder1': "Petition for Alien Relative.",
-                                'service_text2': "Consists of the following:",
+                                'service_text1': "Socorro migratorio al que se aplica:",
+                                'service_boldunder1': "Petición de Familiar Extranjero.",
+                                'service_text2': " Comprende lo siguiente:",
                                 'service_client': currentContact.contactName.toUpperCase(),
                                 'applications': applicationsArray,
                                 'hasText1': true,
@@ -1879,9 +1877,9 @@ function adjustDOCXData() {
                     default:
                         servicesToWord.push(
                             {
-                                'service_text1': "Immigration relief being applied to:",
+                                'service_text1': "Socorro migratorio al que se aplica:",
                                 'service_boldunder1': currentService.serviceName,
-                                'service_text2': "It comprises the following",
+                                'service_text2': ". Comprende lo siguiente:",
                                 'service_client': currentContact.contactName.toUpperCase(),
                                 'applications': applicationsArray,
                                 'hasText1': true,
