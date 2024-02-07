@@ -1722,7 +1722,7 @@ var servicesToWord = [];
 var nameMainClient;
 function adjustDOCXData() {
     if(selectedLang == 1 || selectedLang === 1) {
-        docDir = "docsxup_hidden/files/contract_templates/examplenew.docx";
+        docDir = "docsxup_hidden/files/contract_templates/en_template.docx";
 
         contractJSON.contract.contacts.forEach((currentContact) => {
             var roleText;
@@ -1807,7 +1807,7 @@ function adjustDOCXData() {
             });
         });
     } else {
-        docDir = "docsxup_hidden/files/contract_templates/examplenew.docx";
+        docDir = "docsxup_hidden/files/contract_templates/es_template.docx";
 
         contractJSON.contract.contacts.forEach((currentContact) => {
             var roleText;
@@ -1922,8 +1922,10 @@ function adjustDOCXData() {
                 downPaymentAmount: contractJSON.contract.downPaymentAmount,
                 dateDownPayment: contractJSON.contract.dateDownPayment,
                 numberOfMonthlyPayments: contractJSON.contract.numberOfMonthlyPayments,
-                monthlyPaymentsTotalAmount: contractJSON.contract.monthlyPaymentsTotalAmount,
-                monthlyPayments: contractJSON.contract.monthlyPayments,
+                //monthlyPaymentsTotalAmount
+                mpTA: contractJSON.contract.monthlyPaymentsTotalAmount,
+                //monthlyPayments Array
+                mp: contractJSON.contract.monthlyPayments,
                 monthlyPaymentsfirstd: contractJSON.contract.monthlyPayments[0].date,
                 monthlyPaymentslastd: contractJSON.contract.monthlyPayments[contractJSON.contract.monthlyPayments.length - 1].date,
                 monthlyPaymentsfirsta: contractJSON.contract.monthlyPayments[0].amount,
@@ -1941,8 +1943,8 @@ function adjustDOCXData() {
                 compression: "DEFLATE",
             });
             // Output the document using Data-URI
-            saveAs(blob, "CARRANZA_JOSE_U_VISA_Contract.docx");
-            //uploadDocument(blob);
+            //saveAs(blob, "CARRANZA_JOSE_U_VISA_Contract.docx");
+            uploadDocument(blob);
         }
     );
 };

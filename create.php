@@ -525,6 +525,7 @@
         <script>
             var base_url = '<?php echo base_url();?>';
             var matter_id = '<?php echo $matter_id;?>';
+            var userid = '<?php echo $userid;?>';
             var selectedLang;
         </script>
         <script src="<?php echo base_url(); ?>js/contracts/docxloader.js" type="text/javascript"></script>

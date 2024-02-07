@@ -519,6 +519,7 @@
         <script>
             var base_url = '<?php echo base_url();?>';
             var matter_id = '<?php echo $matter_id;?>';
+            var userid = '<?php echo $userid;?>';
             var contractArray = <?php echo json_encode($contract); ?>;
             var selectedLang;
         </script>

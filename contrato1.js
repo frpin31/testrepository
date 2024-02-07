@@ -2306,6 +2306,8 @@ function sendRequest(transaction){
                 request.roleContactsList = listRoleContacts;
                 request.contractPaymentPlansList = listPaymentPlans;
                 request.contractsDocuments = contractsDocuments;
+                request.userModify = userid;
+                
                 selectedLang = document.getElementById('contractLanguage').value;
                 console.log(JSON.stringify(request));
                 shouldShowConfirmation = false;
@@ -2333,15 +2335,12 @@ function sendRequest(transaction){
                 data.idcontractlanguage = document.getElementById('contractLanguage').value;
                 data.idcontractstatus = "1";
                 data.idmatter = matter_id;
-
                 // Down Payment
                 let downPaymentPlan = {};
                 downPaymentPlan.amountpaymentplan = parseFloat(contractJSON.contract.downPaymentAmount);
                 downPaymentPlan.datepaymentplan = formatDates(contractJSON.contract.dateDownPayment);
                 downPaymentPlan.idpaymentplantype = 2;
-
                 listPaymentPlans.push(downPaymentPlan);
-
                 // Monthly Charges
                 for(let i = 0 ; i < Object.keys(contractJSON.contract.monthlyPayments).length ; i++){
                     let monthlyPlan = {};
@@ -2350,7 +2349,6 @@ function sendRequest(transaction){
                     monthlyPlan.idpaymentplantype = 1;
                     listPaymentPlans.push(monthlyPlan);
                 }
-
                 //Roles
                 for(let i = 0 ; i < Object.keys(contractJSON.contract.contacts).length ; i++){
                     let roleContacts = {};
@@ -2359,7 +2357,6 @@ function sendRequest(transaction){
 
                     listRoleContacts.push(roleContacts);
                 }
-
                 //Applications
                 listContactsApplications = contractJSON.contract.contacts.flatMap(nameObj => {
                     return nameObj.services.flatMap(typeObj => {
@@ -2370,7 +2367,6 @@ function sendRequest(transaction){
                         }));
                     });
                 });
-
                 //Contract Documents
                 let directory_path = "./docsxup/files/matters/";
                 directory_path += matter_id;
@@ -2380,36 +2376,33 @@ function sendRequest(transaction){
                 contractsDocuments.directory_path_contract = directory_path;
                 contractsDocuments.status_contract_document = true;
                 contractsDocuments.version_document_contract = 1;
-
                 console.log(contractsDocuments);
-
                 let oldApplicationsList = [];
                 contractArray[0].listApplications[0].forEach(function(element) {
                     oldApplicationsList.push(element.id);
                 });
-
                 let oldRoleList = [];
                 contractArray[0].listRoles[0].forEach(function(element) {
                     oldRoleList.push(element.id);
                 });
-
                 let oldPaymentsList = [];
                 contractArray[0].listPaymentPlan[0].forEach(function(element) {
                     oldPaymentsList.push(element.id);
                 });
-                
-                let contract_id = contractArray[0].idContract;
 
+                let contract_id = contractArray[0].idContract;
                 request.contracts = data;
                 request.applicationsContactsList = listContactsApplications; 
                 request.roleContactsList = listRoleContacts;
                 request.contractPaymentPlansList = listPaymentPlans;
                 request.contractsDocuments = contractsDocuments;
+                request.userModify = userid;
+
                 // request.oldApplicationsList = oldApplicationsList;
                 // request.oldRoleList = oldRoleList;
                 // request.oldPaymentsList = oldPaymentsList;
                 selectedLang = document.getElementById('contractLanguage').value;
-                
+
                 console.log(JSON.stringify(request));
                 shouldShowConfirmation = false;
                 saveRow(base_url + update + contract_id, null, request, null, base_url + "contract/" + contractArray[0].idContract + "/edit/?matter_id=" + matter_id, 4);

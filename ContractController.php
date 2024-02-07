@@ -71,8 +71,8 @@ class Contract extends CI_Controller {
       //'matter' => $this->matter_model->matterinformation($matter_id),
       'matter_id' => $matter_id,
       'name_matter' => $this->call_matter_name($matter_id),
-      'related_contact'=> $this->call_contact_related($matter_id)
-      
+      'related_contact'=> $this->call_contact_related($matter_id),
+      'userid' => $this->session->userdata('Id')
     ];
     return $this->load->view('Contract/create', $view);
 	}
@@ -92,6 +92,7 @@ class Contract extends CI_Controller {
 			'matter_id' => $this->input->get('matter_id'),
       'name_matter' => $this->call_matter_name($this->input->get('matter_id')),
       'related_contact'=> $this->call_contact_related($this->input->get('matter_id')),
+      'userid' => $this->session->userdata('Id'),
 			'vista'     => 'Contract/edit'
 		];
     return $this->load->view('Contract/edit', $view);
@@ -127,12 +128,6 @@ class Contract extends CI_Controller {
     // $jsonData = file_get_contents('php://input');
     // $sender = json_decode($jsonData, true);
     echo json_encode(preprocess_API_petitions('http://44.214.240.74:8010/api/delete-contract-document', 'POST', file_get_contents('php://input')));
-  }
-
-  function delete_contract_document_data() {
-    // $jsonData = file_get_contents('php://input');
-    // $sender = json_decode($jsonData, true);
-    echo json_encode(preprocess_API_petitions('http://44.214.240.74:8010/api/delete-contract-document-data', 'POST', file_get_contents('php://input')));
   }
 
   function testing_document() {
