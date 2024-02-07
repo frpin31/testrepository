@@ -162,6 +162,7 @@ if (isset($contracts) && is_array($contracts)):
         $payments = $contract['listPaymentPlan']['0'];
         $services = $contract['listMainServices']['0'];
         $docs = $contract['listDocuments']['0'];
+        $actions = $contract['listActions']['0'];
         // Iterate through the array
         foreach ($roles as $roleContact):
             // Check the condition
@@ -185,6 +186,7 @@ if (isset($contracts) && is_array($contracts)):
         $countdp = 1;
         $countmc = 2;
         $countcontractdocs = 1;
+        $countactions = 1;
         $dpamount = 0;
         $mcamount = 0;
         ?>
@@ -214,15 +216,27 @@ if (isset($contracts) && is_array($contracts)):
             </td>
             <td>
                 <?php if ($contract['language'] == 'Spanish'): ?>
-                    <span class="flag-icon flag-icon-esp"></span>
-                    <p class="contract_text">
-                        <?php echo $contract['language']; ?>
-                    </p>
+                    <div style="display: flex;">
+                        <div style="display: inline-block;">
+                            <span class="flag-icon flag-icon-esp"></span>
+                        </div>
+                        <div style="display: inline-block;">
+                            <p class="contract_text" style="margin-left: 0.5em;">
+                                <?php echo $contract['language']; ?>
+                            </p>
+                        </div>
+                    </div>
                 <?php elseif ($contract['language'] == 'English'): ?>
-                    <span class="flag-icon flag-icon-usa"></span>
-                    <p class="contract_text">
-                        <?php echo $contract['language']; ?>
-                    </p>
+                    <div style="display: flex;">
+                        <div style="display: inline-block;">
+                            <span class="flag-icon flag-icon-usa"></span>
+                        </div>
+                        <div style="display: inline-block;">
+                            <p class="contract_text" style="margin-left: 0.5em;">
+                                <?php echo $contract['language']; ?>
+                            </p>
+                        </div>
+                    </div>
                 <?php else: ?>
                     <p class="contract_text">
                         <?php echo $contract['language']; ?>
@@ -554,6 +568,84 @@ if (isset($contracts) && is_array($contracts)):
                             </div>
                         </div>
                     </div>
+                    <!-- ACTIONS ACCORDION -->
+                    <div class="panel-group" id="accordion-actions-contract-<?= $container ?>" role="tablist"
+                        aria-multiselectable="true">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingFour-<?= $container ?>">
+                                <h4 class="panel-title">
+                                    <a role="button" data-toggle="collapse" data-parent="#accordion-actions-contract-<?= $container ?>"
+                                        href="#collapseFour-<?= $container ?>" aria-expanded="false"
+                                        aria-controls="collapseFour-<?= $container ?>">
+                                        Transactions History
+                                    </a>
+                                </h4>
+                            </div>
+                            <!-- body -->
+                            <div id="collapseFour-<?= $container ?>" class="panel-collapse collapse" role="tabpanel"
+                                aria-labelledby="headingFour-<?= $container ?>">
+                                <div class="panel-body">
+                                    <div class="container" style="color:#0055a5; max-height:400px; overflow-y:auto;">
+                                        <table class="table table-hover table-striped" id="actions-contract">
+                                            <thead class="table-primary t_head">
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">User</th>
+                                                    <th scope="col">Action</th>
+                                                    <th scope="col">Element</th>
+                                                    <th scope="col">Registered At</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="t_body">
+                                                <?php if(isset($actions)): ?>
+                                                    <?php foreach ($actions as $action): ?>
+                                                    <tr>
+                                                        <td class="contract_text">
+                                                            <?php echo $countactions ?>
+                                                        </td>
+                                                        <td class="contract_text">
+                                                            <?php echo $action['f6'] ?>
+                                                        </td>
+                                                        <td class="contract_text">
+                                                            <?php if($action['f2'] == "Create"): ?>
+                                                                <?php if($action['f4'] == "contract doc"): ?>
+                                                                    Created Version: <?php echo $action['f3'] ?>
+                                                                <?php else: ?>
+                                                                    Created <?php $action['f4'] ?>
+                                                                <?php endif; ?>
+                                                            <?php elseif($action['f2'] == "Delete"): ?>
+                                                                <?php if($action['f4'] == "contract doc"): ?>
+                                                                    Deleted Version: <?php echo $action['f3'] ?>
+                                                                <?php else: ?>
+                                                                    Deleted <?php $action['f4'] ?>
+                                                                <?php endif; ?>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td class="contract_text">
+                                                            <?php if($action['f4'] == "contract doc"): ?>
+                                                                Contract Version
+                                                            <?php else: ?>
+                                                                <?php echo $action['f4'] ?>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td class="contract_text">
+                                                            <?php echo $action['f5'] ?>
+                                                        </td>
+                                                    </tr>
+                                                    <?php $countactions++; ?>
+                                                <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <td colspan="5">
+                                                        <span style="color: #555;">No actions Available</span>
+                                                    </td>
+                                                <?php endif; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -813,6 +905,20 @@ function generateColors($id)
 ?>
 
 <script>
+    var userid = '<?php echo $userid;?>';
+    const destroy = 'Contract/delete';
+    const delete_contract_document = 'Contract/delete_contract_document';
+
+    function deleteContract(id) {
+        confirmDelete(base_url + destroy, id, null, base_url + "matters/" + 4416 + "/main_view");
+    }
+
+    function deleteDocumentContract(id) {
+        let contractDocumentDelete = {};
+        contractDocumentDelete.idContractDocument = id;
+        contractDocumentDelete.userModify = userid;
+        confirmDelete(base_url + delete_contract_document, contractDocumentDelete, null, base_url + "matters/" + 4416 + "/main_view");
+    }
 
     // $(document).ready(function() {
 
@@ -828,15 +934,4 @@ function generateColors($id)
     //         accordionPanel.find('.panel-collapse').collapse('show');
     //     });
     // });
-
-    const destroy = 'Contract/delete';
-    const delete_contract_document = 'Contract/delete_contract_document';
-
-    function deleteContract(id) {
-        confirmDelete(base_url + destroy, id, null, base_url + "matters/" + 4416 + "/main_view");
-    }
-
-    function deleteDocumentContract(id) {
-        confirmDelete(base_url + delete_contract_document, id, null, base_url + "matters/" + 4416 + "/main_view");
-    }
 </script>
