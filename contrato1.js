@@ -2312,7 +2312,7 @@ function sendRequest(transaction){
                 console.log(JSON.stringify(request));
                 shouldShowConfirmation = false;
                 saveRow(base_url + create, null, request, null, base_url + "matters/" + matter_id + "/main_view", 4);
-                startSwal();
+                startSwal(transaction);
             } else {
                 if(saveButton.hasClass("disabled")){
                     saveButton.removeClass("disabled");
@@ -2407,7 +2407,7 @@ function sendRequest(transaction){
                 shouldShowConfirmation = false;
                 saveRow(base_url + update + contract_id, null, request, null, base_url + "contract/" + contractArray[0].idContract + "/edit/?matter_id=" + matter_id, 4);
                 console.log("" + base_url + update + contract_id + "");
-                startSwal();
+                startSwal(transaction);
             } else {
                 if(saveButton.hasClass("disabled")){
                     saveButton.removeClass("disabled");
@@ -2431,9 +2431,15 @@ function sendRequest(transaction){
 
 let contractDocument = {};
 
-function startSwal(){
+function startSwal(transaction){
+    let textSwal = '';
+    if(transaction == 1){
+        textSwal = 'Contract Creation';
+    } else {
+        textSwal = 'Contract Update';
+    }
     swal.fire({
-        titleText: 'Contract Update',
+        titleText: textSwal,
         html: `
         <div class="container">
             <div class="row mt-3">
