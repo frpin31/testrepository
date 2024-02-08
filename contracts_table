@@ -195,7 +195,7 @@ if (isset($contracts) && is_array($contracts)):
                 <?= $count_t; ?>
             </td>
             <td class="contract_text">
-                <?= $contract['fileNameContract']; ?>
+                <?php echo $docs['0']['f2'] ?>
             </td>
             <td class="contract_text">
                 <?= $primaryContactName ?>
@@ -244,45 +244,31 @@ if (isset($contracts) && is_array($contracts)):
                 <?php endif; ?>
             </td>
             <td class="contract_text">
-                <?php if (is_null($contract['signDate']) || $contract['signDate'] == null || $contract['signDate'] == 'null'): ?>
-                    <p class="text-muted contract_text">Not Been Signed yet</p>
-                <?php else: ?>
-                    <p class="contract_text">
-                        <?php echo $contract['signDate']; ?>
-                    </p>
-                <?php endif; ?>
-            </td>
-            <td>
-                <p class="contract_text">
-                    <?= $contract['status']; ?>
-                </p>
-            </td>
-            <td class="contract_text">
-                <?php if ((pathinfo($contract['fileNameContract'], PATHINFO_EXTENSION)) == 'docx'): ?>
+                <?php if ((pathinfo($docs['0']['f2'], PATHINFO_EXTENSION)) == 'docx'): ?>
                     <div style="display: flex;">
                         <div style="display: inline-block;">
                             <span class="flag-icon flag-icon-wordi" style="font-size: 20px;"></span>
                         </div>
                         <div style="display: inline-block;">
                             <p class="contract_text">
-                                <?php echo strtoupper(pathinfo($contract['fileNameContract'], PATHINFO_EXTENSION)); ?>
+                                <?php echo strtoupper(pathinfo($docs['0']['f2'], PATHINFO_EXTENSION)); ?>
                             </p>
                         </div>
                     </div>
-                <?php elseif ((pathinfo($contract['fileNameContract'], PATHINFO_EXTENSION)) == 'pdf'): ?>
+                <?php elseif ((pathinfo($docs['0']['f2'], PATHINFO_EXTENSION)) == 'pdf'): ?>
                     <div style="display: flex;">
                         <div style="display: inline-block;">
                             <span class="flag-icon flag-icon-pdfi contract_text" style="font-size: 20px;"></span>
                         </div>
                         <div style="display: inline-block;">
                             <p class="contract_text">
-                                <?php echo strtoupper(pathinfo($contract['fileNameContract'], PATHINFO_EXTENSION)); ?>
+                                <?php echo strtoupper(pathinfo($docs['0']['f2'], PATHINFO_EXTENSION)); ?>
                             </p>
                         </div>
                     </div>
                 <?php else: ?>
                     <p class="contract_text">
-                        <?php echo strtoupper(pathinfo($contract['fileNameContract'], PATHINFO_EXTENSION)); ?>
+                        <?php echo strtoupper(pathinfo($docs['0']['f2'], PATHINFO_EXTENSION)); ?>
                     </p>
                 <?php endif; ?>
             </td>
@@ -292,17 +278,31 @@ if (isset($contracts) && is_array($contracts)):
                 </p>
             </td>
             <td>
+                <?php if(isset($actions)): ?>
+                    <?php echo $actions['0']['f7'] ?>
+                <?php else: ?>
+                    <span style="color: #555;">Data Not Available</span>
+                <?php endif; ?>
+            </td>
+            <td>
                 <p class="contract_text">
                     <?php echo $fmt->formatCurrency($contract['totalContract'], "USD"); ?>
                 </p>
             </td>
             <td class="contract_text">
                 <a data-toggle="collapse" href="#detailsContract<?= $container ?>" role="button" aria-expanded="false" class="btn btn-secondary" aria-controls="detailsContract<?= $container ?>" style="background-color: #6c757d; color: #FFFFFF;">
-                    Details</a>
-                <a href="<?php echo base_url("contract/" . $contract['idContract'] . "/edit/?matter_id=$matter->Id") ?>"
-                    class="btn btn-primary" style="background-color: #0d6efd; color: #FFFFFF;">Edit</a>
-                <a href="#;" onclick="deleteContract(<?php echo $contract['idContract'] ?>)" class="btn btn-danger"
-                    style="background-color: #dc3545; color: #FFFFFF;">Delete</a>
+                    Details
+                </a>
+                <a href="<?php echo base_url(rawurldecode($docs['0']['f4'] . $docs['0']['f2'])) ?>" target="_blank" class="btn btn-success" style="background-color: #198754; color: #FFFFFF;">
+                    Version <?php echo $docs['0']['f5'] ?>
+                    <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                </a>
+                <a href="<?php echo base_url("contract/" . $contract['idContract'] . "/edit/?matter_id=$matter->Id") ?>"class="btn btn-primary" style="background-color: #0d6efd; color: #FFFFFF;">
+                    Edit
+                </a>
+                <a href="#;" onclick="deleteContract(<?php echo $contract['idContract'] ?>)" class="btn btn-danger" style="background-color: #dc3545; color: #FFFFFF;">
+                    Delete
+                </a>
             </td>
         </tr>
         <tr id="detailsContract<?= $container ?>" class="collapse">
@@ -336,6 +336,7 @@ if (isset($contracts) && is_array($contracts)):
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                            <?php if(isset($roles)): ?>
                                                 <?php $serviceContactPrint = 0;
                                                 foreach ($roles as $role): ?>
                                                     <tr>
@@ -346,6 +347,9 @@ if (isset($contracts) && is_array($contracts)):
                                                             <?= $role['f3'] ?>
                                                         </td>
                                                         <?php if (is_null($services)): ?>
+                                                            <td>
+                                                                <em class="fst-italic fw-normal">Not Available</em>
+                                                            </td>
                                                             <td>
                                                                 <em class="fst-italic fw-normal">Not Available</em>
                                                             </td>
@@ -377,6 +381,11 @@ if (isset($contracts) && is_array($contracts)):
                                                         <?php endif; ?>
                                                     </tr>
                                                 <?php endforeach; ?>
+                                            <?php else: ?>
+                                                <td colspan="4">
+                                                    <span style="color: #555;">Data Not Available</span>
+                                                </td>
+                                            <?php endif; ?>
                                             </tbody>
                                         </table>
                                     </div>
@@ -413,6 +422,7 @@ if (isset($contracts) && is_array($contracts)):
                                                     </tr>
                                                 </thead>
                                                 <tbody class="t_body">
+                                                <?php if(isset($payments)): ?>
                                                     <!-- Procesamiento de datos de Deposit -->
                                                     <?php foreach ($payments as $payment): ?>
                                                         <?php if ($payment['f3'] == 'deposit'): ?>
@@ -461,6 +471,11 @@ if (isset($contracts) && is_array($contracts)):
                                                             <?php $mcamount += $payment['f1']; ?>
                                                         <?php endif; ?>
                                                     <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <td colspan="4">
+                                                        <span style="color: #555;">Data Not Available</span>
+                                                    </td>
+                                                <?php endif; ?>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -521,46 +536,65 @@ if (isset($contracts) && is_array($contracts)):
                                 aria-labelledby="headingThree-<?= $container ?>">
                                 <div class="panel-body">
                                     <div class="container" style="color:#0055a5; max-height:400px; overflow-y:auto;">
-                                        <table class="table table-hover table-striped" id="documents-contract">
+                                        <table class="table table-hover table-striped documents-contract">
                                             <thead class="table-primary t_head">
                                                 <tr>
                                                     <th scope="col">#</th>
                                                     <th scope="col">File Name</th>
                                                     <th scope="col">Type</th>
                                                     <th scope="col">Version</th>
-                                                    <th scope="col">Created At</th>
+                                                    <th scope="col">Created By</th>
+                                                    <th scope="col">Registered At</th>
                                                     <th scope="col">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="t_body">
-                                                <?php foreach ($docs as $doc): ?>
-                                                    <tr>
-                                                        <td class="contract_text">
-                                                            <?php echo $countcontractdocs ?>
-                                                        </td>
-                                                        <td class="contract_text">
-                                                            <?php echo $doc['f2'] ?>
-                                                        </td>
-                                                        <td class="contract_text">
-                                                            <?php echo $doc['f3'] ?>
-                                                        </td>
-                                                        <td class="contract_text">
-                                                            <?php echo $doc['f5'] ?>
-                                                        </td>
-                                                        <td class="contract_text">
-                                                            <?php echo $doc['f6'] ?>
-                                                        </td>
-                                                        <td class="contract_text">
-                                                            <a href="<?php echo base_url(rawurldecode($doc['f4'] . $doc['f2'])) ?>" target="_blank" class="btn btn-sm btn-primary view" style="background-color: #0d6efd; color: #FFFFFF;">
-                                                                View File
-                                                            </a>
-                                                            <button class="btn btn-sm btn-danger" style="background-color: #dc3545; color: #FFFFFF;" onclick="deleteDocumentContract(<?php echo $doc['f1'] ?>)">
-                                                                Delete
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <?php $countcontractdocs++; ?>
-                                                <?php endforeach; ?>
+                                                <?php if(isset($docs)): ?>
+                                                    <?php foreach ($docs as $doc): ?>
+                                                        <tr>
+                                                            <td class="contract_text">
+                                                                <?php echo $countcontractdocs ?>
+                                                            </td>
+                                                            <td class="contract_text">
+                                                                <?php echo $doc['f2'] ?>
+                                                            </td>
+                                                            <td class="contract_text">
+                                                                <?php echo $doc['f3'] ?>
+                                                            </td>
+                                                            <td class="contract_text">
+                                                                <?php echo $doc['f5'] ?>
+                                                            </td>
+                                                            <td class="contract_text">
+                                                                <?php $flagCreatedBy = false; ?>
+                                                                <?php foreach ($actions as $action): ?>
+                                                                    <?php if($doc['f1'] == $action['f3']): ?>
+                                                                        <?php echo $action['f7'] ?>
+                                                                        <?php $flagCreatedBy = true; ?>
+                                                                    <?php endif; ?>
+                                                                <?php endforeach; ?>
+                                                                <?php if($flagCreatedBy != true): ?>
+                                                                    <span style="color: #555;">Not Available</span>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                            <td class="contract_text">
+                                                                <?php echo $doc['f6'] ?>
+                                                            </td>
+                                                            <td class="contract_text">
+                                                                <a href="<?php echo base_url(rawurldecode($doc['f4'] . $doc['f2'])) ?>" target="_blank" class="btn btn-sm btn-success" style="background-color: #198754; color: #FFFFFF;">
+                                                                    Download File
+                                                                </a>
+                                                                <button class="btn btn-sm btn-danger" style="background-color: #dc3545; color: #FFFFFF;" onclick="deleteDocumentContract(<?php echo $doc['f1'] ?>)">
+                                                                    Delete
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        <?php $countcontractdocs++; ?>
+                                                    <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <td colspan="7">
+                                                        <span style="color: #555;">No Contracts Available</span>
+                                                    </td>
+                                                <?php endif; ?>
                                             </tbody>
                                         </table>
                                     </div>
@@ -577,7 +611,7 @@ if (isset($contracts) && is_array($contracts)):
                                     <a role="button" data-toggle="collapse" data-parent="#accordion-actions-contract-<?= $container ?>"
                                         href="#collapseFour-<?= $container ?>" aria-expanded="false"
                                         aria-controls="collapseFour-<?= $container ?>">
-                                        Transactions History
+                                        Modifications History
                                     </a>
                                 </h4>
                             </div>
@@ -604,32 +638,32 @@ if (isset($contracts) && is_array($contracts)):
                                                             <?php echo $countactions ?>
                                                         </td>
                                                         <td class="contract_text">
-                                                            <?php echo $action['f6'] ?>
+                                                            <?php echo $action['f7'] ?>
                                                         </td>
                                                         <td class="contract_text">
                                                             <?php if($action['f2'] == "Create"): ?>
-                                                                <?php if($action['f4'] == "contract doc"): ?>
-                                                                    Created Version: <?php echo $action['f3'] ?>
+                                                                <?php if($action['f5'] == "contract doc"): ?>
+                                                                    Created Version: <?php echo $action['f4'] ?>
                                                                 <?php else: ?>
-                                                                    Created <?php $action['f4'] ?>
+                                                                    Created <?php $action['f5'] ?>
                                                                 <?php endif; ?>
                                                             <?php elseif($action['f2'] == "Delete"): ?>
-                                                                <?php if($action['f4'] == "contract doc"): ?>
-                                                                    Deleted Version: <?php echo $action['f3'] ?>
+                                                                <?php if($action['f5'] == "contract doc"): ?>
+                                                                    Deleted Version: <?php echo $action['f4'] ?>
                                                                 <?php else: ?>
-                                                                    Deleted <?php $action['f4'] ?>
+                                                                    Deleted <?php $action['f5'] ?>
                                                                 <?php endif; ?>
                                                             <?php endif; ?>
                                                         </td>
                                                         <td class="contract_text">
-                                                            <?php if($action['f4'] == "contract doc"): ?>
+                                                            <?php if($action['f5'] == "contract doc"): ?>
                                                                 Contract Version
                                                             <?php else: ?>
-                                                                <?php echo $action['f4'] ?>
+                                                                <?php echo $action['f5'] ?>
                                                             <?php endif; ?>
                                                         </td>
                                                         <td class="contract_text">
-                                                            <?php echo $action['f5'] ?>
+                                                            <?php echo $action['f6'] ?>
                                                         </td>
                                                     </tr>
                                                     <?php $countactions++; ?>
